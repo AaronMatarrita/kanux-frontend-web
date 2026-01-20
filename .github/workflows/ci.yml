@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@1d96c772d19495a3b5c517cd2bc0cb401ea0529f # v4
+      
+      - name: Validate repository structure
+        run: |
+          echo "Validating repository structure..."
+          if [ -f "README.md" ]; then
+            echo "✓ README.md exists"
+          else
+            echo "✗ README.md not found"
+            exit 1
+          fi
+      
+      - name: Check branch protection files
+        run: |
+          echo "Checking branch protection files..."
+          if [ -f ".github/CODEOWNERS" ]; then
+            echo "✓ CODEOWNERS file exists"
+          else
+            echo "✗ CODEOWNERS file not found"
+            exit 1
+          fi
+          
+          if [ -f ".github/rulesets/main-branch-protection.json" ]; then
+            echo "✓ Branch protection ruleset exists"
+          else
+            echo "✗ Branch protection ruleset not found"
+            exit 1
+          fi
+      
+      - name: Validate JSON files
+        run: |
+          echo "Validating JSON configuration files..."
+          if [ -d ".github/rulesets" ] && [ -n "$(find .github/rulesets -name '*.json' -print -quit)" ]; then
+            for file in .github/rulesets/*.json; do
+              if [ -f "$file" ]; then
+                echo "Validating $file..."
+                if python3 -m json.tool "$file" > /dev/null 2>&1; then
+                  echo "✓ $file is valid JSON"
+                else
+                  echo "✗ $file is invalid JSON"
+                  exit 1
+                fi
+              fi
+            done
+          else
+            echo "⚠ No JSON files found in .github/rulesets directory"
+          fi
+      
+      - name: Build status
+        run: |
+          echo "All checks passed successfully!"
