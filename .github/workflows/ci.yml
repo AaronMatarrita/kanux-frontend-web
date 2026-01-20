@@ -44,17 +44,21 @@ jobs:
       - name: Validate JSON files
         run: |
           echo "Validating JSON configuration files..."
-          for file in .github/rulesets/*.json; do
-            if [ -f "$file" ]; then
-              echo "Validating $file..."
-              if python3 -m json.tool "$file" > /dev/null 2>&1; then
-                echo "✓ $file is valid JSON"
-              else
-                echo "✗ $file is invalid JSON"
-                exit 1
+          if [ -d ".github/rulesets" ] && [ -n "$(find .github/rulesets -name '*.json' -print -quit)" ]; then
+            for file in .github/rulesets/*.json; do
+              if [ -f "$file" ]; then
+                echo "Validating $file..."
+                if python3 -m json.tool "$file" > /dev/null 2>&1; then
+                  echo "✓ $file is valid JSON"
+                else
+                  echo "✗ $file is invalid JSON"
+                  exit 1
+                fi
               fi
-            fi
-          done
+            done
+          else
+            echo "⚠ No JSON files found in .github/rulesets directory"
+          fi
       
       - name: Build status
         run: |
