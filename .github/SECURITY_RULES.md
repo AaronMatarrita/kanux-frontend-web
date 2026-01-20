@@ -1,10 +1,10 @@
 # Security Rules for Main Branch
 
-This document describes the security rules implemented for the main branch of the kanux-frontend-web repository.
+This document describes the security rules and configuration files that can be used to protect the main branch of the kanux-frontend-web repository.
 
 ## Overview
 
-The main branch is protected with a comprehensive set of security rules to ensure code quality and prevent unauthorized changes. These rules are enforced through GitHub Rulesets, CODEOWNERS, and CI workflows.
+The main branch can be protected with a comprehensive set of security rules to ensure code quality and prevent unauthorized changes. These rules are enforced through GitHub Rulesets, CODEOWNERS, and CI workflows **after** they have been properly configured in the repository's GitHub settings. Simply committing these files does not enable enforcement by itself; a repository administrator must import and activate the ruleset and branch protection settings as described below.
 
 ## Branch Protection Rules
 
@@ -21,7 +21,7 @@ The following rules are configured in `.github/rulesets/main-branch-protection.j
 - **Strict Mode**: Branches must be up-to-date with the base branch before merging
 
 ### 3. History Protection
-- **Linear History**: Merge commits and squash merging are enforced to maintain a clean history
+- **Linear History**: Merge commits are disallowed; contributors must use squash or rebase merges (depending on repository settings) to maintain a clean, linear history
 - **Force Push Prevention**: Force pushes to the main branch are blocked
 - **Branch Deletion Prevention**: The main branch cannot be deleted
 
