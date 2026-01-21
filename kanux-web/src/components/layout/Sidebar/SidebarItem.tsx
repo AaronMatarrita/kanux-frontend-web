@@ -4,12 +4,14 @@ import { cn } from "@/lib/utils";
 interface Props {
   label: string;
   icon: LucideIcon;
+  href: string;
   active?: boolean;
 }
 
-export const SidebarItem = ({ label, icon: Icon, active }: Props) => {
+export const SidebarItem = ({ label, icon: Icon, href, active }: Props) => {
   return (
-    <button
+    <a
+      href={href}
       className={cn(
         "relative flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium w-full group overflow-hidden cursor-pointer",
         "transition-all duration-300 ease-out active:scale-[0.97]",
@@ -21,6 +23,7 @@ export const SidebarItem = ({ label, icon: Icon, active }: Props) => {
       {/* Hover background */}
       {!active && (
         <span
+          aria-hidden
           className="absolute inset-0 bg-linear-to-r from-[#0B2A4A]/10 to-transparent opacity-0 
           group-hover:opacity-100 transition-opacity duration-300"
         />
@@ -28,9 +31,10 @@ export const SidebarItem = ({ label, icon: Icon, active }: Props) => {
 
       {/* Active / hover indicator */}
       <span
+        aria-hidden
         className={cn(
-          "absolute left-0 top-1/2 -translate-y-1/2 h-0 w-1 rounded-full bg-[#0B2A4A] transition-all duration-300",
-          active ? "h-6" : "group-hover:h-6",
+          "absolute left-0 top-1/2 -translate-y-1/2 w-1 rounded-full bg-[#0B2A4A] transition-all duration-300",
+          active ? "h-6" : "h-0 group-hover:h-6",
         )}
       />
 
@@ -43,6 +47,6 @@ export const SidebarItem = ({ label, icon: Icon, active }: Props) => {
       />
 
       <span className="relative z-10">{label}</span>
-    </button>
+    </a>
   );
 };

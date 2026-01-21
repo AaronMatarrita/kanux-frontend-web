@@ -1,15 +1,11 @@
-import {
-  Home,
-  Trophy,
-  Medal,
-  MessageSquare,
-  User,
-  CreditCard,
-} from "lucide-react";
+import { SIDEBAR_MENU } from "@/config/sidebar.config";
+import { mockSession } from "@/store/session.mock";
 import { SidebarItem } from "./SidebarItem";
 import { SidebarFooter } from "./SidebarFooter";
 
 export const Sidebar = () => {
+  const menuItems = SIDEBAR_MENU[mockSession.role];
+
   return (
     <aside
       className="
@@ -37,12 +33,14 @@ export const Sidebar = () => {
           overflow-y-auto
         "
       >
-        <SidebarItem icon={Home} label="Home" active />
-        <SidebarItem icon={Trophy} label="Challenges" />
-        <SidebarItem icon={Medal} label="Skills" />
-        <SidebarItem icon={MessageSquare} label="Messages" />
-        <SidebarItem icon={User} label="Profile" />
-        <SidebarItem icon={CreditCard} label="Plans" />
+        {menuItems.map((item) => (
+          <SidebarItem
+            key={item.route}
+            icon={item.icon}
+            label={item.label}
+            href={item.route}
+          />
+        ))}
       </nav>
 
       {/* Spacer */}
