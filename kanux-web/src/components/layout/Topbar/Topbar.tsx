@@ -7,11 +7,16 @@ import { IconButton } from "./IconButton";
 
 interface TopbarProps {
   onToggleSidebar: () => void;
+  isSidebarOpen: boolean;
 }
 
-export const Topbar = ({ onToggleSidebar }: TopbarProps) => {
+export const Topbar = ({ onToggleSidebar, isSidebarOpen }: TopbarProps) => {
   return (
-    <header className="fixed top-0 right-0 left-0 lg:left-72 h-16 bg-white border-b border-slate-200 z-30">
+    <header
+      className={`fixed top-0 right-0 h-16 bg-white border-b border-slate-200 z-30 transition-all duration-300 ${
+        isSidebarOpen ? "left-0 lg:left-72" : "left-0"
+      }`}
+    >
       <div className="h-full px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
         {/* Left: Toggle Sidebar Button */}
         <IconButton
