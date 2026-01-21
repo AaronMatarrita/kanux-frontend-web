@@ -1,8 +1,236 @@
 /**
  * Subscriptions Service
- * Access layer for subscriptions microservice
+ * Access layer for subscriptions microservice (ms-subscriptions)
+ *
+ * All requests are proxied through API Gateway at /subscriptions
  */
 
-export const SubscriptionsService = {
-  // Subscriptions service methods will be implemented here
+import { httpClient } from "@/services/http";
+
+// ============================================================================
+// Request DTOs
+// ============================================================================
+
+export interface CreateCompanyPlanRequest {
+  name: string;
+  description?: string | null;
+  price_monthly: number;
+  features: {
+    max_profile_views_per_month?: number;
+    can_contact_talent?: boolean;
+    can_use_advanced_filters?: boolean;
+    can_create_custom_challenges?: boolean;
+    can_access_metrics?: boolean;
+    can_access_reports?: boolean;
+  };
+}
+
+export interface CreateTalentPlanRequest {
+  name: string;
+  description?: string | null;
+  price_monthly: number;
+  features: {
+    can_access_basic_challenges?: boolean;
+    can_access_advanced_challenges?: boolean;
+    can_access_detailed_reports?: boolean;
+  };
+}
+
+export interface CreateCompanySubscriptionRequest {
+  status?: string;
+  end_date?: string;
+}
+
+export interface CreateTalentSubscriptionRequest {
+  status?: string;
+  start_date?: string;
+  end_date?: string;
+}
+
+// ============================================================================
+// Response DTOs
+// ============================================================================
+
+export interface CompanyPlanFeatures {
+  id?: string;
+  max_profile_views_per_month?: number;
+  can_contact_talent?: boolean;
+  can_use_advanced_filters?: boolean;
+  can_create_custom_challenges?: boolean;
+  can_access_metrics?: boolean;
+  can_access_reports?: boolean;
+}
+
+export interface TalentPlanFeatures {
+  id?: string;
+  can_access_basic_challenges?: boolean;
+  can_access_advanced_challenges?: boolean;
+  can_access_detailed_reports?: boolean;
+}
+
+export interface CompanyPlan {
+  id: string;
+  name: string;
+  description?: string | null;
+  price_monthly: number;
+  company_plan_features: CompanyPlanFeatures[];
+}
+
+export interface TalentPlan {
+  id: string;
+  name: string;
+  description?: string | null;
+  price_monthly: number;
+  talent_plan_features: TalentPlanFeatures[];
+}
+
+export interface CompanySubscription {
+  id: string;
+  company_id: string;
+  plan_id: string;
+  status: string;
+  end_date?: string;
+}
+
+export interface TalentSubscription {
+  id: string;
+  id_profile: string;
+  plan_id: string;
+  status: string;
+  start_date?: string;
+  end_date?: string;
+}
+
+export interface ValidationResponse {
+  allowed: boolean;
+  reason: string;
+}
+
+export interface UsageResponse {
+  count?: number;
+  [key: string]: any;
+}
+
+// ============================================================================
+// Service
+// ============================================================================
+
+export const subscriptionsService = {
+  // ==================== PLANS ====================
+
+  /**
+   * GET /subscriptions/plans/company
+   */
+  getAllCompanyPlans: async (): Promise<CompanyPlan[]> => {
+    const res = await httpClient.get<CompanyPlan[]>(
+      "/subscriptions/plans/company",
+    );
+    return res.data;
+  },
+
+  /**
+   * GET /subscriptions/plans/talent
+   */
+  getAllTalentPlans: async (): Promise<TalentPlan[]> => {
+    const res = await httpClient.get<TalentPlan[]>(
+      "/subscriptions/plans/talent",
+    );
+    return res.data;
+  },
+
+  /**
+   * POST /subscriptions/plans/company
+   */
+  createCompanyPlan: async (
+    data: CreateCompanyPlanRequest,
+  ): Promise<CompanyPlan> => {
+    const res = await httpClient.post<CompanyPlan>(
+      "/subscriptions/plans/company",
+      data,
+    );
+    return res.data;
+  },
+
+  /**
+   * POST /subscriptions/plans/talent
+   */
+  createTalentPlan: async (
+    data: CreateTalentPlanRequest,
+  ): Promise<TalentPlan> => {
+    const res = await httpClient.post<TalentPlan>(
+      "/subscriptions/plans/talent",
+      data,
+    );
+    return res.data;
+  },
+
+  // ==================== SUBSCRIPTIONS ====================
+
+  /**
+   * POST /subscriptions/talent/:id_profile/plan/:id_plan
+   */
+  subscribeTalent: async (
+    profileId: string,
+    planId: string,
+    data: CreateTalentSubscriptionRequest = {},
+  ): Promise<TalentSubscription> => {
+    const res = await httpClient.post<TalentSubscription>(
+      `/subscriptions/talent/${profileId}/plan/${planId}`,
+      data,
+    );
+    return res.data;
+  },
+
+  /**
+   * POST /subscriptions/company/:id_company/plan/:id_plan
+   */
+  subscribeCompany: async (
+    companyId: string,
+    planId: string,
+    data: CreateCompanySubscriptionRequest = {},
+  ): Promise<CompanySubscription> => {
+    const res = await httpClient.post<CompanySubscription>(
+      `/subscriptions/company/${companyId}/plan/${planId}`,
+      data,
+    );
+    return res.data;
+  },
+
+  /**
+   * GET /subscriptions/company/:id_company/validate?action=VIEW_PROFILE
+   */
+  validateCompanyAction: async (
+    companyId: string,
+    action: string,
+  ): Promise<ValidationResponse> => {
+    const res = await httpClient.get<ValidationResponse>(
+      `/subscriptions/company/${companyId}/validate`,
+      {
+        params: { action },
+      },
+    );
+    return res.data;
+  },
+
+  /**
+   * PATCH /subscriptions/company/:id_company/usage/profile-view
+   */
+  incrementProfileView: async (companyId: string): Promise<any> => {
+    const res = await httpClient.patch<any>(
+      `/subscriptions/company/${companyId}/usage/profile-view`,
+      {},
+    );
+    return res.data;
+  },
+
+  /**
+   * PATCH /subscriptions/company/:id_company/usage/challenge
+   */
+  incrementChallenge: async (companyId: string): Promise<any> => {
+    const res = await httpClient.patch<any>(
+      `/subscriptions/company/${companyId}/usage/challenge`,
+      {},
+    );
+    return res.data;
+  },
 };
