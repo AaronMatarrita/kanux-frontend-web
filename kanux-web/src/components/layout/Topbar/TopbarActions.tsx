@@ -2,8 +2,11 @@
 
 import { Sun, LogOut } from "lucide-react";
 import { IconButton } from "./IconButton";
+import { useRouter } from "next/navigation";
 
 export const TopbarActions = () => {
+  const router = useRouter();
+
   const handleThemeToggle = () => {
     // TODO: Implement theme toggle logic in a future task
     console.log("Theme toggle clicked");
@@ -12,6 +15,7 @@ export const TopbarActions = () => {
   const handleLogout = () => {
     // TODO: Implement logout logic in a future task
     console.log("Logout clicked");
+    router.push("/");
   };
 
   return (
