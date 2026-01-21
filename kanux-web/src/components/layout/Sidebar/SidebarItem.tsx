@@ -24,8 +24,7 @@ export const SidebarItem = ({ label, icon: Icon, href, active }: Props) => {
       {!active && (
         <span
           aria-hidden
-          className="absolute inset-0 bg-linear-to-r from-[#0B2A4A]/10 to-transparent opacity-0 
-          group-hover:opacity-100 transition-opacity duration-300"
+          className="absolute inset-0 bg-linear-to-r from-[#0B2A4A]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
         />
       )}
 
