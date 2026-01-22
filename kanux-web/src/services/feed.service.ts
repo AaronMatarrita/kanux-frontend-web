@@ -36,7 +36,7 @@ export interface Post {
   updated_at?: string;
   comments_count?: number;
   reactions_count?: number;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export interface Comment {
@@ -46,7 +46,7 @@ export interface Comment {
   content: string;
   created_at?: string;
   updated_at?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export interface Reaction {
@@ -55,7 +55,7 @@ export interface Reaction {
   user_id: string;
   type: string;
   created_at?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export interface CreatePostResponse {
@@ -70,7 +70,7 @@ export interface UpdatePostResponse {
 
 export interface DeletePostResponse {
   message: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export interface CreateCommentResponse {
@@ -80,11 +80,11 @@ export interface CreateCommentResponse {
 
 export interface DeleteCommentResponse {
   message: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export interface ReactionToggleResponse {
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 // ============================================================================

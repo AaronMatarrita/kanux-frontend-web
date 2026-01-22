@@ -1,4 +1,5 @@
 import {
+  type LucideIcon,
   Home,
   Trophy,
   Medal,
@@ -15,7 +16,7 @@ export type UserRole = "TALENT" | "COMPANY";
 export interface SidebarMenuItem {
   label: string;
   route: string;
-  icon: any;
+  icon: LucideIcon;
 }
 
 export const SIDEBAR_MENU: Record<UserRole, SidebarMenuItem[]> = {

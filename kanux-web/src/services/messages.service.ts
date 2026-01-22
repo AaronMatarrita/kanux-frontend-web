@@ -38,7 +38,7 @@ export interface Conversation {
     last_name?: string;
   };
   last_message?: Message | null;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export interface Message {

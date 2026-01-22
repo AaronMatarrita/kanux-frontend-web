@@ -19,7 +19,7 @@ export interface UpdateTalentProfileRequest {
   experience_level?: string;
   education?: string;
   about?: string;
-  contact?: Record<string, any>;
+  contact?: Record<string, unknown>;
   learning_background_id?: string;
   opportunity_status_id?: string;
 }
@@ -49,7 +49,7 @@ export interface TalentProfile {
   experience_level?: string;
   education?: string;
   about?: string;
-  contact?: Record<string, any>;
+  contact?: Record<string, unknown>;
   profile_completeness?: number;
 
   skills?: Skill[];

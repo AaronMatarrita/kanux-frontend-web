@@ -108,7 +108,7 @@ export interface ValidationResponse {
 
 export interface UsageResponse {
   count?: number;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 // ============================================================================
@@ -215,8 +215,8 @@ export const subscriptionsService = {
   /**
    * PATCH /subscriptions/company/:id_company/usage/profile-view
    */
-  incrementProfileView: async (companyId: string): Promise<any> => {
-    const res = await httpClient.patch<any>(
+  incrementProfileView: async (companyId: string): Promise<UsageResponse> => {
+    const res = await httpClient.patch<UsageResponse>(
       `/subscriptions/company/${companyId}/usage/profile-view`,
       {},
     );
@@ -226,8 +226,8 @@ export const subscriptionsService = {
   /**
    * PATCH /subscriptions/company/:id_company/usage/challenge
    */
-  incrementChallenge: async (companyId: string): Promise<any> => {
-    const res = await httpClient.patch<any>(
+  incrementChallenge: async (companyId: string): Promise<UsageResponse> => {
+    const res = await httpClient.patch<UsageResponse>(
       `/subscriptions/company/${companyId}/usage/challenge`,
       {},
     );

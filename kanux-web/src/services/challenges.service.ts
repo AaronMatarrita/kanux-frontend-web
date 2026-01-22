@@ -26,7 +26,7 @@ export interface SubmitTechnicalChallengeRequest {
 }
 
 export interface EvaluateChallengeRequest {
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 // ============================================================================
@@ -39,7 +39,7 @@ export interface Challenge {
   description?: string;
   type?: string;
   difficulty?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export interface SoftChallenge {
@@ -233,8 +233,8 @@ export const challengesService = {
   evaluateChallenge: async (
     submissionId: string,
     data: EvaluateChallengeRequest,
-  ): Promise<any> => {
-    const res = await httpClient.post<any>(
+  ): Promise<{ success: boolean }> => {
+    const res = await httpClient.post<{ success: boolean }>(
       `/challenges/submissions/${submissionId}/evaluate`,
       data,
     );

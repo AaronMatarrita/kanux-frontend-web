@@ -18,7 +18,7 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
 
   useEffect(() => {
     onClose();
-  }, [pathname]);
+  }, [pathname, onClose]);
 
   useEffect(() => {
     if (isOpen) {
@@ -48,6 +48,7 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
       >
         {/* Logo */}
         <div className="h-16 flex items-center px-6 border-b border-slate-200">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/brand/kanux-logo-sidebar.svg" alt="Kanux" />
         </div>
 
