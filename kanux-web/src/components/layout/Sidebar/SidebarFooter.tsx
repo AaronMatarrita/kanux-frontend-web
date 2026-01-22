@@ -8,11 +8,16 @@ export const SidebarFooter = () => {
     <button className="w-full border-t border-slate-200 px-4 py-4 flex items-center gap-3 cursor-pointer rounded-b-xl transition-all duration-300 ease-out hover:bg-slate-100 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0B2A4A]/40">
       <div className="relative">
         {photoUrl ? (
-          <img
-            src={photoUrl}
-            className="h-10 w-10 rounded-full border border-slate-200"
-            alt={name || "User"}
-          />
+          <>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={photoUrl}
+              className="h-10 w-10 rounded-full border border-slate-200"
+              alt={name || "User"}
+              width={40}
+              height={40}
+            />
+          </>
         ) : (
           <div className="h-10 w-10 rounded-full border border-slate-200 bg-[#0B2A4A] flex items-center justify-center">
             <span className="text-white font-medium text-sm">

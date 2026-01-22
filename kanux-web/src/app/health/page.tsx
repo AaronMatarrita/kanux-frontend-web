@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 
 interface HealthStatus {
@@ -30,43 +30,46 @@ export default function HealthCheckPage() {
       : "http://localhost:3000",
   );
 
-  const checkServiceHealth = async (serviceName: string, path: string) => {
-    const startTime = Date.now();
-    const serviceUrl = `${apiUrl}/${serviceName.toLowerCase()}${path}`;
+  const checkServiceHealth = useCallback(
+    async (serviceName: string, path: string) => {
+      const startTime = Date.now();
+      const serviceUrl = `${apiUrl}/${serviceName.toLowerCase()}${path}`;
 
-    try {
-      const response = await axios.get(serviceUrl, {
-        timeout: 10000,
-        validateStatus: () => true,
-      });
+      try {
+        const response = await axios.get(serviceUrl, {
+          timeout: 10000,
+          validateStatus: () => true,
+        });
 
-      const responseTime = Date.now() - startTime;
-      const status =
-        response.status === 200 ? ("success" as const) : ("error" as const);
+        const responseTime = Date.now() - startTime;
+        const status =
+          response.status === 200 ? ("success" as const) : ("error" as const);
 
-      return {
-        service: serviceName,
-        status,
-        message: `Status ${response.status} - ${JSON.stringify(response.data).substring(0, 100)}`,
-        responseTime,
-        timestamp: new Date().toLocaleTimeString(),
-      };
-    } catch (error) {
-      const responseTime = Date.now() - startTime;
-      const errorMessage =
-        error instanceof Error ? error.message : "Unknown error";
+        return {
+          service: serviceName,
+          status,
+          message: `Status ${response.status} - ${JSON.stringify(response.data).substring(0, 100)}`,
+          responseTime,
+          timestamp: new Date().toLocaleTimeString(),
+        };
+      } catch (error) {
+        const responseTime = Date.now() - startTime;
+        const errorMessage =
+          error instanceof Error ? error.message : "Unknown error";
 
-      return {
-        service: serviceName,
-        status: "error" as const,
-        message: `Error: ${errorMessage}`,
-        responseTime,
-        timestamp: new Date().toLocaleTimeString(),
-      };
-    }
-  };
+        return {
+          service: serviceName,
+          status: "error" as const,
+          message: `Error: ${errorMessage}`,
+          responseTime,
+          timestamp: new Date().toLocaleTimeString(),
+        };
+      }
+    },
+    [apiUrl],
+  );
 
-  const runHealthChecks = async () => {
+  const runHealthChecks = useCallback(async () => {
     setIsLoading(true);
     setHealthStatus(
       SERVICES.map((service) => ({
@@ -91,11 +94,11 @@ export default function HealthCheckPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [checkServiceHealth]);
 
   useEffect(() => {
     runHealthChecks();
-  }, [apiUrl]);
+  }, [runHealthChecks]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -124,7 +127,7 @@ export default function HealthCheckPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
+    <div className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 p-8">
       <div className="max-w-4xl mx-auto">
         <div className="bg-white rounded-lg shadow-lg p-8">
           <h1 className="text-4xl font-bold text-gray-800 mb-2">

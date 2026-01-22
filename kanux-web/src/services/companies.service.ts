@@ -15,13 +15,13 @@ export interface RegisterCompanyRequest {
   name: string;
   about: string;
   location: string;
-  contact?: Record<string, any>;
+  contact?: Record<string, unknown>;
   url_logo?: string;
   goal?: string;
 }
 
 export interface ContactTalentRequest {
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 // ============================================================================
@@ -34,10 +34,10 @@ export interface Company {
   name: string;
   about: string;
   location: string;
-  contact?: Record<string, any>;
+  contact?: Record<string, unknown>;
   url_logo?: string;
   goal?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export interface RegisterCompanyResponse {
@@ -52,7 +52,7 @@ export interface TalentSearchResult {
   title?: string;
   location?: string;
   experience_level?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export interface TalentSearchResponse {
@@ -65,8 +65,14 @@ export interface CompanyMetrics {
   total_conversations: number;
 }
 
+export interface CompanyMetricsResponse {
+  active_challenges: number;
+  candidates_evaluated: number;
+  total_conversation: number;
+}
+
 export interface ContactResponse {
-  data: any;
+  data: unknown;
   status: string;
 }
 
@@ -132,7 +138,7 @@ export const companiesService = {
    * Get metrics for a company
    */
   getCompanyMetrics: async (companyId: string): Promise<CompanyMetrics> => {
-    const res = await httpClient.get<any>(
+    const res = await httpClient.get<CompanyMetricsResponse>(
       `/companies/company/metrics/${companyId}`,
     );
 

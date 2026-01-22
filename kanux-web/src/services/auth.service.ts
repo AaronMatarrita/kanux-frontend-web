@@ -35,7 +35,7 @@ export interface PreRegisterResponse {
 
 export interface UserProfile {
   id?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export interface LoginResponse {
