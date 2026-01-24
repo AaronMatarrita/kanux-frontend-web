@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { AlertCircle, FileText, Clock, CheckCircle } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { ChallengeCard } from "@/components/ui/challenge-card";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { Select } from "@/components/ui/select";
 import { Pagination } from "@/components/ui/pagination";
@@ -31,7 +32,7 @@ export default function Page() {
   const [totalPages, setTotalPages] = useState(1);
   const limit = 10;
   const challengeTypeOptions = [
-    { value: "all", label: "Todos" },
+    { value: "all", label: "All" },
     { value: "technical", label: "Code challenges" },
     { value: "soft", label: "Soft Skills" },
   ];
@@ -162,6 +163,100 @@ export default function Page() {
         </TabsList>
 
         {/* ALL */}
+        <TabsContent value="all" className="mt-6">
+          {loading ? (
+            <div className="flex justify-center py-12">
+              <LoadingSpinner size="lg" message="Cargando challenges..." />
+            </div>
+          ) : error ? (
+            <div className="rounded-lg border border-red-200 bg-red-50 p-6">
+              <div className="flex items-center gap-3">
+                <svg
+                  className="h-6 w-6 text-red-600 shrink-0"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                <div>
+                  <p className="text-sm font-medium text-red-800">{error}</p>
+                  <button
+                    onClick={loadChallenges}
+                    className="mt-2 text-sm text-red-600 hover:text-red-700 underline"
+                  >
+                    Reintentar
+                  </button>
+                </div>
+              </div>
+            </div>
+          ) : displayChallenges.length === 0 ? (
+            <div className="rounded-lg border border-slate-200 bg-slate-50 p-12 text-center">
+              <FileText className="mx-auto h-12 w-12 text-slate-400" />
+              <h3 className="mt-2 text-sm font-medium text-slate-900">
+                There are no challenges available.
+              </h3>
+              <p className="mt-1 text-sm text-slate-500">
+                Come back later to see new challenges.
+              </p>
+            </div>
+          ) : (
+            <>
+              <div className="grid gap-6 grid-cols-[repeat(auto-fit,minmax(280px,1fr))] transition-[grid-template-columns,gap] duration-300 ease-in-out">
+                {displayChallenges.map((challenge) => (
+                  <ChallengeCard
+                    key={challenge.id}
+                    id={challenge.id}
+                    title={challenge.title}
+                    description={challenge.description}
+                    difficulty={challenge.difficulty}
+                    durationMinutes={challenge.duration_minutes}
+                    challengeType={
+                      "challenge_type" in challenge ? "technical" : "soft"
+                    }
+                  />
+                ))}
+              </div>
+
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+                siblingCount={1}
+                className="mt-8"
+              />
+            </>
+          )}
+        </TabsContent>
+
+        <TabsContent value="in-progress" className="mt-6">
+          <div className="rounded-lg border border-slate-200 bg-slate-50 p-12 text-center">
+            <Clock className="mx-auto h-12 w-12 text-slate-400" />
+            <h3 className="mt-2 text-sm font-medium text-slate-900">
+              No challenges in progress
+            </h3>
+            <p className="mt-1 text-sm text-slate-500">
+              Challenges you start will appear here.
+            </p>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="completed" className="mt-6">
+          <div className="rounded-lg border border-slate-200 bg-slate-50 p-12 text-center">
+            <CheckCircle className="mx-auto h-12 w-12 text-slate-400" />
+            <h3 className="mt-2 text-sm font-medium text-slate-900">
+              No completed challenges
+            </h3>
+            <p className="mt-1 text-sm text-slate-500">
+              Challenges you complete will appear here.
+            </p>
+          </div>
+        </TabsContent>
       </Tabs>
     </div>
   );
