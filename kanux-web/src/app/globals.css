@@ -122,3 +122,12 @@
     @apply bg-background text-foreground;
   }
 }
+
+.clip-wave-1 { clip-path: ellipse(80% 100% at 50% 100%); }
+.clip-wave-2 { clip-path: ellipse(100% 100% at 30% 100%); }
+.clip-wave-3 { clip-path: ellipse(120% 100% at 70% 100%); }
+
+input::-ms-reveal,
+input::-ms-clear {
+  display: none;
+}
