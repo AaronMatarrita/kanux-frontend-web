@@ -78,11 +78,10 @@ export function ChallengeCard({
   const config = difficultyConfig[difficulty] || difficultyConfig["Básico"];
   const Icon = config.icon;
 
-  // Limpiar descripción de markdown para preview
   const cleanDescription = description
-    .replace(/```[\s\S]*?```/g, "") // Remover bloques de código
-    .replace(/\*\*(.+?)\*\*/g, "$1") // Remover bold
-    .replace(/\r\n/g, " ") // Remover saltos de línea
+    .replace(/```[\s\S]*?```/g, "")
+    .replace(/\*\*(.+?)\*\*/g, "$1")
+    .replace(/\r\n/g, " ")
     .replace(/\n/g, " ")
     .trim();
 
