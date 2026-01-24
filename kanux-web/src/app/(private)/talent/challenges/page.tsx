@@ -7,7 +7,7 @@ import { ChallengeCard } from "@/components/ui/challenge-card";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { Select } from "@/components/ui/select";
 import { Pagination } from "@/components/ui/pagination";
-import { challengesService } from "@/services/challenges.service";
+import { useChallengesCache } from "@/modules/challenges/store/challengesCache.store";
 
 type ChallengeType = "all" | "technical" | "soft";
 
@@ -30,6 +30,16 @@ export default function Page() {
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+
+  // Zustand store
+  const {
+    getTechnicalChallenges,
+    getSoftChallenges,
+    loadingTechnical,
+    loadingSoft,
+    error: storeError,
+  } = useChallengesCache();
+
   const limit = 10;
   const challengeTypeOptions = [
     { value: "all", label: "All" },
@@ -42,69 +52,35 @@ export default function Page() {
   }, [challengeType, currentPage]);
 
   const loadChallenges = async () => {
-    setLoading(true);
     setError(null);
 
     try {
       if (challengeType === "all" || challengeType === "technical") {
-        const techResponse =
-          await challengesService.listPublicTechnicalChallenges(
-            currentPage,
-            limit,
-          );
-        // PublicTechnicalChallenge to Challenge
-        const mappedTech = techResponse.data.map((ch) => ({
-          id: ch.id,
-          title: ch.title,
-          description: ch.description || "",
-          difficulty: ch.difficulty || "Básico",
-          duration_minutes:
-            (ch as { duration_minutes?: number }).duration_minutes || 30,
-          challenge_type: "Técnico",
-        }));
-        setTechnicalChallenges(mappedTech);
+        const techData = await getTechnicalChallenges(currentPage, limit);
+        setTechnicalChallenges(techData.data);
         if (challengeType === "technical") {
-          setTotalPages(techResponse.meta.total_pages);
+          setTotalPages(techData.totalPages);
         }
       }
 
       if (challengeType === "all" || challengeType === "soft") {
-        const softResponse = await challengesService.listSoftChallenges(
-          currentPage,
-          limit,
-        );
-        //soft challenge to Challenge
-        const mappedSoft = softResponse.data.map((ch: any) => ({
-          id: ch.id,
-          title: ch.title,
-          description: ch.description || "",
-          difficulty: ch.difficulty || "Básico",
-          duration_minutes: ch.duration_minutes || 30,
-        }));
-        setSoftChallenges(mappedSoft);
+        const softData = await getSoftChallenges(currentPage, limit);
+        setSoftChallenges(softData.data);
         if (challengeType === "soft") {
-          setTotalPages(softResponse.meta.lastPage);
+          setTotalPages(softData.totalPages);
         }
       }
 
       if (challengeType === "all") {
-        const techResponse =
-          await challengesService.listPublicTechnicalChallenges(
-            currentPage,
-            limit,
-          );
-        const softResponse = await challengesService.listSoftChallenges(
-          currentPage,
-          limit,
-        );
-        setTotalPages(
-          Math.max(techResponse.meta.total_pages, softResponse.meta.lastPage),
-        );
+        const techData = await getTechnicalChallenges(currentPage, limit);
+        const softData = await getSoftChallenges(currentPage, limit);
+        setTotalPages(Math.max(techData.totalPages, softData.totalPages));
       }
+
+      setLoading(false);
     } catch (err) {
       setError("Error al cargar los challenges. Por favor intenta de nuevo.");
       console.error("Error loading challenges:", err);
-    } finally {
       setLoading(false);
     }
   };
