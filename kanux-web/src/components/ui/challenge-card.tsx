@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Code2, FlaskConical, Layers, Clock, ArrowRight } from "lucide-react";
+import { Clock } from "lucide-react";
+import { difficultyConfig } from "@/modules/challenges/details/config/difficulty.config";
 
 interface ChallengeCardProps {
   id: string;
@@ -9,63 +10,6 @@ interface ChallengeCardProps {
   durationMinutes: number;
   challengeType?: "technical" | "soft";
 }
-
-const difficultyConfig: Record<
-  string,
-  {
-    label: string;
-    className: string;
-    icon: typeof FlaskConical;
-  }
-> = {
-  Básico: {
-    label: "Beginner",
-    className: "bg-emerald-50 text-emerald-700 border border-emerald-200",
-    icon: FlaskConical,
-  },
-  Intermedio: {
-    label: "Intermediate",
-    className: "bg-amber-50 text-amber-700 border border-amber-200",
-    icon: Code2,
-  },
-  Avanzado: {
-    label: "Advanced",
-    className: "bg-rose-50 text-rose-700 border border-rose-200",
-    icon: Layers,
-  },
-  // English fallbacks
-  Basic: {
-    label: "Beginner",
-    className: "bg-emerald-50 text-emerald-700 border border-emerald-200",
-    icon: FlaskConical,
-  },
-  Intermediate: {
-    label: "Intermediate",
-    className: "bg-amber-50 text-amber-700 border border-amber-200",
-    icon: Code2,
-  },
-  Advanced: {
-    label: "Advanced",
-    className: "bg-rose-50 text-rose-700 border border-rose-200",
-    icon: Layers,
-  },
-  // Legacy support
-  easy: {
-    label: "Beginner",
-    className: "bg-emerald-50 text-emerald-700 border border-emerald-200",
-    icon: FlaskConical,
-  },
-  medium: {
-    label: "Intermediate",
-    className: "bg-amber-50 text-amber-700 border border-amber-200",
-    icon: Code2,
-  },
-  hard: {
-    label: "Advanced",
-    className: "bg-rose-50 text-rose-700 border border-rose-200",
-    icon: Layers,
-  },
-};
 
 export function ChallengeCard({
   id,
@@ -78,15 +22,14 @@ export function ChallengeCard({
   const config = difficultyConfig[difficulty] || difficultyConfig["Básico"];
   const Icon = config.icon;
 
-  // Limpiar descripción de markdown para preview
   const cleanDescription = description
-    .replace(/```[\s\S]*?```/g, "") // Remover bloques de código
-    .replace(/\*\*(.+?)\*\*/g, "$1") // Remover bold
-    .replace(/\r\n/g, " ") // Remover saltos de línea
+    .replace(/```[\s\S]*?```/g, "")
+    .replace(/\*\*(.+?)\*\*/g, "$1")
+    .replace(/\r\n/g, " ")
     .replace(/\n/g, " ")
     .trim();
 
-  // Formatear duración
+  // Format duration
   const hours = Math.floor(durationMinutes / 60);
   const mins = durationMinutes % 60;
   const durationStr =
