@@ -6,9 +6,8 @@ type Difficulty = "beginner" | "intermediate" | "advanced";
 
 interface ExecutionTopbarProps {
   title: string;
-  subtitle?: string;
   difficulty: Difficulty;
-  timeLabel: string; // e.g. "1:59:35"
+  timeLabel: string;
   onExit?: () => void;
   onSubmit?: () => void;
 }
@@ -21,7 +20,6 @@ const difficultyStyles: Record<Difficulty, string> = {
 
 export function ExecutionTopbar({
   title,
-  subtitle,
   difficulty,
   timeLabel,
   onExit,
@@ -42,7 +40,6 @@ export function ExecutionTopbar({
           </button>
 
           <div className="min-w-0">
-            <div className="text-sm text-slate-500 truncate">{subtitle}</div>
             <div className="text-base sm:text-lg font-semibold truncate">
               {title}
             </div>
