@@ -12,7 +12,7 @@ import { CompanyAbout } from "@/config/companyAbout.config";
 
 export function CreateAboutCompany() {
     
-    const idUser =  "get user "; //useAuthStore((state: any) => state.idUser);
+    const idUser =  "get user "; 
 
     const [companyAbout, setCompanyAbout] = useState<CompanyAbout>({
         companyName: "",
@@ -39,19 +39,19 @@ export function CreateAboutCompany() {
     const validate = () => {
         const newErrors: { [key: string]: string } = {};
         if (!companyAbout.companyName)
-            newErrors.companyName = "El nombre de la compañía es requerido";
+            newErrors.companyName = "Company name is required";
 
         if (!companyAbout.description)
-            newErrors.description = "La descripción es requerida";
+            newErrors.description = "A description is required.";
 
         if (!companyAbout.contact)
-            newErrors.contact = "El número de contacto es requerido";
+            newErrors.contact = "A contact number is required";
 
         else if (!/^\+?[1-9]\d{7,14}$/.test(companyAbout.contact))
-            newErrors.contact = "Número de contacto inválido";
+            newErrors.contact = "Invalid contact number format";
 
         if (!companyAbout.location)
-            newErrors.location = "La ubicación es requerida";
+            newErrors.location = "Location is required";
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
@@ -83,8 +83,8 @@ export function CreateAboutCompany() {
                 }, 2000);
 
             } catch (error) {
-                console.error("Error en el registro:", error);
-                setErrors({ server: "Hubo un error al registrar la empresa. Inténtalo de nuevo." });
+                console.error("Error:", error);
+                setErrors({ server: "There was an error registering the company. Please try again." });
             }finally{
                 setIsLoading(false);
             }

@@ -14,10 +14,11 @@ export function FormInput({ label, error, helperText, isPassword, type, ...props
   const inputType = isPassword ? (showPassword ? "text" : "password") : type;
   return (
     <div className="w-full mb-4 font-comfortaa">
+      {/* label of input */}
       <label className="block text-sm font-medium text-gray-700 mb-2">
         {label}
       </label>
-
+      {/* input */}
       <div className="relative">
         <input
           {...props}

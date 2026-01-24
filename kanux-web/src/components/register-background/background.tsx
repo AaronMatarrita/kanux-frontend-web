@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 
 interface Props {
     children: React.ReactNode;
-    step: 1 | 2; // Para controlar cuál paso está activo
+    step: 1 | 2; // step of the registration process
 }
 
 export function RegisterBackground({ children, step }: Props) {
