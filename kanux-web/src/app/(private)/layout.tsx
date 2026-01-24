@@ -3,6 +3,7 @@
 import { Sidebar } from "@/components/layout/Sidebar/Sidebar";
 import { Topbar } from "@/components/layout/Topbar/Topbar";
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 
 export default function PrivateLayout({
   children,
@@ -10,6 +11,8 @@ export default function PrivateLayout({
   children: React.ReactNode;
 }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const pathname = usePathname();
+  const isFullBleed = pathname?.includes("/execute");
 
   const toggleSidebar = () => setIsSidebarOpen((prev) => !prev);
   const closeSidebar = () => setIsSidebarOpen(false);
@@ -21,7 +24,7 @@ export default function PrivateLayout({
 
       {/* Main content area */}
       <main
-        className={`mt-16 p-4 sm:p-6 lg:p-8 transition-all duration-300 ${
+        className={`mt-16 ${isFullBleed ? "p-0" : "p-4 sm:p-6 lg:p-8"} transition-all duration-300 ${
           isSidebarOpen ? "lg:ml-72" : "lg:ml-0"
         }`}
       >

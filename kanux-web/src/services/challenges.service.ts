@@ -42,6 +42,15 @@ export interface Challenge {
   [key: string]: unknown;
 }
 
+export interface ChallengeMetrics {
+  total_submissions: number;
+  average_score: number;
+}
+
+export interface PublicTechnicalChallenge extends Challenge {
+  metrics?: ChallengeMetrics;
+}
+
 export interface SoftChallenge {
   id: string;
   title: string;
@@ -98,6 +107,46 @@ export type ChallengeSubmissionsResponse = Array<{
   status: string;
   submitted_at: string;
 }>;
+
+export interface PublicTechnicalChallengesResponse {
+  data: PublicTechnicalChallenge[];
+  meta: {
+    total_records: number;
+    current_page: number;
+    limit: number;
+    total_pages: number;
+  };
+}
+
+export interface PublicTechnicalChallengeDetailResponse {
+  data: PublicTechnicalChallenge;
+  assets: {
+    challenge: unknown;
+    test_cases: unknown;
+  };
+}
+
+export interface TechnicalChallengeExecutionRequest {
+  code: string;
+  language?: "javascript" | "typescript";
+  userId?: string;
+}
+
+export interface TechnicalChallengeExecutionResult {
+  status: "ok" | "error";
+  results?: Array<{
+    id: string | number;
+    description?: string;
+    pass: boolean;
+    expected: unknown;
+    output: unknown;
+    durationMs: number;
+    error?: string;
+  }>;
+  logs?: string;
+  error?: string;
+  exitCode?: number;
+}
 
 // ============================================================================
 // Service
@@ -228,6 +277,40 @@ export const challengesService = {
   },
 
   /**
+   * POST /challenges/internal/technical-challenges/:challengeId/execute
+   * Proxy to ms-runner through ms-challenges. Executes code against test cases.
+   */
+  executeTechnicalChallenge: async (
+    challengeId: string,
+    payload: TechnicalChallengeExecutionRequest,
+  ): Promise<TechnicalChallengeExecutionResult> => {
+    const { code, language, userId } = payload;
+    const runnerAuthToken = process.env.NEXT_PUBLIC_RUNNER_AUTH_TOKEN;
+    const runnerInternalToken = process.env.NEXT_PUBLIC_RUNNER_INTERNAL_TOKEN;
+    const res = await httpClient.post<{
+      message: string;
+      data: TechnicalChallengeExecutionResult;
+    }>(
+      `/challenges/internal/technical-challenges/${challengeId}/execute`,
+      {
+        source_code: code,
+        programming_language: language,
+        user_id: userId,
+      },
+      {
+        headers: {
+          ...(runnerAuthToken ? { "x-runner-token": runnerAuthToken } : {}),
+          ...(runnerInternalToken
+            ? { "x-internal-token": runnerInternalToken }
+            : {}),
+        },
+      },
+    );
+    // ms-challenges wraps runner response in { message, data: {...} }
+    return res.data.data || res.data;
+  },
+
+  /**
    * POST /challenges/submissions/:id_submission/evaluate
    */
   evaluateChallenge: async (
@@ -237,6 +320,36 @@ export const challengesService = {
     const res = await httpClient.post<{ success: boolean }>(
       `/challenges/submissions/${submissionId}/evaluate`,
       data,
+    );
+    return res.data;
+  },
+
+  // ========== Public Technical Challenges ==========
+
+  /**
+   * GET /challenges/public/technical?page=1&limit=10
+   * Public listing filtered to technical challenges only.
+   */
+  listPublicTechnicalChallenges: async (
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<PublicTechnicalChallengesResponse> => {
+    const res = await httpClient.get<PublicTechnicalChallengesResponse>(
+      "/challenges/technical-challenges/public",
+      { params: { page, limit } },
+    );
+    return res.data;
+  },
+
+  /**
+   * GET /challenges/public/technical/:challengeId
+   * Returns challenge metadata plus bundled assets (challenge + test_cases).
+   */
+  getPublicTechnicalChallengeDetail: async (
+    challengeId: string,
+  ): Promise<PublicTechnicalChallengeDetailResponse> => {
+    const res = await httpClient.get<PublicTechnicalChallengeDetailResponse>(
+      `/challenges/technical-challenges/public/${challengeId}`,
     );
     return res.data;
   },
