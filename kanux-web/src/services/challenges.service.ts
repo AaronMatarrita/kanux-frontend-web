@@ -42,6 +42,15 @@ export interface Challenge {
   [key: string]: unknown;
 }
 
+export interface ChallengeMetrics {
+  total_submissions: number;
+  average_score: number;
+}
+
+export interface PublicTechnicalChallenge extends Challenge {
+  metrics?: ChallengeMetrics;
+}
+
 export interface SoftChallenge {
   id: string;
   title: string;
@@ -98,6 +107,24 @@ export type ChallengeSubmissionsResponse = Array<{
   status: string;
   submitted_at: string;
 }>;
+
+export interface PublicTechnicalChallengesResponse {
+  data: PublicTechnicalChallenge[];
+  meta: {
+    total_records: number;
+    current_page: number;
+    limit: number;
+    total_pages: number;
+  };
+}
+
+export interface PublicTechnicalChallengeDetailResponse {
+  data: PublicTechnicalChallenge;
+  assets: {
+    challenge: unknown;
+    test_cases: unknown;
+  };
+}
 
 // ============================================================================
 // Service
@@ -237,6 +264,36 @@ export const challengesService = {
     const res = await httpClient.post<{ success: boolean }>(
       `/challenges/submissions/${submissionId}/evaluate`,
       data,
+    );
+    return res.data;
+  },
+
+  // ========== Public Technical Challenges ==========
+
+  /**
+   * GET /challenges/public/technical?page=1&limit=10
+   * Public listing filtered to technical challenges only.
+   */
+  listPublicTechnicalChallenges: async (
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<PublicTechnicalChallengesResponse> => {
+    const res = await httpClient.get<PublicTechnicalChallengesResponse>(
+      "/challenges/technical-challenges/public",
+      { params: { page, limit } },
+    );
+    return res.data;
+  },
+
+  /**
+   * GET /challenges/public/technical/:challengeId
+   * Returns challenge metadata plus bundled assets (challenge + test_cases).
+   */
+  getPublicTechnicalChallengeDetail: async (
+    challengeId: string,
+  ): Promise<PublicTechnicalChallengeDetailResponse> => {
+    const res = await httpClient.get<PublicTechnicalChallengeDetailResponse>(
+      `/challenges/technical-challenges/public/${challengeId}`,
     );
     return res.data;
   },
