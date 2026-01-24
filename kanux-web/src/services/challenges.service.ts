@@ -332,7 +332,7 @@ export const challengesService = {
    */
   listPublicTechnicalChallenges: async (
     page: number = 1,
-    limit: number = 10,
+    limit: number = 1,
   ): Promise<PublicTechnicalChallengesResponse> => {
     const res = await httpClient.get<PublicTechnicalChallengesResponse>(
       "/challenges/technical-challenges/public",
