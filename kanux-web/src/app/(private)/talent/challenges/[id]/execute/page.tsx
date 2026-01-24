@@ -36,7 +36,7 @@ export default function Page() {
   }, [challengeId]);
 
   const challenge = state.data?.data;
-  const assets = state.data?.assets?.challenge as any;
+  const assets = state.data?.assets as any;
 
   return (
     <ExecutionContainer

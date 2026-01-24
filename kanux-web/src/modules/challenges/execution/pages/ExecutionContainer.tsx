@@ -2,6 +2,7 @@
 
 import { ExecutionTopbar } from "@/modules/challenges/execution/components/ExecutionTopbar";
 import { ChallengeDescriptionPanel } from "@/modules/challenges/execution/components/ChallengeDescriptionPanel";
+import { TestCasesPanel } from "@/modules/challenges/execution/components/TestCasesPanel";
 import { LoadingOverlay } from "@/components";
 
 interface ExecutionContainerProps {
@@ -19,6 +20,9 @@ export function ExecutionContainer({
   assets,
   loading = false,
 }: ExecutionContainerProps) {
+  const challengeAssets = (assets as any)?.challenge;
+  const testCases = (assets as any)?.test_cases?.test_cases || [];
+
   return (
     <div className="h-screen flex flex-col">
       <LoadingOverlay visible={loading} message="Loading challenge..." />
@@ -39,7 +43,7 @@ export function ExecutionContainer({
           <div className="h-full bg-white border-r border-slate-200 overflow-hidden">
             <ChallengeDescriptionPanel
               headerTitle="Instructions"
-              assets={assets}
+              assets={challengeAssets}
               loading={loading}
             />
           </div>
@@ -56,16 +60,9 @@ export function ExecutionContainer({
             </div>
           </div>
 
-          {/* Right: Test cases / Summary (placeholder) */}
+          {/* Right: Test cases / Summary */}
           <div className="h-full bg-white p-4 overflow-auto">
-            <div className="space-y-2">
-              <p className="text-sm font-semibold text-slate-700">
-                Right Sidebar
-              </p>
-              <p className="text-xs text-slate-500">
-                Placeholder for test cases list and execution summary.
-              </p>
-            </div>
+            <TestCasesPanel testCases={testCases} />
           </div>
         </div>
       </div>
