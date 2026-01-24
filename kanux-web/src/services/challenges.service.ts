@@ -126,6 +126,28 @@ export interface PublicTechnicalChallengeDetailResponse {
   };
 }
 
+export interface TechnicalChallengeExecutionRequest {
+  code: string;
+  language?: "javascript" | "typescript";
+  userId?: string;
+}
+
+export interface TechnicalChallengeExecutionResult {
+  status: "ok" | "error";
+  results?: Array<{
+    id: string | number;
+    description?: string;
+    pass: boolean;
+    expected: unknown;
+    output: unknown;
+    durationMs: number;
+    error?: string;
+  }>;
+  logs?: string;
+  error?: string;
+  exitCode?: number;
+}
+
 // ============================================================================
 // Service
 // ============================================================================
@@ -252,6 +274,40 @@ export const challengesService = {
       `/challenges/challenges/${challengeId}/submissions/${companyId}`,
     );
     return res.data;
+  },
+
+  /**
+   * POST /challenges/internal/technical-challenges/:challengeId/execute
+   * Proxy to ms-runner through ms-challenges. Executes code against test cases.
+   */
+  executeTechnicalChallenge: async (
+    challengeId: string,
+    payload: TechnicalChallengeExecutionRequest,
+  ): Promise<TechnicalChallengeExecutionResult> => {
+    const { code, language, userId } = payload;
+    const runnerAuthToken = process.env.NEXT_PUBLIC_RUNNER_AUTH_TOKEN;
+    const runnerInternalToken = process.env.NEXT_PUBLIC_RUNNER_INTERNAL_TOKEN;
+    const res = await httpClient.post<{
+      message: string;
+      data: TechnicalChallengeExecutionResult;
+    }>(
+      `/challenges/internal/technical-challenges/${challengeId}/execute`,
+      {
+        source_code: code,
+        programming_language: language,
+        user_id: userId,
+      },
+      {
+        headers: {
+          ...(runnerAuthToken ? { "x-runner-token": runnerAuthToken } : {}),
+          ...(runnerInternalToken
+            ? { "x-internal-token": runnerInternalToken }
+            : {}),
+        },
+      },
+    );
+    // ms-challenges wraps runner response in { message, data: {...} }
+    return res.data.data || res.data;
   },
 
   /**
