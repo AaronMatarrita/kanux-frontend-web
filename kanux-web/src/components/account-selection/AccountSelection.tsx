@@ -23,7 +23,7 @@ const OPTIONS: OptionAccountSelection[] = [
         key: "company",
         title: "Company",
         description: "Create challenges, analyze talent, and connect with skilled candidates.",
-        route: "/onboarding/company",
+        route: "/onboarding/register-company",
         bullets: [
             "Post real-world challenges",
             "View detailed skill analytics",

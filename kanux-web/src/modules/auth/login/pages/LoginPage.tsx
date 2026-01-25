@@ -1,12 +1,11 @@
-'use client';
-
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { LoginForm } from '../components';
-import { authService } from '@/services';
-import styles from '../styles/login.module.css';
-import type { LoginFormData } from '../types';
-import type { SignUpFormData } from '../types/signup.types';
+"use client";
+import { AxiosError } from "axios";
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import { LoginForm } from "../components";
+import { authService } from "@/services";
+import styles from "../styles/login.module.css";
+import type { LoginFormData } from "../types";
 
 /**
  * Login Page
@@ -33,48 +32,22 @@ export const LoginPage: React.FC = () => {
         password: data.password,
       });
 
-      localStorage.setItem('kanux_token', response.token);
-      localStorage.setItem('kanux_user', JSON.stringify(response.user));
+      localStorage.setItem("kanux_token", response.token);
+      localStorage.setItem("kanux_session", response.sessionId);
+      localStorage.setItem("kanux_user", JSON.stringify(response.user));
 
-      console.log('Login successful:', response.user);
+      console.log("Login successful:", response.user);
 
-      router.push('/dashboard');
+      router.push("/dashboard");
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Login failed. Please try again.';
-      setSubmitError(errorMessage);
-      console.error('Login error:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+      let errorMessage = "Error al iniciar sesión";
 
-  const handleSignUp = async (data: SignUpFormData) => {
-    setIsLoading(true);
-    setSubmitError(undefined);
-
-    try {
-      // Call the pre-register service
-      const response = await authService.preRegister({
-        email: data.email,
-        password: data.password,
-        confirmPassword: data.confirmPassword,
-        userType: data.userType || 'talent',
-      });
-
-      console.log('Sign up successful:', response);
-      
-      // Navigate to the next step (talent or company registration)
-      if (response.nextStep === 'REGISTER_TALENT') {
-        router.push('/auth/onboarding/talent');
-      } else if (response.nextStep === 'REGISTER_COMPANY') {
-        router.push('/auth/onboarding/company');
+      if (error instanceof AxiosError) {
+        errorMessage =
+          error.response?.data?.message ?? "Correo o contraseña inválidos";
       }
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Sign up failed. Please try again.';
+
       setSubmitError(errorMessage);
-      console.error('Sign up error:', error);
     } finally {
       setIsLoading(false);
     }
@@ -91,7 +64,15 @@ export const LoginPage: React.FC = () => {
             viewBox="70.5 10 22 22"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
-            style={{ width: '60px', height: '60px', flexShrink: 0, border: '2px solid white', backgroundColor: 'white', borderRadius: '8px', padding: '8px' }}
+            style={{
+              width: "60px",
+              height: "60px",
+              flexShrink: 0,
+              border: "2px solid white",
+              backgroundColor: "white",
+              borderRadius: "8px",
+              padding: "8px",
+            }}
           >
             <g clipPath="url(#clip0_215_5913)">
               <path
@@ -146,18 +127,17 @@ export const LoginPage: React.FC = () => {
             together.
           </h1>
           <p className={styles.brandingDescription}>
-            Kánux connects professionals and companies through real challenges and
-            verified skills.
+            Kánux connects professionals and companies through real challenges
+            and verified skills.
           </p>
         </div>
 
-        <div style={{ height: '40px' }} />
+        <div style={{ height: "40px" }} />
       </div>
 
       <div className={styles.formSide}>
         <LoginForm
           onSubmit={handleLogin}
-          onSignUp={handleSignUp}
           isLoading={isLoading}
           submitError={submitError}
         />

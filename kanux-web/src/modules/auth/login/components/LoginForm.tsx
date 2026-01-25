@@ -2,27 +2,24 @@
 
 import React, { useState, FormEvent } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import EmailInput from './EmailInput';
 import PasswordInput from './PasswordInput';
-import SignUpForm from './SignUpForm';
 import styles from '../styles/login.module.css';
 import type { LoginFormData, LoginFormErrors } from '../types';
-import type { SignUpFormData } from '../types/signup.types';
 
 interface LoginFormProps {
   onSubmit?: (data: LoginFormData) => Promise<void> | void;
-  onSignUp?: (data: SignUpFormData) => Promise<void> | void;
   isLoading?: boolean;
   submitError?: string;
 }
 
 export const LoginForm: React.FC<LoginFormProps> = ({
   onSubmit,
-  onSignUp,
   isLoading = false,
   submitError,
 }) => {
-  const [showSignUp, setShowSignUp] = useState(false);
+  const router = useRouter();
   
   const [formData, setFormData] = useState<LoginFormData>({
     email: '',
@@ -31,7 +28,6 @@ export const LoginForm: React.FC<LoginFormProps> = ({
 
   const [errors, setErrors] = useState<LoginFormErrors>({});
   const [rememberMe, setRememberMe] = useState(false);
-  const [signUpError, setSignUpError] = useState<string>();
 
   const validateEmail = (email: string): string | undefined => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -93,30 +89,9 @@ export const LoginForm: React.FC<LoginFormProps> = ({
     }
   };
 
-
-  const handleSignUp = async (data: SignUpFormData) => {
-    setSignUpError(undefined);
-    try {
-      if (onSignUp) {
-        await onSignUp(data);
-      }
-
-      setShowSignUp(false);
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Sign up failed';
-      setSignUpError(errorMessage);
-    }
+  const handleSignUpClick = () => {
+    router.push('/onboarding/account-selection');
   };
-
-  if (showSignUp) {
-    return (
-      <SignUpForm
-        onSubmit={handleSignUp}
-        onCancel={() => setShowSignUp(false)}
-        submitError={signUpError}
-      />
-    );
-  }
 
   return (
     <div className={styles.loginCard}>
@@ -173,7 +148,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         <span>No tienes una cuenta?</span>
         <button
           type="button"
-          onClick={() => setShowSignUp(true)}
+          onClick={handleSignUpClick}
           style={{
             background: 'none',
             border: 'none',
