@@ -102,11 +102,25 @@ export type ChallengeSubmissionsResponse = Array<{
     title: string;
     type: string;
     difficulty: string;
+    description?: string;
+    duration_minutes?: number;
   };
   score: number;
   status: string;
+  evaluation_type?: string;
   submitted_at: string;
 }>;
+
+export interface ChallengeHistoryResponse {
+  message: string;
+  data: ChallengeSubmissionsResponse;
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    total_pages: number;
+  };
+}
 
 export interface PublicTechnicalChallengesResponse {
   data: PublicTechnicalChallenge[];
@@ -226,10 +240,10 @@ export const challengesService = {
    * GET /challenges/technical-challenges/challenge/submit-challenges
    */
   getMyChallengeHistory: async (): Promise<ChallengeSubmissionsResponse> => {
-    const res = await httpClient.get<ChallengeSubmissionsResponse>(
+    const res = await httpClient.get<ChallengeHistoryResponse>(
       "/challenges/technical-challenges/challenge/submit-challenges",
     );
-    return res.data;
+    return res.data.data;
   },
 
   // ========== General Challenges ==========
