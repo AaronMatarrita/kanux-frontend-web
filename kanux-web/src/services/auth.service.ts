@@ -32,6 +32,7 @@ export interface UserProfile {
 
 export interface LoginResponse {
   token: string;
+  sessionId: string;
   user: {
     id: string;
     email: string;
