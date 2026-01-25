@@ -6,18 +6,14 @@ import { LoginForm } from "../components";
 import { authService } from "@/services";
 import styles from "../styles/login.module.css";
 import type { LoginFormData } from "../types";
+import { useAuth } from "@/context/AuthContext";
+import { getDeviceId } from "@/lib/device";
+import { mapLoginResponseToSession } from "@/helper/mapper";
 
-/**
- * Login Page
- * Main entry point for user authentication
- *
- * Specifications:
- * - Email field
- * - Password field
- * - Login button
- * - "Don't have an account? Sign up" link
- */
+
 export const LoginPage: React.FC = () => {
+  const { login } = useAuth();
+  const deviceId=getDeviceId();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [submitError, setSubmitError] = useState<string>();
@@ -27,18 +23,25 @@ export const LoginPage: React.FC = () => {
     setSubmitError(undefined);
 
     try {
+      console.log("Attempting login with data:", data);
       const response = await authService.login({
         email: data.email,
         password: data.password,
+        deviceId: deviceId,
       });
 
-      localStorage.setItem("kanux_token", response.token);
-      localStorage.setItem("kanux_session", response.sessionId);
-      localStorage.setItem("kanux_user", JSON.stringify(response.user));
+      console.log("Login successful:", response);
+     const session = mapLoginResponseToSession(response); 
 
-      console.log("Login successful:", response.user);
+console.log("session successful:", session);
 
-      router.push("/dashboard");
+      await login(session);
+
+      router.push(
+      response.user.userType === "talent"
+        ? "/talent/dashboard"
+        : "/company/dashboard"
+    );
     } catch (error) {
       let errorMessage = "Error al iniciar sesión";
 

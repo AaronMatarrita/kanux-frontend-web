@@ -3,6 +3,16 @@
 import React from 'react';
 import { Zap, Users, FileText, MessageSquare } from 'lucide-react';
 import { StatCard, LatestSubmissions, RecentlyViewed } from '@/components/dashboard';
+import { useAuth } from '@/context/AuthContext';
+import { useSyncExternalStore } from "react";
+
+function useIsClient() {
+  return useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
+}
 
 // Mock data
 const MOCK_STATS = {
@@ -71,11 +81,27 @@ const MOCK_PROFILES = [
 ];
 
 export default function DashboardPage() {
+    const { session } = useAuth();
+
+const isClient = useIsClient();
+
+  const getUserGreeting = () => {
+    if (!isClient) return "Bienvenido de vuelta";
+    
+    if (!session) return "Bienvenido de vuelta";
+    
+    if (session.user.userType === "company") {
+      return `Bienvenido de vuelta, ${session.user.profile?.name || "Company"}`;
+    } 
+  };
+
+  const greeting = getUserGreeting();
+
   return (
     <div className="space-y-8">
       {/* Header */}
       <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold text-slate-900">Welcome back, Tech Corporhh</h1>
+        <h1 className="text-3xl font-bold text-slate-900">{greeting}</h1>
         <p className="text-slate-600">Here what happening with your hiring process today.</p>
       </div>
 
