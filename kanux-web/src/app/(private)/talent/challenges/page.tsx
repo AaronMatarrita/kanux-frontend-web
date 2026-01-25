@@ -42,7 +42,7 @@ export default function Page() {
       <Tabs defaultValue="all" className="w-full">
         <TabsList className="bg-slate-100 p-1 rounded-xl">
           <TabsTrigger value="all">All Challenges</TabsTrigger>
-          <TabsTrigger value="in-progress">In Progress</TabsTrigger>
+
           <TabsTrigger value="completed">Completed</TabsTrigger>
         </TabsList>
 

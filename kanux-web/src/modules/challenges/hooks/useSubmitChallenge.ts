@@ -4,6 +4,7 @@ import { useState, useCallback } from "react";
 import { toast } from "sonner";
 import { challengesService } from "@/services/challenges.service";
 import { useRouter } from "next/navigation";
+import { useSubmissionStore } from "@/store/submission.store";
 
 export interface SubmitResult {
   submission_id: string;
@@ -20,6 +21,7 @@ export function useSubmitChallenge(options?: UseSubmitChallengeOptions) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const { clearSubmission } = useSubmissionStore();
 
   const submit = useCallback(
     async (
@@ -55,6 +57,9 @@ export function useSubmitChallenge(options?: UseSubmitChallengeOptions) {
 
         toast.success("Solución enviada correctamente");
         options?.onSuccess?.(result);
+
+        // Clear submission from localStorage after successful submit
+        clearSubmission();
 
         return result;
       } catch (err: any) {

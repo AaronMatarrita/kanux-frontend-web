@@ -10,7 +10,7 @@ import { EditorWorkspace } from "@/modules/challenges/execution/components/Edito
 import { SubmitConfirmationModal } from "@/modules/challenges/execution/components/SubmitConfirmationModal";
 import { LoadingOverlay } from "@/components";
 import { challengesService } from "@/services/challenges.service";
-import { SubmissionEntry } from "@/store/submission.store";
+import { SubmissionEntry, useSubmissionStore } from "@/store/submission.store";
 
 type Difficulty = "beginner" | "intermediate" | "advanced";
 
@@ -35,6 +35,7 @@ export function ExecutionContainer({
   onExpired,
 }: ExecutionContainerProps) {
   const router = useRouter();
+  const { clearSubmission } = useSubmissionStore();
   const challengeAssets = (assets as any)?.challenge;
   const testCases = (assets as any)?.test_cases?.test_cases || [];
   const initialCode =
@@ -195,6 +196,11 @@ export function ExecutionContainer({
       router.push(
         `/talent/challenges/results?submissionId=${response.submission_id}`,
       );
+
+      // Clear submission from localStorage after navigation starts
+      setTimeout(() => {
+        clearSubmission();
+      }, 100);
     } catch (err: any) {
       let errorMsg = "Error al enviar la solución";
 
