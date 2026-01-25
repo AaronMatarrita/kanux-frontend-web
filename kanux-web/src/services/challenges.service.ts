@@ -201,11 +201,11 @@ export const challengesService = {
   startTechnicalChallenge: async (
     challengeId: string,
   ): Promise<TechnicalChallengeStartResponse> => {
-    const res = await httpClient.post<TechnicalChallengeStartResponse>(
-      `/challenges/technical-challenges/${challengeId}/start`,
-      {}, // el backend usa el param, no necesita body
-    );
-    return res.data;
+    const res = await httpClient.post<{
+      message: string;
+      data: TechnicalChallengeStartResponse;
+    }>(`/challenges/technical-challenges/${challengeId}/start`, {});
+    return res.data.data;
   },
 
   /**
