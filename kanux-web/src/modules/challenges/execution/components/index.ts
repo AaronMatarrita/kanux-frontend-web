@@ -5,3 +5,4 @@ export * from "./LanguageSelector";
 export * from "./MonacoEditorWrapper";
 export * from "./ConsolePanel";
 export * from "./EditorWorkspace";
+export * from "./SubmitConfirmationModal";

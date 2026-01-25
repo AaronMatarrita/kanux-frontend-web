@@ -12,7 +12,10 @@ export default function PrivateLayout({
 }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const pathname = usePathname();
-  const isFullBleed = pathname?.includes("/execute");
+  const fullBleedRoutes = ["/execute", "/results"];
+  const isFullBleed = fullBleedRoutes.some((route) =>
+    pathname?.includes(route),
+  );
 
   const toggleSidebar = () => setIsSidebarOpen((prev) => !prev);
   const closeSidebar = () => setIsSidebarOpen(false);
