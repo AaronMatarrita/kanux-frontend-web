@@ -16,6 +16,7 @@ interface EditorWorkspaceProps {
   runningExternal?: boolean;
   outputExternal?: string;
   errorExternal?: string;
+  persistenceKey?: string;
 }
 
 export function EditorWorkspace({
@@ -25,6 +26,7 @@ export function EditorWorkspace({
   runningExternal,
   outputExternal,
   errorExternal,
+  persistenceKey,
 }: EditorWorkspaceProps) {
   const [language, setLanguage] =
     useState<ProgrammingLanguage>(initialLanguage);
@@ -41,6 +43,19 @@ export function EditorWorkspace({
   useEffect(() => {
     setLanguage(initialLanguage);
   }, [initialLanguage]);
+
+  // Load persisted code/language on mount
+  useEffect(() => {
+    if (!persistenceKey || typeof window === "undefined") return;
+    try {
+      const savedCode = localStorage.getItem(`${persistenceKey}:code`);
+      const savedLang = localStorage.getItem(`${persistenceKey}:language`);
+      if (savedCode !== null) setCode(savedCode);
+      if (savedLang === "javascript" || savedLang === "typescript") {
+        setLanguage(savedLang as ProgrammingLanguage);
+      }
+    } catch {}
+  }, [persistenceKey]);
 
   // Sync external output/error/running when provided
   useEffect(() => {
@@ -83,6 +98,21 @@ export function EditorWorkspace({
       setRunning(false);
     }
   };
+
+  // Persist code and language on change
+  useEffect(() => {
+    if (!persistenceKey || typeof window === "undefined") return;
+    try {
+      localStorage.setItem(`${persistenceKey}:code`, code);
+    } catch {}
+  }, [code, persistenceKey]);
+
+  useEffect(() => {
+    if (!persistenceKey || typeof window === "undefined") return;
+    try {
+      localStorage.setItem(`${persistenceKey}:language`, language);
+    } catch {}
+  }, [language, persistenceKey]);
 
   return (
     <div className="h-full flex flex-col">
