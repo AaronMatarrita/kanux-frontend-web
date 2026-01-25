@@ -9,4 +9,4 @@ export { challengesService } from "./challenges.service";
 export { companiesService } from "./companies.service";
 export { messagesService } from "./messages.service";
 export { subscriptionsService } from "./subscriptions.service";
-export { feedService } from "./feed.service";
+export { feedService } from "./feed.service";export { candidatesService } from "./candidates.service";
