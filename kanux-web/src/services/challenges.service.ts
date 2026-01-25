@@ -20,7 +20,6 @@ export interface SubmitSoftChallengeRequest {
 }
 
 export interface SubmitTechnicalChallengeRequest {
-  submission_id: string;
   programming_language: string;
   source_code: string;
 }
@@ -93,6 +92,20 @@ export interface TechnicalChallengeStartResponse {
 export interface TechnicalChallengeSubmitResponse {
   submission_id: string;
   status: string;
+}
+
+export interface TechnicalChallengeResultResponse {
+  submission_id: string;
+  status: string;
+  score: number;
+  challenge?: {
+    id: string;
+    title: string;
+    difficulty: string;
+  };
+  feedback?: string; // JSON string with AI feedback payload
+  submitted_at?: string;
+  feedback_generated_at?: string;
 }
 
 export type ChallengeSubmissionsResponse = Array<{
@@ -223,17 +236,33 @@ export const challengesService = {
   },
 
   /**
-   * POST /challenges/technical-challenges/:challengeId/submit
+   * POST /challenges/technical-challenges/:submissionId/submit
+   * @param submissionId - ID de la submission (va en la URL)
+   * @param data - { programming_language, source_code }
    */
   submitTechnicalChallenge: async (
-    challengeId: string,
+    submissionId: string,
     data: SubmitTechnicalChallengeRequest,
   ): Promise<TechnicalChallengeSubmitResponse> => {
-    const res = await httpClient.post<TechnicalChallengeSubmitResponse>(
-      `/challenges/technical-challenges/${challengeId}/submit`,
-      data,
-    );
-    return res.data;
+    const res = await httpClient.post<{
+      message: string;
+      data: TechnicalChallengeSubmitResponse;
+    }>(`/challenges/technical-challenges/${submissionId}/submit`, data);
+    return res.data.data;
+  },
+
+  /**
+   * GET /challenges/technical-challenges/:submissionId/result
+   * Retrieves the evaluated result including AI feedback (if available).
+   */
+  getTechnicalChallengeResult: async (
+    submissionId: string,
+  ): Promise<TechnicalChallengeResultResponse> => {
+    const res = await httpClient.get<{
+      message: string;
+      data: TechnicalChallengeResultResponse;
+    }>(`/challenges/technical-challenges/${submissionId}/result`);
+    return res.data.data;
   },
 
   /**

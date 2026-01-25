@@ -1,11 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { ExecutionTopbar } from "@/modules/challenges/execution/components/ExecutionTopbar";
 import { ChallengeDescriptionPanel } from "@/modules/challenges/execution/components/ChallengeDescriptionPanel";
 import { TestCasesPanel } from "@/modules/challenges/execution/components/TestCasesPanel";
 import { EditorWorkspace } from "@/modules/challenges/execution/components/EditorWorkspace";
+import { SubmitConfirmationModal } from "@/modules/challenges/execution/components/SubmitConfirmationModal";
 import { LoadingOverlay } from "@/components";
 import { challengesService } from "@/services/challenges.service";
 import { SubmissionEntry } from "@/store/submission.store";
@@ -30,6 +32,7 @@ export function ExecutionContainer({
   submission,
   onExpired,
 }: ExecutionContainerProps) {
+  const router = useRouter();
   const challengeAssets = (assets as any)?.challenge;
   const testCases = (assets as any)?.test_cases?.test_cases || [];
   const initialCode =
@@ -57,6 +60,10 @@ export function ExecutionContainer({
 
   const [expired, setExpired] = useState(false);
   const [timeLabel, setTimeLabel] = useState("--:--");
+  const [submitModalOpen, setSubmitModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [currentCode, setCurrentCode] = useState(initialCode);
+  const [currentLanguage, setCurrentLanguage] = useState(programmingLanguage);
   const warned5 = useRef(false);
   const warned1 = useRef(false);
 
@@ -121,6 +128,104 @@ export function ExecutionContainer({
     };
   }, [submission, onExpired]);
 
+  // Handle submit action
+  const handleSubmitClick = () => {
+    if (expired) {
+      toast.error("El tiempo del challenge ha terminado");
+      return;
+    }
+
+    if (!submission?.submissionId) {
+      toast.error("Submission no inicializada");
+      return;
+    }
+
+    if (!currentCode || currentCode.trim().length === 0) {
+      toast.error("El código no puede estar vacío");
+      return;
+    }
+
+    setSubmitModalOpen(true);
+  };
+
+  const handleSubmitConfirm = async () => {
+    if (!submission?.submissionId || !challenge?.id) {
+      toast.error("Datos incompletos para enviar");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const response = await challengesService.submitTechnicalChallenge(
+        submission.submissionId,
+        {
+          source_code: currentCode,
+          programming_language: currentLanguage,
+        },
+      );
+
+      // Close modal
+      setSubmitModalOpen(false);
+
+      // Store result data in localStorage for the results page
+      const resultData = {
+        submission_id: response.submission_id,
+        status: response.status,
+        score: (response as any).score || 0,
+        challenge: {
+          id: challenge.id,
+          title: challenge.title,
+          difficulty: challenge.difficulty,
+        },
+      };
+
+      if (typeof window !== "undefined") {
+        localStorage.setItem(
+          `challenge:result:${response.submission_id}`,
+          JSON.stringify(resultData),
+        );
+      }
+
+      toast.success("Solución enviada correctamente");
+
+      // Redirect to results page
+      router.push(
+        `/talent/challenges/results?submissionId=${response.submission_id}`,
+      );
+    } catch (err: any) {
+      let errorMsg = "Error al enviar la solución";
+
+      if (err?.response?.status === 404) {
+        errorMsg = "La submission no existe o fue expirada";
+        console.error("Submit error 404:", {
+          submissionId: submission.submissionId,
+          url: `/challenges/technical-challenges/${submission.submissionId}/submit`,
+          error: err?.response?.data,
+        });
+      } else if (err?.response?.status === 403) {
+        errorMsg = "No tienes permisos para esta submission";
+      } else if (err?.response?.status === 400) {
+        errorMsg =
+          err?.response?.data?.message ||
+          "La submission no está activa o ha expirado";
+      } else if (err?.response?.data?.message) {
+        errorMsg = err.response.data.message;
+      } else if (err?.message) {
+        errorMsg = err.message;
+      }
+
+      toast.error(errorMsg);
+      console.error("Submit error:", err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleExit = () => {
+    router.back();
+  };
+
   const mergedTestCases = testCases.map((tc: any) => {
     const match = executionState.results?.find(
       (r) => String(r.id) === String(tc.id),
@@ -149,6 +254,10 @@ export function ExecutionContainer({
   }, [persistenceKey]);
 
   const handleRun = async (code: string, language: any) => {
+    // Store current code and language for submit
+    setCurrentCode(code);
+    setCurrentLanguage(language);
+
     if (expired) {
       toast.error("El tiempo del challenge ha terminado");
       return { error: "Tiempo expirado" };
@@ -270,6 +379,13 @@ export function ExecutionContainer({
   return (
     <div className="h-screen flex flex-col">
       <LoadingOverlay visible={loading} message="Loading challenge..." />
+      <SubmitConfirmationModal
+        isOpen={submitModalOpen}
+        isLoading={isSubmitting}
+        challengeTitle={challenge?.title}
+        onConfirm={handleSubmitConfirm}
+        onCancel={() => setSubmitModalOpen(false)}
+      />
       <ExecutionTopbar
         title={challenge?.title || "Loading..."}
         difficulty={((): "beginner" | "intermediate" | "advanced" => {
@@ -279,6 +395,8 @@ export function ExecutionContainer({
           return "intermediate";
         })()}
         timeLabel={timeLabel}
+        onExit={handleExit}
+        onSubmit={handleSubmitClick}
       />
 
       <div className="flex-1 bg-white">
