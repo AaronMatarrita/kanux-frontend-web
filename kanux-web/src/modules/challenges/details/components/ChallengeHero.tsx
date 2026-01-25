@@ -1,8 +1,10 @@
-import Link from "next/link";
+"use client";
+
 import { Play, ArrowLeft, Clock, FileText } from "lucide-react";
 import { difficultyConfig } from "../config/difficulty.config";
 import { Pill } from "./Pill";
-import { formatDuration, getStartButtonProps } from "../utils/challenge.utils";
+import { formatDuration } from "../utils/challenge.utils";
+import { useStartChallenge } from "../hooks/useStartChallenge";
 
 interface ChallengeHeroProps {
   challenge: any;
@@ -20,8 +22,11 @@ export function ChallengeHero({
   const difficulty = challenge?.difficulty || "Básico";
   const diffConfig = difficultyConfig[difficulty] || difficultyConfig["Básico"];
   const DiffIcon = diffConfig.icon;
-  const startUrl = isTechnical ? `/talent/challenges/${id}/execute` : "#";
-  const startBtn = getStartButtonProps(isTechnical, startUrl);
+
+  const { startChallenge, isStarting } = useStartChallenge({
+    challengeId: id,
+    durationMinutes: challenge?.duration_minutes || 60,
+  });
 
   return (
     <>
@@ -74,18 +79,20 @@ export function ChallengeHero({
             </div>
           </div>
 
-          <Link
-            href={startBtn.href}
+          <button
+            type="button"
+            disabled={!isTechnical || isStarting}
+            onClick={startChallenge}
             className={`inline-flex items-center justify-center gap-2 rounded-md px-5 py-2.5 text-sm font-semibold transition
             ${
-              startBtn.disabled
+              !isTechnical
                 ? "bg-slate-200 text-slate-400 cursor-not-allowed"
-                : "bg-[#2EC27E] text-white hover:bg-[#28b76a]"
+                : "bg-[#2EC27E] text-white hover:bg-[#28b76a] disabled:bg-slate-200 disabled:text-slate-400"
             }`}
           >
             <Play className="h-4 w-4" />
-            {startBtn.label}
-          </Link>
+            {isStarting ? "Iniciando..." : "Iniciar challenge"}
+          </button>
         </div>
       </section>
     </>
