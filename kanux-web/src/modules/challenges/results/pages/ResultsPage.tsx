@@ -152,7 +152,7 @@ export function ResultsPage({
             <div className="space-y-3">
               <Button
                 size="lg"
-                className="w-full bg-transparent"
+                className="w-full cursor-pointer justify-center gap-2"
                 onClick={() => router.push("/talent/challenges")}
               >
                 Ver Más Retos

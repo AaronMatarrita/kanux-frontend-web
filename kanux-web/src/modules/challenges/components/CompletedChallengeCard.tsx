@@ -1,8 +1,10 @@
 "use client";
 
-import { CheckCircle, Trophy, Medal, AlertTriangle } from "lucide-react";
+import { CheckCircle, Trophy, Medal, AlertTriangle, Eye } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { CompletedChallenge } from "./CompletedTab";
 import { difficultyConfig } from "@/modules/challenges/details/config/difficulty.config";
+import { Button } from "@/components/ui/button";
 
 interface CompletedChallengeCardProps {
   submission: CompletedChallenge;
@@ -44,10 +46,17 @@ function getScoreConfig(score: number) {
 export function CompletedChallengeCard({
   submission,
 }: CompletedChallengeCardProps) {
+  const router = useRouter();
   const difficulty = submission.challenge.difficulty;
   const config = difficultyConfig[difficulty] || difficultyConfig["Básico"];
   const scoreConfig = getScoreConfig(submission.score);
   const ScoreIcon = scoreConfig.Icon;
+
+  const handleViewDetails = () => {
+    router.push(
+      `/talent/challenges/results?submissionId=${submission.submission_id}`,
+    );
+  };
 
   return (
     <div className="group relative flex items-center justify-between gap-4 rounded-xl border border-slate-200 bg-white p-5 transition-all hover:-translate-y-0.5 hover:shadow-md">
@@ -82,18 +91,30 @@ export function CompletedChallengeCard({
         </div>
       </div>
 
-      {/* Score */}
-      <div className="shrink-0 flex flex-col items-end gap-1">
-        <div
-          className={`inline-flex items-center gap-1 rounded-full px-3 py-1 ring-1 transition-colors
+      {/* Score and Action */}
+      <div className="shrink-0 flex items-center gap-3">
+        <div className="flex flex-col items-end gap-1">
+          <div
+            className={`inline-flex items-center gap-1 rounded-full px-3 py-1 ring-1 transition-colors
           ${scoreConfig.bg} ${scoreConfig.ring}`}
-        >
-          <ScoreIcon className={`h-4 w-4 ${scoreConfig.iconColor}`} />
-          <span className={`text-lg font-bold ${scoreConfig.text}`}>
-            {submission.score}
-          </span>
-          <span className={`text-sm ${scoreConfig.iconColor}`}>/100</span>
+          >
+            <ScoreIcon className={`h-4 w-4 ${scoreConfig.iconColor}`} />
+            <span className={`text-lg font-bold ${scoreConfig.text}`}>
+              {submission.score}
+            </span>
+            <span className={`text-sm ${scoreConfig.iconColor}`}>/100</span>
+          </div>
         </div>
+
+        <Button
+          onClick={handleViewDetails}
+          variant="outline"
+          size="sm"
+          className="gap-2"
+        >
+          <Eye className="h-4 w-4" />
+          Ver Detalles
+        </Button>
       </div>
     </div>
   );
