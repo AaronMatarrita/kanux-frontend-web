@@ -4,7 +4,18 @@ import React from 'react';
 import { CheckCircle, Trophy, Zap, Award } from 'lucide-react';
 import { StatCard, ProfileCompletion, RecommendedChallenges, SkillsToImprove } from '@/components/dashboard';
 
-// Mock data
+import { useSyncExternalStore } from 'react';
+import { useAuth } from '@/context/AuthContext';
+
+function useIsClient() {
+  return useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
+}
+
+
 const MOCK_STATS = {
   skillsVerified: { value: 4, change: '+1 this month' },
   challengesCompleted: { value: 23, change: '92% average score' },
@@ -43,11 +54,25 @@ const MOCK_SKILLS_TO_IMPROVE = [
 ];
 
 export default function TalentDashboardPage() {
+   const { session } = useAuth();
+  const isClient = useIsClient();
+
+  const getUserName = () => {
+    if (!isClient) return 'Alex';
+    
+    if (!session) return 'Alex';
+    
+    if (session.user.userType === 'talent') {
+      return session.user.profile?.full_name || 'Talento';
+    }
+    
+  };
+
   return (
     <div className="space-y-8">
       {/* Header */}
       <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold text-slate-900">Welcome back, Alex</h1>
+        <h1 className="text-3xl font-bold text-slate-900">Bienvenido de vuelta, {getUserName()}</h1>
         <p className="text-slate-600">Keep building your skills and unlocking new opportunities.</p>
       </div>
 

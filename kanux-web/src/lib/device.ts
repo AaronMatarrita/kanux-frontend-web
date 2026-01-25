@@ -2,7 +2,7 @@
 
 const DEVICE_ID_KEY = 'kanux_device_id';
 
-const generateDeviceId = (): string => {
+export const generateDeviceId = (): string => {
   const timestamp = Date.now();
   const randomString = Math.random().toString(36).substring(2, 15);
   const userAgent = typeof navigator !== 'undefined' ? navigator.userAgent : '';

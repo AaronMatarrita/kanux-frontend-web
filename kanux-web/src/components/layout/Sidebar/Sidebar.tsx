@@ -6,6 +6,17 @@ import { SidebarItem } from "./SidebarItem";
 import { SidebarFooter } from "./SidebarFooter";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
+import { useAuth } from "@/context/AuthContext";
+import { mapUserTypeToRole } from "@/helper/mapper";
+import { useSyncExternalStore } from "react";
+
+function useIsClient() {
+  return useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
+}
 
 interface SidebarProps {
   isOpen: boolean;
@@ -14,7 +25,16 @@ interface SidebarProps {
 
 export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
   const pathname = usePathname();
-  const menuItems = SIDEBAR_MENU[mockSession.role];
+  const { session } = useAuth();
+ const isClient = useIsClient();
+
+  const role = !isClient
+    ? mockSession.role  
+    : session
+    ? mapUserTypeToRole(session.user.userType)
+    : mockSession.role;
+
+  const menuItems = SIDEBAR_MENU[role];
 
   useEffect(() => {
     onClose();
