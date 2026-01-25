@@ -7,7 +7,7 @@ import { ExecutionTopbar } from "@/modules/challenges/execution/components/Execu
 import { ChallengeDescriptionPanel } from "@/modules/challenges/execution/components/ChallengeDescriptionPanel";
 import { TestCasesPanel } from "@/modules/challenges/execution/components/TestCasesPanel";
 import { EditorWorkspace } from "@/modules/challenges/execution/components/EditorWorkspace";
-import { SubmitConfirmationModal } from "@/modules/challenges/execution/components/SubmitConfirmationModal";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { LoadingOverlay } from "@/components";
 import { challengesService } from "@/services/challenges.service";
 import { SubmissionEntry, useSubmissionStore } from "@/store/submission.store";
@@ -387,10 +387,17 @@ export function ExecutionContainer({
   return (
     <div className="h-screen flex flex-col">
       <LoadingOverlay visible={loading} message="Loading challenge..." />
-      <SubmitConfirmationModal
+      <ConfirmDialog
         isOpen={submitModalOpen}
+        title="Confirmar envío"
+        description={
+          challenge?.title
+            ? `¿Estás seguro de enviar tu solución para ${challenge.title}?`
+            : "¿Estás seguro de enviar tu solución?"
+        }
         isLoading={isSubmitting}
-        challengeTitle={challenge?.title}
+        confirmLabel="Enviar"
+        cancelLabel="Cancelar"
         onConfirm={handleSubmitConfirm}
         onCancel={() => setSubmitModalOpen(false)}
       />

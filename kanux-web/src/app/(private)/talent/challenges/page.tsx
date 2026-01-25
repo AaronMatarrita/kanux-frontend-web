@@ -6,8 +6,12 @@ import { AllChallengesTab } from "@/modules/challenges/components/AllChallengesT
 import { InProgressTab } from "@/modules/challenges/components/InProgressTab";
 import { CompletedTab } from "@/modules/challenges/components/CompletedTab";
 import { useChallenges } from "@/modules/challenges/hooks/useChallenges";
+import { useState } from "react";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 export default function Page() {
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmLoading, setConfirmLoading] = useState(false);
   const {
     challengeType,
     displayChallenges,
@@ -27,6 +31,17 @@ export default function Page() {
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const openReloadConfirm = () => setConfirmOpen(true);
+  const handleConfirmReload = async () => {
+    try {
+      setConfirmLoading(true);
+      await loadChallenges();
+      setConfirmOpen(false);
+    } finally {
+      setConfirmLoading(false);
+    }
   };
 
   return (
@@ -71,6 +86,17 @@ export default function Page() {
           />
         </TabsContent>
       </Tabs>
+
+      <ConfirmDialog
+        isOpen={confirmOpen}
+        title="Actualizar challenges"
+        description="¿Deseas actualizar la lista de challenges?"
+        isLoading={confirmLoading}
+        confirmLabel="Actualizar"
+        cancelLabel="Cancelar"
+        onConfirm={handleConfirmReload}
+        onCancel={() => setConfirmOpen(false)}
+      />
     </div>
   );
 }
