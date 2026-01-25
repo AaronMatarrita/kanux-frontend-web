@@ -21,13 +21,13 @@ export default function PrivateLayout({
   const closeSidebar = () => setIsSidebarOpen(false);
 
   return (
-    <div className="min-h-screen bg-[#f8f8f8]">
+    <div className="min-h-screen bg-[#f8f8f8] flex flex-col">
       <Sidebar isOpen={isSidebarOpen} onClose={closeSidebar} />
       <Topbar onToggleSidebar={toggleSidebar} isSidebarOpen={isSidebarOpen} />
 
       {/* Main content area */}
       <main
-        className={`mt-16 ${isFullBleed ? "p-0" : "p-4 sm:p-6 lg:p-8"} transition-all duration-300 ${
+        className={`mt-16 flex-1 overflow-y-auto ${isFullBleed ? "p-0" : "p-4 sm:p-6 lg:p-8"} transition-all duration-300 ${
           isSidebarOpen ? "lg:ml-72" : "lg:ml-0"
         }`}
       >

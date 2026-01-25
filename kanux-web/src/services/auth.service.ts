@@ -30,16 +30,33 @@ export interface UserProfile {
   [key: string]: unknown;
 }
 
-export interface LoginResponse {
-  token: string;
-  sessionId: string;
-  user: {
-    id: string;
-    email: string;
-    userType: "talent" | "company";
-    profile: UserProfile;
-  };
-}
+import {
+  BackendTalentProfile,
+  BackendCompanyProfile,
+} from "@/modules/auth/login/types";
+
+export type LoginResponse =
+  | {
+      token: string;
+      sessionId: string;
+      user: {
+        id: string;
+        email: string;
+        userType: "talent";
+        profile: BackendTalentProfile;
+      };
+    }
+  | {
+      token: string;
+      sessionId: string;
+      user: {
+        id: string;
+        email: string;
+        userType: "company";
+        profile: BackendCompanyProfile;
+      };
+    };
+
 
 
 export const authService = {

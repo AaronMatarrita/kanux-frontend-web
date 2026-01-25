@@ -38,7 +38,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
 
   const validatePassword = (password: string): string | undefined => {
     if (!password) return 'Password is required';
-    if (password.length < 6) return 'Password must be at least 6 characters';
+    if (password.length < 4) return 'Password must be at least 4 characters';
     return undefined;
   };
 
