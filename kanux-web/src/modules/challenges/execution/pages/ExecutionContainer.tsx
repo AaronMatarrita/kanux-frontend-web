@@ -12,6 +12,8 @@ import { LoadingOverlay } from "@/components";
 import { challengesService } from "@/services/challenges.service";
 import { SubmissionEntry } from "@/store/submission.store";
 
+type Difficulty = "beginner" | "intermediate" | "advanced";
+
 interface ExecutionContainerProps {
   challenge?: {
     id?: string;
@@ -223,7 +225,7 @@ export function ExecutionContainer({
   };
 
   const handleExit = () => {
-    router.back();
+    router.push("/talent/challenges");
   };
 
   const mergedTestCases = testCases.map((tc: any) => {

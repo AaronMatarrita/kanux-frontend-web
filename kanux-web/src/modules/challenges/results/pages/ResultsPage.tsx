@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { TrendingUp } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { BackNavigation } from "@/modules/challenges/components/BackNavigation";
 import {
   challengesService,
   TechnicalChallengeResultResponse,
@@ -120,6 +121,12 @@ export function ResultsPage({
 
   return (
     <div className="min-h-screen bg-linear-to-b from-background to-muted/20">
+      <div className="max-w-5xl mx-auto px-4 pt-4">
+        <BackNavigation
+          label="Volver a challenges"
+          onClick={() => router.push("/talent/challenges")}
+        />
+      </div>
       <ResultsHero
         isPassed={isPassed}
         scorePercentage={finalScore}

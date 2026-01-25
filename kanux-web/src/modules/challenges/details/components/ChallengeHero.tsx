@@ -1,10 +1,11 @@
 "use client";
 
-import { Play, ArrowLeft, Clock, FileText } from "lucide-react";
+import { Play, Clock, FileText } from "lucide-react";
 import { difficultyConfig } from "../config/difficulty.config";
 import { Pill } from "./Pill";
 import { formatDuration } from "../utils/challenge.utils";
 import { useStartChallenge } from "../hooks/useStartChallenge";
+import { BackNavigation } from "@/modules/challenges/components/BackNavigation";
 
 interface ChallengeHeroProps {
   challenge: any;
@@ -32,13 +33,7 @@ export function ChallengeHero({
     <>
       {/* HEADER */}
       <div className="flex items-center justify-between">
-        <button
-          onClick={onBack}
-          className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-900 transition cursor-pointer"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Volver a challenges
-        </button>
+        <BackNavigation label="Volver a challenges" onClick={onBack} />
       </div>
 
       {/* HERO */}
