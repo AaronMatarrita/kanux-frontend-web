@@ -105,23 +105,11 @@ export function CreateAccountCompany() {
         </div>
       )}
       <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Google Sign in */}
-        <button
-          type="button"
-          className="w-full border border-gray-300 text-gray-700 p-3 rounded-lg flex items-center justify-center gap-2 hover:bg-gray-50 transition-colors"
-        >
-          <svg className="w-5 h-5" viewBox="0 0 24 24">
-            <text x="12" y="16" fontSize="14" fontWeight="bold" textAnchor="middle" fill="#4285F4">
-              G
-            </text>
-          </svg>
-          <span className="text-sm font-medium">Google Sign in</span>
-        </button>
 
         {/* Divider */}
         <div className="flex items-center gap-4 my-4">
           <div className="flex-1 h-px bg-gray-300"></div>
-          <span className="text-xs text-gray-500 font-medium">OR SIGN UP WITH EMAIL</span>
+          <span className="text-xs text-gray-500 font-medium">SIGN UP WITH EMAIL</span>
           <div className="flex-1 h-px bg-gray-300"></div>
         </div>
         {/* company email */}
@@ -159,6 +147,7 @@ export function CreateAccountCompany() {
         {/* Submit Button */}
         <button
           type="submit"
+          disabled={isLoading}
           className="w-full bg-green-500 hover:bg-green-600 text-white p-3 rounded-lg font-medium text-sm transition-colors mt-6"
         >
           {isLoading ? "Registering..." : "Create Account"}

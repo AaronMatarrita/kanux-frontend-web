@@ -41,8 +41,14 @@ export interface Company {
 }
 
 export interface RegisterCompanyResponse {
-  data: Company;
-  token: string;
+  success: boolean; 
+  user: {
+    id: string;
+    email: string;
+    user_type: string;
+    profile: Company; 
+    [key: string]: unknown;
+  };
 }
 
 export interface TalentSearchResult {
