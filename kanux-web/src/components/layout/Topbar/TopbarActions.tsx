@@ -3,8 +3,10 @@
 import { Sun, LogOut } from "lucide-react";
 import { IconButton } from "./IconButton";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 
 export const TopbarActions = () => {
+  const {logout,session} = useAuth();
   const router = useRouter();
 
   const handleThemeToggle = () => {
@@ -13,9 +15,8 @@ export const TopbarActions = () => {
   };
 
   const handleLogout = () => {
-    // TODO: Implement logout logic in a future task
-    console.log("Logout clicked");
-    router.push("/");
+    logout();
+    router.push("/auth/login");
   };
 
   return (
