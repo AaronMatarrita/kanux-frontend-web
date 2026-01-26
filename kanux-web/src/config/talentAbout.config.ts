@@ -6,6 +6,6 @@ export interface TalentAbout {
   experience_level?: string;
   education?: string;
   about?: string;
-  contact?: Record<string, unknown>;
+  contact?: string;
 }
 
