@@ -7,6 +7,7 @@ import { TextInput } from "./TextInput";
 import { TextArea } from "./TextArea";
 import { TalentProfile } from "@/services/profiles.service";
 import { profilesService } from "@/services/profiles.service";
+import { SuccessModal } from "../resgister-confirmation/confirmationRegister";
 
 export function CreateAboutTalent() {
 
@@ -74,6 +75,7 @@ export function CreateAboutTalent() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setServerError(null)
+        setSuccess(false);
         if (validate()) {
             setIsLoading(true);
             try {
@@ -96,11 +98,7 @@ export function CreateAboutTalent() {
                 localStorage.setItem("Kanux_user", JSON.stringify(response.user));
 
                 setSuccess(true);
-                setTimeout(() => {
-                    localStorage.removeItem("kanux_user_id");
-                    router.push("/talent/dashboard"); //send to talent dashboard
-                }, 2000);
-
+                localStorage.removeItem("kanux_user_id");
             } catch (error) {
                 console.error("Error:", error);
                 setServerError("There was an error updating your profile. Please try again.");
@@ -109,6 +107,11 @@ export function CreateAboutTalent() {
             }
         }
     };
+
+    // confirmation modal
+    if (success) {
+        return <SuccessModal redirectPath="/talent/dashboard" />;
+    }
 
     return (
         <div className="w-full max-w-2xl mx-auto">
