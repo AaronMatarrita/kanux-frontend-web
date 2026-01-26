@@ -5,12 +5,13 @@ import { useRouter } from "next/navigation";
 import { TalentAbout } from "@/config/talentAbout.config";
 import { TextInput } from "./TextInput";
 import { TextArea } from "./TextArea";
-import { TalentProfile} from "@/services/profiles.service";
+import { TalentProfile } from "@/services/profiles.service";
 import { profilesService } from "@/services/profiles.service";
+import { SuccessModal } from "../resgister-confirmation/confirmationRegister";
 
 export function CreateAboutTalent() {
 
-    const user = localStorage.getItem("kanux_user_id")??"";
+    const user = localStorage.getItem("kanux_user_id") ?? "";
 
     const [talentAbout, setTalentAbout] = useState<TalentAbout>({
         first_name: "",
@@ -20,18 +21,20 @@ export function CreateAboutTalent() {
         experience_level: "",
         education: "",
         about: "",
-        contact: {}
+        contact: "",
     });
 
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
     const [success, setSuccess] = useState(false);
+    const [serverError, setServerError] = useState<string | null>(null);
+
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
 
     // Handle input changes
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
-        setTalentAbout({...talentAbout, [name]: value});
+        setTalentAbout({ ...talentAbout, [name]: value });
     };
 
     // Validation
@@ -58,6 +61,11 @@ export function CreateAboutTalent() {
 
         if (!talentAbout.about?.trim())
             newErrors.about = "Please tell us about yourself";
+        if (!talentAbout.contact?.trim())
+            newErrors.contact = "A contact number is required";
+
+        else if (!/^\+?[1-9]\d{7,14}$/.test(talentAbout.contact))
+            newErrors.contact = "Invalid contact number format";
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
@@ -66,38 +74,44 @@ export function CreateAboutTalent() {
     // Handle form submit
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setServerError(null)
+        setSuccess(false);
         if (validate()) {
             setIsLoading(true);
             try {
 
-                const updatedProfile: TalentProfile = {
+                const createProfile: TalentProfile = {
                     id: "",
-                    user_id: user,   
+                    user_id: user,
                     first_name: talentAbout.first_name,
                     last_name: talentAbout.last_name,
                     title: talentAbout.title,
                     location: talentAbout.location,
                     experience_level: talentAbout.experience_level,
                     education: talentAbout.education,
-                    about: talentAbout.about
+                    about: talentAbout.about,
+                    contact: { phone: talentAbout.contact },
                 };
 
-                const response = await profilesService.updateMyProfile(updatedProfile);
+                const response = await profilesService.preRegisterProfile(user, createProfile);
+                console.log("Profile created successfully:", response);
+                localStorage.setItem("Kanux_user", JSON.stringify(response.user));
 
                 setSuccess(true);
-                setTimeout(() => {
-                    localStorage.removeItem("kanux_user_id");
-                    router.push("/talent/dashboard"); //send to talent dashboard
-                }, 2000);
-
+                localStorage.removeItem("kanux_user_id");
             } catch (error) {
                 console.error("Error:", error);
-                setErrors({ server: "There was an error updating your profile. Please try again." });
+                setServerError("There was an error updating your profile. Please try again.");
             } finally {
                 setIsLoading(false);
             }
         }
     };
+
+    // confirmation modal
+    if (success) {
+        return <SuccessModal redirectPath="/talent/dashboard" />;
+    }
 
     return (
         <div className="w-full max-w-2xl mx-auto">
@@ -106,12 +120,16 @@ export function CreateAboutTalent() {
                 <h1 className="text-center text-3xl font-bold text-blue-900 mb-2">Complete your profile</h1>
                 <p className="text-center text-gray-500">This helps companies understand your background.</p>
             </div>
-
+            {serverError && (
+                <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg text-sm text-center">
+                    {serverError}
+                </div>
+            )}
             <form onSubmit={handleSubmit} className="space-y-8">
                 {/* PERSONAL INFORMATION Section */}
                 <div>
                     <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wide mb-6">Personal information</h2>
-                    
+
                     {/* First Name */}
                     <TextInput
                         label="First Name"
@@ -122,7 +140,7 @@ export function CreateAboutTalent() {
                         placeholder="John"
                         error={errors.first_name}
                     />
-                    
+
                     {/* Last Name */}
                     <TextInput
                         label="Last Name"
@@ -132,6 +150,26 @@ export function CreateAboutTalent() {
                         onChange={handleInputChange}
                         placeholder="Doe"
                         error={errors.last_name}
+                    />
+                    {/* Contanct */}
+                    <TextInput
+                        label="Contact"
+                        type="text"
+                        name="contact"
+                        value={talentAbout.contact}
+                        onChange={handleInputChange}
+                        placeholder="+506 0000-0000"
+                        error={errors.contact}
+                    />
+                    {/* Location */}
+                    <TextInput
+                        label="Location"
+                        type="text"
+                        name="location"
+                        value={talentAbout.location}
+                        onChange={handleInputChange}
+                        placeholder="San Francisco, USA"
+                        error={errors.location}
                     />
 
                     {/* Professional Title */}
@@ -143,17 +181,6 @@ export function CreateAboutTalent() {
                         onChange={handleInputChange}
                         placeholder="Software Developer"
                         error={errors.title}
-                    />
-
-                    {/* Location */}
-                    <TextInput
-                        label="Location"
-                        type="text"
-                        name="location"
-                        value={talentAbout.location}
-                        onChange={handleInputChange}
-                        placeholder="San Francisco, USA"
-                        error={errors.location}
                     />
 
                     {/* Experience Level */}

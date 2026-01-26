@@ -38,7 +38,16 @@ export interface CreateLanguageRequest {
 // ============================================================================
 // Response DTOs
 // ============================================================================
-
+export interface TalentPreregisterResponse {
+  success: boolean;
+  user: {
+    id: string;
+    email: string;
+    user_type: string;
+    profile: TalentProfile;
+    [key: string]: unknown;
+  };
+}
 export interface TalentProfile {
   id: string;
   user_id: string;
@@ -94,6 +103,11 @@ export interface Catalogs {
 // ============================================================================
 
 export const profilesService = {
+
+  preRegisterProfile: async (id_user: string, data: TalentProfile): Promise<TalentPreregisterResponse> => {
+    const res = await httpClient.post<TalentPreregisterResponse>(`/profiles/${id_user}`, data);
+    return res.data;
+  },
   /**
    * GET /profiles/me
    * Get current user's profile (requires auth)
