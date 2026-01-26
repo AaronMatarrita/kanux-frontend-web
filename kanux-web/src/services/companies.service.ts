@@ -40,6 +40,18 @@ export interface Company {
   [key: string]: unknown;
 }
 
+export interface CompanyDashboardData {
+  totalChallenges: number;
+  totalTalentsParticipated: number;
+  unreadMessages: number;
+  totalUsersParticipated: number;
+}
+
+export interface CompanyDashboardResponse {
+  success: boolean;
+  data: CompanyDashboardData;
+}
+
 export interface RegisterCompanyResponse {
   data: Company;
   token: string;
@@ -161,6 +173,21 @@ export const companiesService = {
       `/companies/company/contact/${companyId}:${talentId}`,
       {},
     );
+    return res.data;
+  },
+
+   getCompanyDashboard: async (
+    token: string
+  ): Promise<CompanyDashboardResponse> => {
+    const res = await httpClient.get<CompanyDashboardResponse>(
+      `/companies/company/dashboard`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
     return res.data;
   },
 };
