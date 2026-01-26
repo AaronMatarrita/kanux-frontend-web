@@ -22,6 +22,8 @@ export interface LoginRequest {
 export interface PreRegisterResponse {
   success: boolean;
   user: string; 
+  token: string;
+  sessionId: string;
   nextStep: "REGISTER_TALENT" | "REGISTER_COMPANY";
 }
 

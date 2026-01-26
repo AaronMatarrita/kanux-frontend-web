@@ -5,11 +5,13 @@ import { useRouter } from "next/navigation";
 import { TalentAbout } from "@/config/talentAbout.config";
 import { TextInput } from "./TextInput";
 import { TextArea } from "./TextArea";
-import { ExperienceInput } from "./ExperienceInput";
+import { TalentProfile} from "@/services/profiles.service";
+import { profilesService } from "@/services/profiles.service";
 
 export function CreateAboutTalent() {
 
-    const idUser = "get user";
+    const userData = localStorage.getItem("kanux_user");
+    const user = userData ? JSON.parse(userData) : null;
 
     const [talentAbout, setTalentAbout] = useState<TalentAbout>({
         first_name: "",
@@ -68,9 +70,21 @@ export function CreateAboutTalent() {
         if (validate()) {
             setIsLoading(true);
             try {
-                // TODO: Submit talentAbout data to API
-                console.log("Talent profile data:", talentAbout);
-                
+
+                const updatedProfile: TalentProfile = {
+                    id: "",
+                    user_id: user.id,   
+                    first_name: talentAbout.first_name,
+                    last_name: talentAbout.last_name,
+                    title: talentAbout.title,
+                    location: talentAbout.location,
+                    experience_level: talentAbout.experience_level,
+                    education: talentAbout.education,
+                    about: talentAbout.about
+                };
+
+                await profilesService.updateMyProfile(updatedProfile);
+
                 setSuccess(true);
                 setTimeout(() => {
                     router.push("/talent/dashboard"); //send to talent dashboard

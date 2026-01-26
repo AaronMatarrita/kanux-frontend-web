@@ -10,7 +10,7 @@ const OPTIONS: OptionAccountSelection[] = [
         key: "professional",
         title: "Professional",
         description: "Build skills, complete challenges, and get discovered by companies.",
-        route: "/onboarding/professional",
+        route: "/onboarding/register-talent",
         bullets: [
             "Create your skill-based profile",
             "Complete real-world challenges",
@@ -46,11 +46,9 @@ export const AccountSelection = () => {
         if (!selectedKey) return;
 
         const chosen = OPTIONS.find((o) => o.key === selectedKey);
-
+        
         if (chosen?.route) {
             router.push(chosen.route);
-        } else {
-            router.push(`/onboarding/selected?role=${selectedKey}`);
         }
     };
     return (
