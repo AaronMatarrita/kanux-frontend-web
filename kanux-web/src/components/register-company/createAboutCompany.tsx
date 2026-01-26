@@ -11,8 +11,8 @@ import { CompanyAbout } from "@/config/companyAbout.config";
 
 
 export function CreateAboutCompany() {
-    
-    const idUser =  "get user "; 
+
+    const user = localStorage.getItem("kanux_user_id")??"";
 
     const [companyAbout, setCompanyAbout] = useState<CompanyAbout>({
         companyName: "",
@@ -24,6 +24,7 @@ export function CreateAboutCompany() {
 
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
     const [success, setSuccess] = useState(false);
+    const [serverError, setServerError] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
 
@@ -59,6 +60,7 @@ export function CreateAboutCompany() {
     // handle form submit 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setServerError(null);
         if (validate()) {
             setIsLoading(true);
             try {
@@ -72,20 +74,20 @@ export function CreateAboutCompany() {
                 };
                 // request to service
                 const response = await companiesService.registerCompany(
-                    idUser,// user id
+                    user,
                     registerRequest
                 );
 
                 setSuccess(true);
-                // here need show success message and redirect to dashboard
                 setTimeout(() => {
-                    router.push("/dashboard");
+                    localStorage.removeItem("kanux_user_id");
+                    router.push("/company/dashboard");
                 }, 2000);
 
             } catch (error) {
                 console.error("Error:", error);
-                setErrors({ server: "There was an error registering the company. Please try again." });
-            }finally{
+                setServerError("There was an error registering the company. Please try again.");
+            } finally {
                 setIsLoading(false);
             }
         }
@@ -97,6 +99,11 @@ export function CreateAboutCompany() {
             <div className="mb-6">
                 <h1 className="text-center text-3xl font-bold text-blue-800 mb-2">Tell us about your company</h1>
             </div>
+            {serverError && (
+                <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg text-sm text-center">
+                    {serverError}
+                </div>
+            )}
             {/* details */}
             <div className="mb-8">
                 <p className="text-left font-bold text-black text-sm">COMPANY DETAILS</p>
@@ -159,7 +166,7 @@ export function CreateAboutCompany() {
                             className={`px-6 py-3 rounded-lg font-medium text-sm transition-colors  pb-5 pt-5 
                             ${companyAbout.goal === "hiring"
                                     ? "bg-green-100 text-green-700 border-2 border-none"
-                                    : "border-1 border-gray-300 text-gray-700 hover:border-gray-400"
+                                    : "border-1px border-gray-300 text-gray-700 hover:border-gray-400"
                                 }`}
                         >
                             Hiring talent
@@ -171,7 +178,7 @@ export function CreateAboutCompany() {
                             className={`px-6 py-3 rounded-lg font-medium text-sm transition-colors pb-5 pt-5  
                                 ${companyAbout.goal === "challenges"
                                     ? "bg-green-100 text-green-700 border-2 border-none"
-                                    : "border-1 border-gray-300 text-gray-700 hover:border-gray-400"
+                                    : "border-1px border-gray-300 text-gray-700 hover:border-gray-400"
                                 }`}
                         >
                             Running skill challenges
@@ -183,7 +190,7 @@ export function CreateAboutCompany() {
                             className={`px-6 py-3 rounded-lg font-medium text-sm transition-colors  pb-5 pt-5
                             ${companyAbout.goal === "both"
                                     ? "bg-green-100 text-green-700 border-2 border-none"
-                                    : "border-1 border-gray-300 text-gray-700 hover:border-gray-400"
+                                    : "border-1px border-gray-300 text-gray-700 hover:border-gray-400"
                                 }`}
                         >
                             Both
