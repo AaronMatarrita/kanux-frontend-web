@@ -4,8 +4,10 @@ import { use, useState } from "react";
 import { useRouter } from "next/navigation";
 import { FormInput } from "./formInput";
 import { companiesService } from "@/services";
-import { RegisterCompanyRequest } from "@/services/companies.service";
+import { RegisterCompanyRequest,RegisterCompanyResponse } from "@/services/companies.service";
 import { CompanyAbout } from "@/config/companyAbout.config";
+import { SuccessModal } from "../resgister-confirmation/confirmationRegister";
+import { set } from "react-hook-form";
 
 
 
@@ -77,13 +79,10 @@ export function CreateAboutCompany() {
                     user,
                     registerRequest
                 );
-
+                
+                localStorage.setItem("kanux_user", JSON.stringify(response.user));
+                localStorage.removeItem("kanux_user_id");
                 setSuccess(true);
-                setTimeout(() => {
-                    localStorage.removeItem("kanux_user_id");
-                    router.push("/company/dashboard");
-                }, 2000);
-
             } catch (error) {
                 console.error("Error:", error);
                 setServerError("There was an error registering the company. Please try again.");
@@ -92,7 +91,9 @@ export function CreateAboutCompany() {
             }
         }
     };
-
+    if (success) {
+        return <SuccessModal redirectPath="/company/dashboard" />;
+    }
     return (
         <div className="w-full">
             {/* title */}
@@ -201,6 +202,7 @@ export function CreateAboutCompany() {
                 {/* Submit Button */}
                 <button
                     type="submit"
+                    disabled={isLoading}
                     className="w-full bg-green-500 hover:bg-green-600 text-white p-3 rounded-lg font-medium text-sm transition-colors mt-6"
                 >
                     {isLoading ? "Registering company..." : "Finish setup"}
