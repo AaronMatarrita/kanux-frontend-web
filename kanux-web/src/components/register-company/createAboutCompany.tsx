@@ -25,7 +25,7 @@ export function CreateAboutCompany() {
     });
 
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
-    const [success, setSuccess] = useState(true);
+    const [success, setSuccess] = useState(false);
     const [serverError, setServerError] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
