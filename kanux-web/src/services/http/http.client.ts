@@ -19,9 +19,16 @@ export const httpClient: AxiosInstance = axios.create({
 httpClient.interceptors.request.use(
   (config) => {
     if (typeof window !== "undefined") {
-      const token = localStorage.getItem("kanux_token");
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+      const sessionData = localStorage.getItem("session");
+      if (sessionData) {
+        try {
+          const session = JSON.parse(sessionData);
+          if (session?.token) {
+            config.headers.Authorization = `Bearer ${session.token}`;
+          }
+        } catch (error) {
+          console.error("Error parsing session data:", error);
+        }
       }
     }
     return config;
