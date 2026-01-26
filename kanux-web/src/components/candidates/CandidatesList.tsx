@@ -1,49 +1,50 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { Search, Eye, MessageSquare } from 'lucide-react';
-import type { Candidate } from '@/services/candidates.service';
-import { candidatesService } from '@/services/candidates.service';
+import React, { useState, useEffect, useMemo, useCallback } from "react";
+import { Search, Eye, MessageSquare } from "lucide-react";
+import type { Candidate } from "@/services/candidates.service";
+import { candidatesService } from "@/services/candidates.service";
+import { Select } from "@/components/ui/select";
 
 const MOCK_CANDIDATES: Candidate[] = [
   {
-    id: '1',
-    name: 'Sarah Martinez',
-    skills: ['React', 'TypeScript', 'Node.js'],
-    background: 'Self-taught',
-    location: 'San Francisco, CA',
+    id: "1",
+    name: "Sarah Martinez",
+    skills: ["React", "TypeScript", "Node.js"],
+    background: "Self-taught",
+    location: "San Francisco, CA",
     match: 94,
   },
   {
-    id: '2',
-    name: 'James Chen',
-    skills: ['Python', 'Django', 'PostgreSQL'],
-    background: 'Bootcamp',
-    location: 'New York, NY',
+    id: "2",
+    name: "James Chen",
+    skills: ["Python", "Django", "PostgreSQL"],
+    background: "Bootcamp",
+    location: "New York, NY",
     match: 92,
   },
   {
-    id: '3',
-    name: 'Emily Rodriguez',
-    skills: ['Vue.js', 'AWS', 'Docker'],
-    background: 'University',
-    location: 'Austin, TX',
+    id: "3",
+    name: "Emily Rodriguez",
+    skills: ["Vue.js", "AWS", "Docker"],
+    background: "University",
+    location: "Austin, TX",
     match: 89,
   },
   {
-    id: '4',
-    name: 'Michael Kim',
-    skills: ['Angular', 'C#', '.NET'],
-    background: 'Self-taught',
-    location: 'Seattle, WA',
+    id: "4",
+    name: "Michael Kim",
+    skills: ["Angular", "C#", ".NET"],
+    background: "Self-taught",
+    location: "Seattle, WA",
     match: 87,
   },
   {
-    id: '5',
-    name: 'Alex Johnson',
-    skills: ['Java', 'Spring Boot', 'Kubernetes'],
-    background: 'University',
-    location: 'Boston, MA',
+    id: "5",
+    name: "Alex Johnson",
+    skills: ["Java", "Spring Boot", "Kubernetes"],
+    background: "University",
+    location: "Boston, MA",
     match: 85,
   },
 ];
@@ -58,33 +59,39 @@ export const CandidatesList: React.FC<CandidatesProps> = ({
   onContact,
 }) => {
   const [isLoading, setIsLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [skillFilter, setSkillFilter] = useState<string>('All Skills');
-  const [backgroundFilter, setBackgroundFilter] = useState<string>('');
-  const [locationFilter, setLocationFilter] = useState<string>('');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [skillFilter, setSkillFilter] = useState<string>("All Skills");
+  const [backgroundFilter, setBackgroundFilter] = useState<string>("");
+  const [locationFilter, setLocationFilter] = useState<string>("");
   const [skillsOptions, setSkillsOptions] = useState<string[]>([]);
 
   // Unique values for filters
   const uniqueBackgrounds = useMemo(
     () => Array.from(new Set(MOCK_CANDIDATES.map((c) => c.background))),
-    []
+    [],
   );
   const uniqueLocations = useMemo(
     () => Array.from(new Set(MOCK_CANDIDATES.map((c) => c.location))),
-    []
+    [],
   );
 
   useEffect(() => {
     const loadFilters = async () => {
       try {
         const skills = await candidatesService.getSkillFilters();
-        const uniqueSkills = Array.from(new Set(
-          Array.isArray(skills) ? skills.filter(s => typeof s === 'string') : []
-        ));
+        const uniqueSkills = Array.from(
+          new Set(
+            Array.isArray(skills)
+              ? skills.filter((s) => typeof s === "string")
+              : [],
+          ),
+        );
         setSkillsOptions(uniqueSkills);
       } catch (error) {
-        console.error('Error loading skills filter:', error);
-        setSkillsOptions(Array.from(new Set(MOCK_CANDIDATES.flatMap((c) => c.skills))));
+        console.error("Error loading skills filter:", error);
+        setSkillsOptions(
+          Array.from(new Set(MOCK_CANDIDATES.flatMap((c) => c.skills))),
+        );
       } finally {
         setIsLoading(false);
       }
@@ -101,27 +108,27 @@ export const CandidatesList: React.FC<CandidatesProps> = ({
         (candidate) =>
           candidate.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
           candidate.skills.some((skill) =>
-            skill.toLowerCase().includes(searchTerm.toLowerCase())
-          )
+            skill.toLowerCase().includes(searchTerm.toLowerCase()),
+          ),
       );
     }
 
-    if (skillFilter && skillFilter !== 'All Skills') {
+    if (skillFilter && skillFilter !== "All Skills") {
       filtered = filtered.filter((candidate) =>
-        candidate.skills.includes(skillFilter)
+        candidate.skills.includes(skillFilter),
       );
     }
 
     if (backgroundFilter) {
       filtered = filtered.filter(
-        (candidate) => candidate.background === backgroundFilter
+        (candidate) => candidate.background === backgroundFilter,
       );
     }
 
     // Location filter
     if (locationFilter) {
       filtered = filtered.filter(
-        (candidate) => candidate.location === locationFilter
+        (candidate) => candidate.location === locationFilter,
       );
     }
 
@@ -132,14 +139,43 @@ export const CandidatesList: React.FC<CandidatesProps> = ({
     (candidateId: string) => {
       onViewProfile?.(candidateId);
     },
-    [onViewProfile]
+    [onViewProfile],
   );
 
   const handleContact = useCallback(
     (candidateId: string) => {
       onContact?.(candidateId);
     },
-    [onContact]
+    [onContact],
+  );
+
+  const skillSelectOptions = useMemo(
+    () => [
+      { label: "All Skills", value: "All Skills" },
+      ...skillsOptions.map((skill) => ({
+        label: skill,
+        value: skill,
+      })),
+    ],
+    [skillsOptions],
+  );
+
+  const backgroundSelectOptions = useMemo(
+    () =>
+      uniqueBackgrounds.map((bg) => ({
+        label: bg,
+        value: bg,
+      })),
+    [uniqueBackgrounds],
+  );
+
+  const locationSelectOptions = useMemo(
+    () =>
+      uniqueLocations.map((loc) => ({
+        label: loc,
+        value: loc,
+      })),
+    [uniqueLocations],
   );
 
   if (isLoading) {
@@ -177,44 +213,28 @@ export const CandidatesList: React.FC<CandidatesProps> = ({
         {/* Filters Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Skills Filter */}
-          <select
+          <Select
             value={skillFilter}
-            onChange={(e) => setSkillFilter(e.target.value)}
-            className="px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 text-slate-700"
-          >
-            <option>All Skills</option>
-            {skillsOptions.map((skill) => (
-              <option key={skill} value={skill}>
-                {skill}
-              </option>
-            ))}
-          </select>
+            onChange={setSkillFilter}
+            options={skillSelectOptions}
+            placeholder="All Skills"
+          />
 
-          <select
+          {/* Background Filter */}
+          <Select
             value={backgroundFilter}
-            onChange={(e) => setBackgroundFilter(e.target.value)}
-            className="px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 text-slate-700"
-          >
-            <option value="">Experience Background</option>
-            {uniqueBackgrounds.map((bg) => (
-              <option key={bg} value={bg}>
-                {bg}
-              </option>
-            ))}
-          </select>
+            onChange={setBackgroundFilter}
+            options={backgroundSelectOptions}
+            placeholder="Experience Background"
+          />
 
-          <select
+          {/* Location Filter */}
+          <Select
             value={locationFilter}
-            onChange={(e) => setLocationFilter(e.target.value)}
-            className="px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 text-slate-700"
-          >
-            <option value="">Location</option>
-            {uniqueLocations.map((location) => (
-              <option key={location} value={location}>
-                {location}
-              </option>
-            ))}
-          </select>
+            onChange={setLocationFilter}
+            options={locationSelectOptions}
+            placeholder="Location"
+          />
         </div>
       </div>
 
@@ -270,7 +290,7 @@ export const CandidatesList: React.FC<CandidatesProps> = ({
                   </td>
                   <td className="px-6 py-4">
                     <p className="text-sm text-slate-600">
-                       {candidate.location}
+                      {candidate.location}
                     </p>
                   </td>
                   <td className="px-6 py-4">
@@ -320,7 +340,8 @@ export const CandidatesList: React.FC<CandidatesProps> = ({
       </div>
 
       <div className="text-sm text-slate-600">
-        Showing {filteredCandidates.length} of {MOCK_CANDIDATES.length} candidates
+        Showing {filteredCandidates.length} of {MOCK_CANDIDATES.length}{" "}
+        candidates
       </div>
     </div>
   );
