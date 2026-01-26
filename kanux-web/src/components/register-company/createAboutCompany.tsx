@@ -12,8 +12,7 @@ import { CompanyAbout } from "@/config/companyAbout.config";
 
 export function CreateAboutCompany() {
 
-    const userData = localStorage.getItem("kanux_user");
-    const user = userData ? JSON.parse(userData) : null;
+    const user = localStorage.getItem("kanux_user_id")??"";
 
     const [companyAbout, setCompanyAbout] = useState<CompanyAbout>({
         companyName: "",
@@ -75,13 +74,14 @@ export function CreateAboutCompany() {
                 };
                 // request to service
                 const response = await companiesService.registerCompany(
-                    user.id,
+                    user,
                     registerRequest
                 );
 
                 setSuccess(true);
                 setTimeout(() => {
-                    router.push("/dashboard");
+                    localStorage.removeItem("kanux_user_id");
+                    router.push("/company/dashboard");
                 }, 2000);
 
             } catch (error) {

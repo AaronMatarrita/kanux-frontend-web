@@ -77,7 +77,7 @@ export function CreateAccountTalent() {
         //save data in local storage
         localStorage.setItem("kanux_token", response.token);
         localStorage.setItem("kanux_session", response.sessionId);
-        localStorage.setItem("kanux_user", JSON.stringify(response.user));
+        localStorage.setItem("kanux_user_id", JSON.stringify(response.user));
 
         setSuccess(true);
         setTimeout(() => {

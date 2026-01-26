@@ -10,8 +10,7 @@ import { profilesService } from "@/services/profiles.service";
 
 export function CreateAboutTalent() {
 
-    const userData = localStorage.getItem("kanux_user");
-    const user = userData ? JSON.parse(userData) : null;
+    const user = localStorage.getItem("kanux_user_id")??"";
 
     const [talentAbout, setTalentAbout] = useState<TalentAbout>({
         first_name: "",
@@ -73,7 +72,7 @@ export function CreateAboutTalent() {
 
                 const updatedProfile: TalentProfile = {
                     id: "",
-                    user_id: user.id,   
+                    user_id: user,   
                     first_name: talentAbout.first_name,
                     last_name: talentAbout.last_name,
                     title: talentAbout.title,
@@ -83,10 +82,11 @@ export function CreateAboutTalent() {
                     about: talentAbout.about
                 };
 
-                await profilesService.updateMyProfile(updatedProfile);
+                const response = await profilesService.updateMyProfile(updatedProfile);
 
                 setSuccess(true);
                 setTimeout(() => {
+                    localStorage.removeItem("kanux_user_id");
                     router.push("/talent/dashboard"); //send to talent dashboard
                 }, 2000);
 
