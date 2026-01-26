@@ -1,19 +1,11 @@
 export interface TalentAbout {
-  // ABOUT ME Section
-  aboutMe: string;
-  
-  // BASIC INFORMATION Section
-  basicInformation: {
-    professionalTitle: string;
-    phoneNumber: string;
-    location: string;
-    languages: string[];
-    experienceBackground: {
-      selfTaught: boolean;
-      studentAcademic: boolean;
-      bootcamp: boolean;
-      earlyProfessional: boolean;
-    };
-  };
+  first_name?: string;
+  last_name?: string;
+  title?: string;
+  location?: string;
+  experience_level?: string;
+  education?: string;
+  about?: string;
+  contact?: Record<string, unknown>;
 }
 

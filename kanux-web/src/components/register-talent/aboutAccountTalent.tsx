@@ -5,122 +5,58 @@ import { useRouter } from "next/navigation";
 import { TalentAbout } from "@/config/talentAbout.config";
 import { TextInput } from "./TextInput";
 import { TextArea } from "./TextArea";
-import { LanguageInput } from "./LanguageInput";
 import { ExperienceInput } from "./ExperienceInput";
 
 export function CreateAboutTalent() {
-    
+
     const idUser = "get user";
 
     const [talentAbout, setTalentAbout] = useState<TalentAbout>({
-        aboutMe: "",
-        basicInformation: {
-            professionalTitle: "",
-            phoneNumber: "",
-            location: "",
-            languages: [],
-            experienceBackground: {
-                selfTaught: false,
-                studentAcademic: false,
-                bootcamp: false,
-                earlyProfessional: false
-            }
-        }
+        first_name: "",
+        last_name: "",
+        title: "",
+        location: "",
+        experience_level: "",
+        education: "",
+        about: "",
+        contact: {}
     });
 
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
     const [success, setSuccess] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const [languageInput, setLanguageInput] = useState("");
     const router = useRouter();
 
-    // Handle about me change
-    const handleAboutMeChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        setTalentAbout({
-            ...talentAbout,
-            aboutMe: e.target.value
-        });
-    };
-
-    // Handle basic information changes
-    const handleBasicInfoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Handle input changes
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
-        setTalentAbout({
-            ...talentAbout,
-            basicInformation: {
-                ...talentAbout.basicInformation,
-                [name]: value
-            }
-        });
-    };
-
-    // Handle language addition
-    const handleAddLanguage = () => {
-        if (languageInput.trim()) {
-            setTalentAbout({
-                ...talentAbout,
-                basicInformation: {
-                    ...talentAbout.basicInformation,
-                    languages: [...talentAbout.basicInformation.languages, languageInput.trim()]
-                }
-            });
-            setLanguageInput("");
-        }
-    };
-
-    // Handle language removal
-    const handleRemoveLanguage = (index: number) => {
-        setTalentAbout({
-            ...talentAbout,
-            basicInformation: {
-                ...talentAbout.basicInformation,
-                languages: talentAbout.basicInformation.languages.filter((_, i) => i !== index)
-            }
-        });
-    };
-
-    // Handle experience background change
-    const handleExperienceChange = (key: keyof typeof talentAbout.basicInformation.experienceBackground) => {
-        setTalentAbout({
-            ...talentAbout,
-            basicInformation: {
-                ...talentAbout.basicInformation,
-                experienceBackground: {
-                    ...talentAbout.basicInformation.experienceBackground,
-                    [key]: true,
-                    selfTaught: key === "selfTaught" ? true : false,
-                    studentAcademic: key === "studentAcademic" ? true : false,
-                    bootcamp: key === "bootcamp" ? true : false,
-                    earlyProfessional: key === "earlyProfessional" ? true : false
-                }
-            }
-        });
+        setTalentAbout({...talentAbout, [name]: value});
     };
 
     // Validation
     const validate = () => {
         const newErrors: { [key: string]: string } = {};
-        
-        if (!talentAbout.aboutMe.trim())
-            newErrors.aboutMe = "Please tell us about yourself";
 
-        if (!talentAbout.basicInformation.professionalTitle.trim())
-            newErrors.professionalTitle = "Professional title is required";
+        if (!talentAbout.first_name?.trim())
+            newErrors.first_name = "First name is required";
 
-        if (!talentAbout.basicInformation.phoneNumber.trim())
-            newErrors.phoneNumber = "Phone number is required";
-        else if (!/^\+?[1-9]\d{7,14}$/.test(talentAbout.basicInformation.phoneNumber.replace(/[\s\-()]/g, "")))
-            newErrors.phoneNumber = "Invalid phone number format";
+        if (!talentAbout.last_name?.trim())
+            newErrors.last_name = "Last name is required";
 
-        if (!talentAbout.basicInformation.location.trim())
+        if (!talentAbout.title?.trim())
+            newErrors.title = "Professional title is required";
+
+        if (!talentAbout.location?.trim())
             newErrors.location = "Location is required";
 
-        if (talentAbout.basicInformation.languages.length === 0)
-            newErrors.languages = "Add at least one language";
+        if (!talentAbout.experience_level?.trim())
+            newErrors.experience_level = "Experience level is required";
 
-        const hasExperience = Object.values(talentAbout.basicInformation.experienceBackground).some(v => v);
-        if (!hasExperience)
-            newErrors.experience = "Select your experience background";
+        if (!talentAbout.education?.trim())
+            newErrors.education = "Education is required";
+
+        if (!talentAbout.about?.trim())
+            newErrors.about = "Please tell us about yourself";
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
@@ -132,6 +68,8 @@ export function CreateAboutTalent() {
         if (validate()) {
             setIsLoading(true);
             try {
+                // TODO: Submit talentAbout data to API
+                console.log("Talent profile data:", talentAbout);
                 
                 setSuccess(true);
                 setTimeout(() => {
@@ -151,86 +89,94 @@ export function CreateAboutTalent() {
         <div className="w-full max-w-2xl mx-auto">
             {/* Title Section */}
             <div className="mb-8">
-                <h1 className="text-3xl font-bold text-blue-900 mb-2">Complete your profile</h1>
-                <p className="text-gray-500">This helps companies understand your background.</p>
+                <h1 className="text-center text-3xl font-bold text-blue-900 mb-2">Complete your profile</h1>
+                <p className="text-center text-gray-500">This helps companies understand your background.</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-8">
+                {/* PERSONAL INFORMATION Section */}
+                <div>
+                    <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wide mb-6">Personal information</h2>
+                    
+                    {/* First Name */}
+                    <TextInput
+                        label="First Name"
+                        type="text"
+                        name="first_name"
+                        value={talentAbout.first_name}
+                        onChange={handleInputChange}
+                        placeholder="John"
+                        error={errors.first_name}
+                    />
+                    
+                    {/* Last Name */}
+                    <TextInput
+                        label="Last Name"
+                        type="text"
+                        name="last_name"
+                        value={talentAbout.last_name}
+                        onChange={handleInputChange}
+                        placeholder="Doe"
+                        error={errors.last_name}
+                    />
+
+                    {/* Professional Title */}
+                    <TextInput
+                        label="Professional Title"
+                        type="text"
+                        name="title"
+                        value={talentAbout.title}
+                        onChange={handleInputChange}
+                        placeholder="Software Developer"
+                        error={errors.title}
+                    />
+
+                    {/* Location */}
+                    <TextInput
+                        label="Location"
+                        type="text"
+                        name="location"
+                        value={talentAbout.location}
+                        onChange={handleInputChange}
+                        placeholder="San Francisco, USA"
+                        error={errors.location}
+                    />
+
+                    {/* Experience Level */}
+                    <TextInput
+                        label="Experience Level"
+                        type="text"
+                        name="experience_level"
+                        value={talentAbout.experience_level}
+                        onChange={handleInputChange}
+                        placeholder="5 years"
+                        error={errors.experience_level}
+                    />
+
+                    {/* Education */}
+                    <TextInput
+                        label="Education"
+                        type="text"
+                        name="education"
+                        value={talentAbout.education}
+                        onChange={handleInputChange}
+                        placeholder="Bachelor in Computer Science"
+                        error={errors.education}
+                    />
+                </div>
+
                 {/* ABOUT ME Section */}
                 <div>
                     <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wide mb-4">About me</h2>
                     <TextArea
                         label=""
-                        name="aboutMe"
-                        value={talentAbout.aboutMe}
-                        onChange={handleAboutMeChange}
+                        name="about"
+                        value={talentAbout.about}
+                        onChange={handleInputChange}
                         placeholder="Self-taught developer focused on frontend technologies."
                         helperText="A short description (2-3 lines)"
-                        error={errors.aboutMe}
+                        error={errors.about}
                         rows={3}
-                    />
-                </div>
-
-                {/* BASIC INFORMATION Section */}
-                <div>
-                    <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wide mb-6">Basic information</h2>
-                    {/* professional title */}
-                    <TextInput
-                        label="Professional Title"
-                        type="text"
-                        name="professionalTitle"
-                        value={talentAbout.basicInformation.professionalTitle}
-                        onChange={handleBasicInfoChange}
-                        placeholder="Developer"
-                        error={errors.professionalTitle}
-                    />
-                    {/* phone number */}
-                    <TextInput
-                        label="Phone number"
-                        type="tel"
-                        name="phoneNumber"
-                        value={talentAbout.basicInformation.phoneNumber}
-                        onChange={handleBasicInfoChange}
-                        placeholder="+506 0000-0000"
-                        error={errors.phoneNumber}
-                    />
-                    {/* location */}
-                    <TextInput
-                        label="Location"
-                        type="text"
-                        name="location"
-                        value={talentAbout.basicInformation.location}
-                        onChange={handleBasicInfoChange}
-                        placeholder="San Francisco, USA"
-                        error={errors.location}
-                    />
-                    {/* languages */}
-                    <LanguageInput
-                        languages={talentAbout.basicInformation.languages}
-                        error={errors.languages}
-                        languageInput={languageInput}
-                        onLanguageInputChange={setLanguageInput}
-                        onAddLanguage={handleAddLanguage}
-                        onRemoveLanguage={handleRemoveLanguage}
-                    />
-                    {/* experience background */}
-                    <ExperienceInput
-                        label="Experience / Learning Background"
-                        options={[
-                            { key: "selfTaught", label: "Self-Taught" },
-                            { key: "studentAcademic", label: "Student/Academic" },
-                            { key: "bootcamp", label: "Bootcamp" },
-                            { key: "earlyProfessional", label: "Early Professional" }
-                        ]}
-                        selectedKey={
-                            Object.entries(talentAbout.basicInformation.experienceBackground).find(
-                                ([_, value]) => value
-                            )?.[0] || null
-                        }
-                        onSelect={(key) =>
-                            handleExperienceChange(key as keyof typeof talentAbout.basicInformation.experienceBackground)
-                        }
-                        error={errors.experience}
                     />
                 </div>
 
