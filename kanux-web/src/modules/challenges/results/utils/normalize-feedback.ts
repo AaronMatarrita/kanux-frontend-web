@@ -3,8 +3,22 @@ export type NormalizedFeedback = {
   finalScore?: number;
 };
 
+function safeJsonParse<T = unknown>(value: string): T | null {
+  try {
+    return JSON.parse(value) as T;
+  } catch (error) {
+    console.warn("[normalizeFeedback] JSON parse failed", error);
+    return null;
+  }
+}
+
 function sanitizeJsonString(input: string): string {
-  return input
+  const stripped = input
+    .trim()
+    .replace(/^```[a-zA-Z0-9]*\s*\n?/, "")
+    .replace(/\n?```\s*$/, "");
+
+  return stripped
     .replace(/\n/g, "\\n")
     .replace(/\r/g, "\\r")
     .replace(/\t/g, "\\t");
@@ -30,8 +44,14 @@ export function normalizeFeedback(
   }
 
   try {
-    const parsed = JSON.parse(feedback);
-    console.log("[normalizeFeedback] first parse result:", parsed);
+    const parsed = safeJsonParse<Record<string, unknown>>(feedback);
+
+    if (!parsed) {
+      console.warn(
+        "[normalizeFeedback] feedback not JSON, returning markdown fallback",
+      );
+      return { markdown: normalizeMarkdown(feedback) };
+    }
 
     let realFeedback = parsed;
 
@@ -42,7 +62,15 @@ export function normalizeFeedback(
 
       console.log("[normalizeFeedback] sanitized raw:", sanitizedRaw);
 
-      realFeedback = JSON.parse(sanitizedRaw);
+      const parsedRaw = safeJsonParse<Record<string, unknown>>(sanitizedRaw);
+
+      if (parsedRaw) {
+        realFeedback = parsedRaw;
+      } else {
+        console.warn(
+          "[normalizeFeedback] raw content still invalid after sanitizing",
+        );
+      }
     }
 
     console.log("[normalizeFeedback] real feedback object:", realFeedback);
@@ -60,9 +88,11 @@ export function normalizeFeedback(
 
     const normalized: NormalizedFeedback = {
       markdown: hasMarkdown
-        ? normalizeMarkdown(realFeedback.markdown)
+        ? normalizeMarkdown(realFeedback.markdown as string)
         : undefined,
-      finalScore: hasFinalScore ? realFeedback.final_score : undefined,
+      finalScore: hasFinalScore
+        ? (realFeedback.final_score as number)
+        : undefined,
     };
 
     console.log("[normalizeFeedback] normalized feedback result:", normalized);
