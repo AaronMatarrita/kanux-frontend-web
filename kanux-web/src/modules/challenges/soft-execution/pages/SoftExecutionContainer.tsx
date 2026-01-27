@@ -261,6 +261,12 @@ export function SoftExecutionContainer({ id }: SoftExecutionContainerProps) {
       <SoftExecutionTopbar
         title={challenge.title}
         progress={progress}
+        difficulty={((): "beginner" | "intermediate" | "advanced" => {
+          const d = (challenge?.difficulty || "intermediate").toLowerCase();
+          if (d === "básico") return "beginner";
+          if (d === "avanzado") return "advanced";
+          return "intermediate";
+        })()}
         currentQuestion={currentQuestionIndex + 1}
         totalQuestions={totalQuestions}
         timeLabel={timeLabel}
