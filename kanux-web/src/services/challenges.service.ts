@@ -54,7 +54,10 @@ export interface SoftChallenge {
   id: string;
   title: string;
   description?: string;
-  non_technical_challenges: {
+  difficulty?: string;
+  duration_minutes?: number;
+  non_technical_challenges: Array<{
+    instructions?: string;
     non_technical_questions: Array<{
       id: string;
       question: string;
@@ -63,6 +66,11 @@ export interface SoftChallenge {
         option_text: string;
       }>;
     }>;
+  }>;
+  company?: {
+    name: string;
+    about: string;
+    url_logo: string | null;
   };
 }
 

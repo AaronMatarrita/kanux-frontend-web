@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { TechnicalChallengeDetail } from "@/modules/challenges/details/pages/TechnicalChallengeDetail";
+import { ChallengeDetail } from "@/modules/challenges/details/pages/ChallengeDetail";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -21,5 +21,5 @@ export default function ChallengeDetailsPage({ params }: PageProps) {
 
   if (!id) return null;
 
-  return <TechnicalChallengeDetail id={id} />;
+  return <ChallengeDetail id={id} />;
 }
