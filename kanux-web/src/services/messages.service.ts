@@ -68,7 +68,10 @@ export const messagesService = {
   createConversation: async (
     data: CreateConversationRequest,
   ): Promise<Conversation> => {
-    const res = await httpClient.post<Conversation>("/conversations", data);
+    const res = await httpClient.post<Conversation>(
+      "/messages/conversations",
+      data,
+    );
     return res.data;
   },
 
