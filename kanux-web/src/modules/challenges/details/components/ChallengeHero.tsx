@@ -76,14 +76,10 @@ export function ChallengeHero({
 
           <button
             type="button"
-            disabled={!isTechnical || isStarting}
+            disabled={isStarting}
             onClick={startChallenge}
             className={`inline-flex items-center justify-center gap-2 rounded-md px-5 py-2.5 text-sm font-semibold transition
-            ${
-              !isTechnical
-                ? "bg-slate-200 text-slate-400 cursor-not-allowed"
-                : "bg-[#2EC27E] text-white hover:bg-[#28b76a] disabled:bg-slate-200 disabled:text-slate-400"
-            }`}
+            bg-[#2EC27E] text-white hover:bg-[#28b76a] disabled:bg-slate-200 disabled:text-slate-400`}
           >
             <Play className="h-4 w-4" />
             {isStarting ? "Iniciando..." : "Iniciar challenge"}

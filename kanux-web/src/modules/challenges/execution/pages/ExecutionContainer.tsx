@@ -131,7 +131,6 @@ export function ExecutionContainer({
     };
   }, [submission, onExpired]);
 
-  // Handle submit action
   const handleSubmitClick = () => {
     if (expired) {
       toast.error("El tiempo del challenge ha terminado");
@@ -183,6 +182,7 @@ export function ExecutionContainer({
           title: challenge.title,
           difficulty: challenge.difficulty,
         },
+        timestamp: Date.now(),
       };
 
       if (typeof window !== "undefined") {
@@ -190,9 +190,10 @@ export function ExecutionContainer({
           `challenge:result:${response.submission_id}`,
           JSON.stringify(resultData),
         );
+        sessionStorage.setItem("last_submission_id", response.submission_id);
       }
 
-      toast.success("Solución enviada correctamente");
+      toast.success("Solución enviada correctamente. Redirigiendo...");
 
       const resultsUrl = `/talent/challenges/results?submissionId=${response.submission_id}`;
 
@@ -201,9 +202,14 @@ export function ExecutionContainer({
 
         setTimeout(() => {
           clearSubmission();
-        }, 100);
-      } catch (redirectErr) {
-        throw redirectErr;
+        }, 500);
+      } catch (routerError) {
+        console.warn("Router push failed, using fallback:", routerError);
+
+        setTimeout(() => {
+          clearSubmission();
+          window.location.assign(resultsUrl);
+        }, 300);
       }
     } catch (err: any) {
       let errorMsg = "Error al enviar la solución";
@@ -221,8 +227,6 @@ export function ExecutionContainer({
       } else if (err?.message) {
         errorMsg = err.message;
       }
-
-      toast.error(errorMsg);
     } finally {
       setIsSubmitting(false);
     }
@@ -240,7 +244,6 @@ export function ExecutionContainer({
     return { ...tc, status };
   });
 
-  // Load persisted execution (output, error, results) when available
   useEffect(() => {
     if (!persistenceKey || typeof window === "undefined") return;
     try {
@@ -254,13 +257,10 @@ export function ExecutionContainer({
           results: Array.isArray(parsed.results) ? parsed.results : [],
         }));
       }
-    } catch {
-      // ignore
-    }
+    } catch {}
   }, [persistenceKey]);
 
   const handleRun = async (code: string, language: any) => {
-    // Store current code and language for submit
     setCurrentCode(code);
     setCurrentLanguage(language);
 
@@ -297,7 +297,6 @@ export function ExecutionContainer({
         },
       );
 
-      // Handle both ok and error statuses from runner
       if (res.status === "error") {
         const errorMsg = res.error || "Code execution returned an error";
         setExecutionState({
@@ -359,7 +358,6 @@ export function ExecutionContainer({
     }
   };
 
-  // Persist execution results/output/error for the active submission
   useEffect(() => {
     if (!persistenceKey || typeof window === "undefined") return;
     try {
