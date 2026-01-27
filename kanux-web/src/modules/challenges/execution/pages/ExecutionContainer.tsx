@@ -168,10 +168,12 @@ export function ExecutionContainer({
         },
       );
 
-      // Close modal
+      if (!response?.submission_id) {
+        throw new Error("La respuesta del servidor no incluye submission_id");
+      }
+
       setSubmitModalOpen(false);
 
-      // Store result data in localStorage for the results page
       const resultData = {
         submission_id: response.submission_id,
         status: response.status,
@@ -192,25 +194,22 @@ export function ExecutionContainer({
 
       toast.success("Solución enviada correctamente");
 
-      // Redirect to results page
-      router.push(
-        `/talent/challenges/results?submissionId=${response.submission_id}`,
-      );
+      const resultsUrl = `/talent/challenges/results?submissionId=${response.submission_id}`;
 
-      // Clear submission from localStorage after navigation starts
-      setTimeout(() => {
-        clearSubmission();
-      }, 100);
+      try {
+        await router.push(resultsUrl);
+
+        setTimeout(() => {
+          clearSubmission();
+        }, 100);
+      } catch (redirectErr) {
+        throw redirectErr;
+      }
     } catch (err: any) {
       let errorMsg = "Error al enviar la solución";
 
       if (err?.response?.status === 404) {
         errorMsg = "La submission no existe o fue expirada";
-        console.error("Submit error 404:", {
-          submissionId: submission.submissionId,
-          url: `/challenges/technical-challenges/${submission.submissionId}/submit`,
-          error: err?.response?.data,
-        });
       } else if (err?.response?.status === 403) {
         errorMsg = "No tienes permisos para esta submission";
       } else if (err?.response?.status === 400) {
@@ -224,7 +223,6 @@ export function ExecutionContainer({
       }
 
       toast.error(errorMsg);
-      console.error("Submit error:", err);
     } finally {
       setIsSubmitting(false);
     }
@@ -314,14 +312,13 @@ export function ExecutionContainer({
         return { output: res.logs || "", error: errorMsg };
       }
 
-      // Success: results contain test case outcomes
       const passedCount = (res.results || []).filter((r) => r.pass).length;
       const totalCount = res.results?.length || 0;
-      // Clean output: show only actual logs, not raw JSON
+
       const cleanOutput = res.logs
         ? res.logs.includes("{") && res.logs.includes("results")
-          ? "✓ Code executed successfully. Check test cases above." // Don't show raw JSON
-          : res.logs // Show actual console logs
+          ? "✓ Code executed successfully. Check test cases above."
+          : res.logs
         : "✓ Code executed successfully. Check test cases above.";
       setExecutionState({
         running: false,
@@ -333,11 +330,9 @@ export function ExecutionContainer({
       toast.success(`Execution completed: ${passedCount}/${totalCount} passed`);
       return { output: res.logs || "", error: "" };
     } catch (err: any) {
-      // Handle HTTP errors and API wrapper errors
       let errorMsg = "Execution failed";
       let description = "";
 
-      // Check nested error structure from ms-challenges wrapper
       if (err?.response?.data?.data?.error) {
         errorMsg = err.response.data.data.error;
         description = err.response.data.message || "";
@@ -374,9 +369,7 @@ export function ExecutionContainer({
         results: executionState.results,
       };
       localStorage.setItem(`${persistenceKey}:exec`, JSON.stringify(payload));
-    } catch {
-      // ignore
-    }
+    } catch {}
   }, [
     executionState.output,
     executionState.error,
