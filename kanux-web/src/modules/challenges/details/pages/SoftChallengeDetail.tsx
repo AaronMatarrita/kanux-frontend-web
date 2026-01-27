@@ -2,18 +2,20 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { challengesService } from "@/services/challenges.service";
+import {
+  challengesService,
+  SoftChallenge,
+} from "@/services/challenges.service";
 import { EmptyState } from "@/components/ui/empty-state";
 import {
   ChallengeHero,
   ChallengeDescription,
-  Constraints,
   SoftChallengeDetails,
   ChallengeSummary,
   CompanyCard,
 } from "@/modules/challenges/details/components";
 
-interface DetailsContainerProps {
+interface SoftChallengeDetailProps {
   id: string;
 }
 
@@ -23,35 +25,25 @@ interface CompanyInfo {
   logo: string | null;
 }
 
-export function DetailsContainer({ id }: DetailsContainerProps) {
+export function SoftChallengeDetail({ id }: SoftChallengeDetailProps) {
   const router = useRouter();
-  const [isTechnical, setIsTechnical] = useState(false);
-  const [techData, setTechData] = useState<any>(null);
-  const [softData, setSoftData] = useState<any>(null);
+  const [softData, setSoftData] = useState<SoftChallenge | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
   useEffect(() => {
-    async function loadData() {
+    async function loadSoftChallenge() {
       try {
-        const res =
-          await challengesService.getPublicTechnicalChallengeDetail(id);
-        setTechData(res.data);
-        setIsTechnical(true);
+        const data = await challengesService.getSoftChallenge(id);
+        setSoftData(data);
       } catch {
-        try {
-          const soft = await challengesService.getSoftChallenge(id);
-          setSoftData(soft);
-          setIsTechnical(false);
-        } catch {
-          setError(true);
-        }
+        setError(true);
       } finally {
         setLoading(false);
       }
     }
 
-    loadData();
+    loadSoftChallenge();
   }, [id]);
 
   if (loading) {
@@ -62,22 +54,20 @@ export function DetailsContainer({ id }: DetailsContainerProps) {
     );
   }
 
-  if (error) {
+  if (error || !softData) {
     return (
       <EmptyState
         title="Challenge no encontrado"
-        description="No pudimos cargar los detalles del challenge. Intenta nuevamente."
+        description="No pudimos cargar los detalles del challenge de soft skills. Intenta nuevamente."
       />
     );
   }
 
-  const challenge = isTechnical ? techData : softData;
-
-  const companyInfo: CompanyInfo = challenge?.company
+  const companyInfo: CompanyInfo = softData?.company
     ? {
-        name: challenge.company.name,
-        about: challenge.company.about,
-        logo: challenge.company.url_logo,
+        name: softData.company.name,
+        about: softData.company.about,
+        logo: softData.company.url_logo,
       }
     : {
         name: "KÁNUX",
@@ -89,8 +79,8 @@ export function DetailsContainer({ id }: DetailsContainerProps) {
     <div className="space-y-6">
       {/* HERO SECTION */}
       <ChallengeHero
-        challenge={challenge}
-        isTechnical={isTechnical}
+        challenge={softData}
+        isTechnical={false}
         id={id}
         onBack={() => router.back()}
       />
@@ -99,25 +89,16 @@ export function DetailsContainer({ id }: DetailsContainerProps) {
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
         {/* MAIN CONTENT */}
         <div className="space-y-6 md:col-span-2">
-          <ChallengeDescription description={challenge?.description} />
+          <ChallengeDescription description={softData.description || ""} />
 
-          {/* TECHNICAL SPECIFIC SECTIONS */}
-          {isTechnical && (
-            <Constraints
-              constraints={techData?.assets?.challenge?.constraints || []}
-            />
-          )}
-
-          {/* SOFT SKILLS SPECIFIC SECTIONS */}
-          {!isTechnical && <SoftChallengeDetails softData={softData} />}
+          <SoftChallengeDetails softData={softData} />
         </div>
 
         {/* SIDEBAR */}
         <aside className="space-y-6 md:sticky md:top-6 h-fit">
           <ChallengeSummary
-            challenge={challenge}
-            isTechnical={isTechnical}
-            techData={techData}
+            challenge={softData}
+            isTechnical={false}
             softData={softData}
           />
 

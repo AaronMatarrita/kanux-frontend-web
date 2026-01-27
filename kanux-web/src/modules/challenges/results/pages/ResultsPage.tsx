@@ -22,7 +22,22 @@ import {
 
 import { normalizeFeedback } from "@/modules/challenges/results/utils/normalize-feedback";
 
-interface ResultData extends TechnicalChallengeResultResponse {}
+type LocalStoredResult = {
+  submission_id: string;
+  status?: string;
+  score?: number;
+  total_questions?: number;
+  correct_answers?: number;
+  feedback?: string;
+  submitted_at?: string;
+  challenge?: {
+    id?: string;
+    title?: string;
+    difficulty?: string;
+  };
+};
+
+type ResultData = TechnicalChallengeResultResponse | LocalStoredResult;
 
 interface ResultsPageProps {
   submissionId?: string;
@@ -57,11 +72,29 @@ export function ResultsPage({
     }
 
     (async () => {
-      try {
-        setLoadingState("loading");
+      setLoadingState("loading");
 
-        const res =
-          await challengesService.getTechnicalChallengeResult(submissionId);
+      const localKey = `challenge:result:${submissionId}`;
+      const localResultRaw =
+        typeof window !== "undefined" ? localStorage.getItem(localKey) : null;
+
+      if (localResultRaw) {
+        try {
+          const parsed: LocalStoredResult = JSON.parse(localResultRaw);
+          setResultData(parsed);
+          setLoadingState("idle");
+          return;
+        } catch (err) {
+          console.warn("Failed to parse local result, falling back to API", {
+            err,
+          });
+        }
+      }
+
+      try {
+        const res = await challengesService.getTechnicalChallengeResult(
+          submissionId,
+        );
 
         setResultData(res);
         setLoadingState("idle");
@@ -107,7 +140,8 @@ export function ResultsPage({
     );
   }
 
-  const finalScore = feedback.finalScore ?? Math.round(resultData.score ?? 0);
+  const finalScore =
+    feedback.finalScore ?? Math.round((resultData as any)?.score ?? 0);
 
   const isPassed = finalScore >= 60;
 

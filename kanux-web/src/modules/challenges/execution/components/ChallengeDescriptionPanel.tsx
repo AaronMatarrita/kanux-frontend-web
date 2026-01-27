@@ -142,14 +142,14 @@ function ExampleCard({
 }
 
 export function ChallengeDescriptionPanel({
-  headerTitle = "Instructions",
+  headerTitle = "Instrucciones",
   assets,
   loading = false,
 }: ChallengeDescriptionPanelProps) {
   if (loading) {
     return (
       <div className="h-full flex items-center justify-center">
-        <span className="text-sm text-slate-500">Loading challenge...</span>
+        <span className="text-sm text-slate-500">Cargando challenge...</span>
       </div>
     );
   }

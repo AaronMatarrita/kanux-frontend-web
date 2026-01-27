@@ -5,6 +5,7 @@ import { difficultyConfig } from "../config/difficulty.config";
 import { Pill } from "./Pill";
 import { formatDuration } from "../utils/challenge.utils";
 import { useStartChallenge } from "../hooks/useStartChallenge";
+import { useStartSoftChallenge } from "../hooks/useStartSoftChallenge";
 import { BackNavigation } from "@/modules/challenges/components/BackNavigation";
 
 interface ChallengeHeroProps {
@@ -24,10 +25,26 @@ export function ChallengeHero({
   const diffConfig = difficultyConfig[difficulty] || difficultyConfig["Básico"];
   const DiffIcon = diffConfig.icon;
 
-  const { startChallenge, isStarting } = useStartChallenge({
-    challengeId: id,
-    durationMinutes: challenge?.duration_minutes || 60,
-  });
+  const { startChallenge: startTechnical, isStarting: isStartingTechnical } =
+    useStartChallenge({
+      challengeId: id,
+      durationMinutes: challenge?.duration_minutes || 60,
+    });
+
+  const { startChallenge: startSoft, isStarting: isStartingSoft } =
+    useStartSoftChallenge({
+      challengeId: id,
+    });
+
+  const handleStart = () => {
+    if (isTechnical) {
+      startTechnical();
+    } else {
+      startSoft();
+    }
+  };
+
+  const isStarting = isTechnical ? isStartingTechnical : isStartingSoft;
 
   return (
     <>
@@ -76,14 +93,10 @@ export function ChallengeHero({
 
           <button
             type="button"
-            disabled={!isTechnical || isStarting}
-            onClick={startChallenge}
+            disabled={isStarting}
+            onClick={handleStart}
             className={`inline-flex items-center justify-center gap-2 rounded-md px-5 py-2.5 text-sm font-semibold transition
-            ${
-              !isTechnical
-                ? "bg-slate-200 text-slate-400 cursor-not-allowed"
-                : "bg-[#2EC27E] text-white hover:bg-[#28b76a] disabled:bg-slate-200 disabled:text-slate-400"
-            }`}
+            bg-[#2EC27E] text-white hover:bg-[#28b76a] disabled:bg-slate-200 disabled:text-slate-400`}
           >
             <Play className="h-4 w-4" />
             {isStarting ? "Iniciando..." : "Iniciar challenge"}

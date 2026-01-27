@@ -1,17 +1,18 @@
-"use client";
-
 import { ArrowLeft, Clock } from "lucide-react";
 
 type Difficulty = "beginner" | "intermediate" | "advanced";
 
-interface ExecutionTopbarProps {
+interface SoftExecutionTopbarProps {
   title: string;
+  progress: number;
   difficulty: Difficulty;
+  currentQuestion: number;
+  totalQuestions: number;
   timeLabel: string;
-  onExit?: () => void;
-  onSubmit?: () => void;
+  onExit: () => void;
+  onSubmit: () => void;
   isSubmitting?: boolean;
-  submitDisabled?: boolean;
+  expired?: boolean;
 }
 
 const difficultyStyles: Record<Difficulty, string> = {
@@ -20,21 +21,23 @@ const difficultyStyles: Record<Difficulty, string> = {
   advanced: "bg-rose-50 text-rose-700 border border-rose-200",
 };
 
-export function ExecutionTopbar({
+export function SoftExecutionTopbar({
   title,
+  progress,
   difficulty,
+  currentQuestion,
+  totalQuestions,
   timeLabel,
   onExit,
   onSubmit,
-  isSubmitting = false,
-  submitDisabled = false,
-}: ExecutionTopbarProps) {
-  const disabled = submitDisabled || isSubmitting;
+  isSubmitting,
+  expired,
+}: SoftExecutionTopbarProps) {
+  const disabled = Boolean(expired || isSubmitting);
 
   return (
     <div className="w-full bg-white border-b border-slate-200">
       <div className="px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-4">
-        {/* Left: Exit + titles */}
         <div className="flex items-center gap-4 min-w-0">
           <button
             type="button"
@@ -52,7 +55,6 @@ export function ExecutionTopbar({
           </div>
         </div>
 
-        {/* Right: difficulty pill, timer, submit button */}
         <div className="flex items-center gap-3 sm:gap-4">
           <span
             className={`px-3 py-1 rounded-full text-xs font-medium ${difficultyStyles[difficulty]}`}
@@ -74,6 +76,13 @@ export function ExecutionTopbar({
             {isSubmitting ? "Enviando..." : "Enviar solución"}
           </button>
         </div>
+      </div>
+
+      <div className="h-1 bg-slate-100">
+        <div
+          className="h-full bg-[#2EC27E] transition-all duration-300"
+          style={{ width: `${progress}%` }}
+        />
       </div>
     </div>
   );

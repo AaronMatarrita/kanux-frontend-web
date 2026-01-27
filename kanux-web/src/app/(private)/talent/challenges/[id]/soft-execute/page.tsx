@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ChallengeDetail } from "@/modules/challenges/details/pages/ChallengeDetail";
+import { SoftExecutionContainer } from "@/modules/challenges/soft-execution/pages/SoftExecutionContainer";
 
 interface PageProps {
   params: Promise<{ id: string }>;
 }
 
-export default function ChallengeDetailsPage({ params }: PageProps) {
+export default function SoftExecutePage({ params }: PageProps) {
   const [id, setId] = useState<string>("");
 
   useEffect(() => {
@@ -21,5 +21,5 @@ export default function ChallengeDetailsPage({ params }: PageProps) {
 
   if (!id) return null;
 
-  return <ChallengeDetail id={id} />;
+  return <SoftExecutionContainer id={id} />;
 }

@@ -131,7 +131,6 @@ export function ExecutionContainer({
     };
   }, [submission, onExpired]);
 
-  // Handle submit action
   const handleSubmitClick = () => {
     if (expired) {
       toast.error("El tiempo del challenge ha terminado");
@@ -168,10 +167,12 @@ export function ExecutionContainer({
         },
       );
 
-      // Close modal
+      if (!response?.submission_id) {
+        throw new Error("La respuesta del servidor no incluye submission_id");
+      }
+
       setSubmitModalOpen(false);
 
-      // Store result data in localStorage for the results page
       const resultData = {
         submission_id: response.submission_id,
         status: response.status,
@@ -181,6 +182,7 @@ export function ExecutionContainer({
           title: challenge.title,
           difficulty: challenge.difficulty,
         },
+        timestamp: Date.now(),
       };
 
       if (typeof window !== "undefined") {
@@ -188,29 +190,32 @@ export function ExecutionContainer({
           `challenge:result:${response.submission_id}`,
           JSON.stringify(resultData),
         );
+        sessionStorage.setItem("last_submission_id", response.submission_id);
       }
 
-      toast.success("Solución enviada correctamente");
+      toast.success("Solución enviada correctamente. Redirigiendo...");
 
-      // Redirect to results page
-      router.push(
-        `/talent/challenges/results?submissionId=${response.submission_id}`,
-      );
+      const resultsUrl = `/talent/challenges/results?submissionId=${response.submission_id}`;
 
-      // Clear submission from localStorage after navigation starts
-      setTimeout(() => {
-        clearSubmission();
-      }, 100);
+      try {
+        await router.push(resultsUrl);
+
+        setTimeout(() => {
+          clearSubmission();
+        }, 500);
+      } catch (routerError) {
+        console.warn("Router push failed, using fallback:", routerError);
+
+        setTimeout(() => {
+          clearSubmission();
+          window.location.assign(resultsUrl);
+        }, 300);
+      }
     } catch (err: any) {
       let errorMsg = "Error al enviar la solución";
 
       if (err?.response?.status === 404) {
         errorMsg = "La submission no existe o fue expirada";
-        console.error("Submit error 404:", {
-          submissionId: submission.submissionId,
-          url: `/challenges/technical-challenges/${submission.submissionId}/submit`,
-          error: err?.response?.data,
-        });
       } else if (err?.response?.status === 403) {
         errorMsg = "No tienes permisos para esta submission";
       } else if (err?.response?.status === 400) {
@@ -222,9 +227,6 @@ export function ExecutionContainer({
       } else if (err?.message) {
         errorMsg = err.message;
       }
-
-      toast.error(errorMsg);
-      console.error("Submit error:", err);
     } finally {
       setIsSubmitting(false);
     }
@@ -242,7 +244,6 @@ export function ExecutionContainer({
     return { ...tc, status };
   });
 
-  // Load persisted execution (output, error, results) when available
   useEffect(() => {
     if (!persistenceKey || typeof window === "undefined") return;
     try {
@@ -256,13 +257,10 @@ export function ExecutionContainer({
           results: Array.isArray(parsed.results) ? parsed.results : [],
         }));
       }
-    } catch {
-      // ignore
-    }
+    } catch {}
   }, [persistenceKey]);
 
   const handleRun = async (code: string, language: any) => {
-    // Store current code and language for submit
     setCurrentCode(code);
     setCurrentLanguage(language);
 
@@ -299,7 +297,6 @@ export function ExecutionContainer({
         },
       );
 
-      // Handle both ok and error statuses from runner
       if (res.status === "error") {
         const errorMsg = res.error || "Code execution returned an error";
         setExecutionState({
@@ -314,14 +311,13 @@ export function ExecutionContainer({
         return { output: res.logs || "", error: errorMsg };
       }
 
-      // Success: results contain test case outcomes
       const passedCount = (res.results || []).filter((r) => r.pass).length;
       const totalCount = res.results?.length || 0;
-      // Clean output: show only actual logs, not raw JSON
+
       const cleanOutput = res.logs
         ? res.logs.includes("{") && res.logs.includes("results")
-          ? "✓ Code executed successfully. Check test cases above." // Don't show raw JSON
-          : res.logs // Show actual console logs
+          ? "✓ Code executed successfully. Check test cases above."
+          : res.logs
         : "✓ Code executed successfully. Check test cases above.";
       setExecutionState({
         running: false,
@@ -333,11 +329,9 @@ export function ExecutionContainer({
       toast.success(`Execution completed: ${passedCount}/${totalCount} passed`);
       return { output: res.logs || "", error: "" };
     } catch (err: any) {
-      // Handle HTTP errors and API wrapper errors
       let errorMsg = "Execution failed";
       let description = "";
 
-      // Check nested error structure from ms-challenges wrapper
       if (err?.response?.data?.data?.error) {
         errorMsg = err.response.data.data.error;
         description = err.response.data.message || "";
@@ -364,7 +358,6 @@ export function ExecutionContainer({
     }
   };
 
-  // Persist execution results/output/error for the active submission
   useEffect(() => {
     if (!persistenceKey || typeof window === "undefined") return;
     try {
@@ -374,9 +367,7 @@ export function ExecutionContainer({
         results: executionState.results,
       };
       localStorage.setItem(`${persistenceKey}:exec`, JSON.stringify(payload));
-    } catch {
-      // ignore
-    }
+    } catch {}
   }, [
     executionState.output,
     executionState.error,
@@ -386,7 +377,7 @@ export function ExecutionContainer({
 
   return (
     <div className="h-screen flex flex-col">
-      <LoadingOverlay visible={loading} message="Loading challenge..." />
+      <LoadingOverlay visible={loading} message="Cargando challenge..." />
       <ConfirmDialog
         isOpen={submitModalOpen}
         title="Confirmar envío"
@@ -402,7 +393,7 @@ export function ExecutionContainer({
         onCancel={() => setSubmitModalOpen(false)}
       />
       <ExecutionTopbar
-        title={challenge?.title || "Loading..."}
+        title={challenge?.title || "Cargando..."}
         difficulty={((): "beginner" | "intermediate" | "advanced" => {
           const d = (challenge?.difficulty || "intermediate").toLowerCase();
           if (d === "básico") return "beginner";
@@ -412,6 +403,8 @@ export function ExecutionContainer({
         timeLabel={timeLabel}
         onExit={handleExit}
         onSubmit={handleSubmitClick}
+        isSubmitting={isSubmitting}
+        submitDisabled={loading || expired || !submission?.submissionId}
       />
 
       <div className="flex-1 bg-white">
@@ -419,7 +412,7 @@ export function ExecutionContainer({
           {/* Left: Instructions / Markdown */}
           <div className="h-full bg-white border-r border-slate-200 overflow-hidden">
             <ChallengeDescriptionPanel
-              headerTitle="Instructions"
+              headerTitle="Instrucciones"
               assets={challengeAssets}
               loading={loading}
             />
