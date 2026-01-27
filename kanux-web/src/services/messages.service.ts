@@ -80,7 +80,7 @@ export const messagesService = {
    * Get all conversations for current user (requires auth)
    */
   getUserConversations: async (): Promise<Conversation[]> => {
-    const res = await httpClient.get<Conversation[]>("/conversations");
+    const res = await httpClient.get<Conversation[]>("/messages/conversations");
     return res.data;
   },
 
