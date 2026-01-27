@@ -274,11 +274,11 @@ export const challengesService = {
   },
 
   /**
-   * GET /challenges/technical-challenges/challenge/submit-challenges
+   * GET /challenges/history/my
    */
   getMyChallengeHistory: async (): Promise<ChallengeSubmissionsResponse> => {
     const res = await httpClient.get<ChallengeHistoryResponse>(
-      "/challenges/technical-challenges/challenge/submit-challenges",
+      "/challenges/history/my",
     );
     return res.data.data;
   },
