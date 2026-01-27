@@ -278,8 +278,8 @@ export function SoftExecutionContainer({ id }: SoftExecutionContainerProps) {
 
       <div className="flex flex-1 overflow-hidden">
         {/* Main Content */}
-        <div className="flex flex-1 flex-col overflow-y-auto p-6">
-          <div className="mx-auto w-full max-w-3xl space-y-6">
+        <div className="flex flex-1 flex-col overflow-y-auto bg-linear-to-br from-slate-50 to-slate-100 p-4 sm:p-6 lg:p-8">
+          <div className="mx-auto w-full max-w-4xl space-y-6">
             <SoftQuestionCard
               question={currentQuestion}
               questionNumber={currentQuestionIndex + 1}
@@ -291,30 +291,34 @@ export function SoftExecutionContainer({ id }: SoftExecutionContainerProps) {
             />
 
             {/* Navigation Buttons */}
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-4 pt-4">
               <button
                 type="button"
                 onClick={handlePrevious}
-                disabled={currentQuestionIndex === 0}
-                className="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+                disabled={currentQuestionIndex === 0 || expired}
+                className="rounded-lg border-2 border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 hover:border-slate-400 disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-slate-100 transition-all duration-200"
               >
-                Anterior
+                ← Anterior
               </button>
+
+              <div className="flex-1" />
 
               {currentQuestionIndex < totalQuestions - 1 ? (
                 <button
                   type="button"
                   onClick={handleNext}
-                  className="rounded-md bg-[#2EC27E] px-4 py-2 text-sm font-medium text-white hover:bg-[#28b76a]"
+                  className="rounded-lg bg-[#2EC27E] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#28b76a] disabled:bg-slate-300 disabled:cursor-not-allowed transition-all duration-200 shadow-md hover:shadow-lg"
                 >
-                  Siguiente
+                  Siguiente →
                 </button>
               ) : (
                 <button
                   type="button"
                   onClick={handleSubmit}
-                  disabled={isSubmitting || expired}
-                  className="rounded-md bg-[#2EC27E] px-6 py-2 text-sm font-semibold text-white hover:bg-[#28b76a] disabled:bg-slate-200 disabled:text-slate-400"
+                  disabled={
+                    isSubmitting || expired || !answers[currentQuestion?.id]
+                  }
+                  className="hidden rounded-lg bg-[#2EC27E] px-6 py-2.5 text-sm font-bold text-white hover:bg-[#28b76a] disabled:bg-slate-300 disabled:text-slate-500 disabled:cursor-not-allowed transition-all duration-200 shadow-md hover:shadow-lg disabled:shadow-none"
                 >
                   {isSubmitting ? "Enviando..." : "Enviar Challenge"}
                 </button>
@@ -324,7 +328,7 @@ export function SoftExecutionContainer({ id }: SoftExecutionContainerProps) {
         </div>
 
         {/* Sidebar */}
-        <aside className="w-80 border-l border-slate-200 bg-white p-6 overflow-y-auto">
+        <aside className="w-full sm:w-96 border-l border-slate-200 bg-white overflow-y-auto p-4 sm:p-6 shadow-lg">
           <SoftChallengeInfo
             challenge={challenge}
             questions={questions}
