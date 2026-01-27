@@ -320,7 +320,7 @@ export function SoftExecutionContainer({ id }: SoftExecutionContainerProps) {
                   }
                   className="hidden rounded-lg bg-[#2EC27E] px-6 py-2.5 text-sm font-bold text-white hover:bg-[#28b76a] disabled:bg-slate-300 disabled:text-slate-500 disabled:cursor-not-allowed transition-all duration-200 shadow-md hover:shadow-lg disabled:shadow-none"
                 >
-                  {isSubmitting ? "Enviando..." : "Enviar Challenge"}
+                  {isSubmitting ? "Enviando..." : "Enviar solución"}
                 </button>
               )}
             </div>

@@ -10,6 +10,8 @@ interface ExecutionTopbarProps {
   timeLabel: string;
   onExit?: () => void;
   onSubmit?: () => void;
+  isSubmitting?: boolean;
+  submitDisabled?: boolean;
 }
 
 const difficultyStyles: Record<Difficulty, string> = {
@@ -24,7 +26,11 @@ export function ExecutionTopbar({
   timeLabel,
   onExit,
   onSubmit,
+  isSubmitting = false,
+  submitDisabled = false,
 }: ExecutionTopbarProps) {
+  const disabled = submitDisabled || isSubmitting;
+
   return (
     <div className="w-full bg-white border-b border-slate-200">
       <div className="px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-4">
@@ -36,7 +42,7 @@ export function ExecutionTopbar({
             className="inline-flex items-center gap-2 text-slate-700 hover:text-slate-900 px-2 py-1 rounded-md hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300"
           >
             <ArrowLeft className="w-5 h-5" />
-            <span className="text-sm font-medium">Exit</span>
+            <span className="text-sm font-medium">Salir</span>
           </button>
 
           <div className="min-w-0">
@@ -62,9 +68,10 @@ export function ExecutionTopbar({
           <button
             type="button"
             onClick={onSubmit}
-            className="inline-flex items-center rounded-md bg-emerald-600 px-3 sm:px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300"
+            disabled={disabled}
+            className="inline-flex items-center rounded-md bg-emerald-600 px-3 sm:px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300 disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            Submit Solution
+            {isSubmitting ? "Enviando..." : "Enviar solución"}
           </button>
         </div>
       </div>

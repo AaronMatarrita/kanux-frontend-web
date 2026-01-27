@@ -377,7 +377,7 @@ export function ExecutionContainer({
 
   return (
     <div className="h-screen flex flex-col">
-      <LoadingOverlay visible={loading} message="Loading challenge..." />
+      <LoadingOverlay visible={loading} message="Cargando challenge..." />
       <ConfirmDialog
         isOpen={submitModalOpen}
         title="Confirmar envío"
@@ -393,7 +393,7 @@ export function ExecutionContainer({
         onCancel={() => setSubmitModalOpen(false)}
       />
       <ExecutionTopbar
-        title={challenge?.title || "Loading..."}
+        title={challenge?.title || "Cargando..."}
         difficulty={((): "beginner" | "intermediate" | "advanced" => {
           const d = (challenge?.difficulty || "intermediate").toLowerCase();
           if (d === "básico") return "beginner";
@@ -403,6 +403,8 @@ export function ExecutionContainer({
         timeLabel={timeLabel}
         onExit={handleExit}
         onSubmit={handleSubmitClick}
+        isSubmitting={isSubmitting}
+        submitDisabled={loading || expired || !submission?.submissionId}
       />
 
       <div className="flex-1 bg-white">
@@ -410,7 +412,7 @@ export function ExecutionContainer({
           {/* Left: Instructions / Markdown */}
           <div className="h-full bg-white border-r border-slate-200 overflow-hidden">
             <ChallengeDescriptionPanel
-              headerTitle="Instructions"
+              headerTitle="Instrucciones"
               assets={challengeAssets}
               loading={loading}
             />
