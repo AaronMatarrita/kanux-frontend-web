@@ -1,6 +1,6 @@
 "use client";
 
-import { SetStateAction, useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import {
@@ -27,6 +27,12 @@ export function SoftExecutionContainer({ id }: SoftExecutionContainerProps) {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [timeLabel, setTimeLabel] = useState("--:--");
+  const [expired, setExpired] = useState(false);
+  const warned5 = useRef(false);
+  const warned1 = useRef(false);
+
+  const timerStorageKey = `soft-challenge:${id}:expiresAt`;
 
   useEffect(() => {
     async function loadChallenge() {
@@ -42,6 +48,77 @@ export function SoftExecutionContainer({ id }: SoftExecutionContainerProps) {
 
     loadChallenge();
   }, [id]);
+
+  useEffect(() => {
+    if (!challenge) return;
+
+    warned5.current = false;
+    warned1.current = false;
+
+    const durationMinutes = challenge.duration_minutes || 30;
+    const now = Date.now();
+
+    const storedExpiresAt =
+      typeof window !== "undefined"
+        ? Number(sessionStorage.getItem(timerStorageKey))
+        : NaN;
+
+    const expiresAt =
+      Number.isFinite(storedExpiresAt) && storedExpiresAt > now
+        ? storedExpiresAt
+        : now + durationMinutes * 60 * 1000;
+
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem(timerStorageKey, String(expiresAt));
+    }
+
+    const updateCountdown = () => {
+      const remainingMs = expiresAt - Date.now();
+      const remainingSec = Math.max(0, Math.floor(remainingMs / 1000));
+      const minutes = Math.floor(remainingSec / 60)
+        .toString()
+        .padStart(2, "0");
+      const seconds = (remainingSec % 60).toString().padStart(2, "0");
+
+      setTimeLabel(`${minutes}:${seconds}`);
+
+      if (remainingSec === 0) {
+        setExpired(true);
+        if (!warned1.current) {
+          toast.error(
+            "Se acabó el tiempo del challenge. La edición se bloqueó.",
+          );
+          warned1.current = true;
+        }
+        return true;
+      }
+
+      if (remainingSec <= 60 && !warned1.current) {
+        warned1.current = true;
+        toast.warning("Último minuto: el challenge está por terminar.");
+      } else if (remainingSec <= 300 && !warned5.current) {
+        warned5.current = true;
+        toast.info("Quedan 5 minutos para completar el challenge.");
+      }
+
+      setExpired(false);
+      return false;
+    };
+
+    const stop = updateCountdown();
+    const intervalId = stop
+      ? undefined
+      : setInterval(() => {
+          const shouldStop = updateCountdown();
+          if (shouldStop && intervalId) {
+            clearInterval(intervalId);
+          }
+        }, 1000);
+
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [challenge, timerStorageKey]);
 
   if (loading) {
     return <LoadingOverlay visible message="Cargando challenge..." />;
@@ -60,9 +137,16 @@ export function SoftExecutionContainer({ id }: SoftExecutionContainerProps) {
     challenge.non_technical_challenges?.[0]?.non_technical_questions || [];
   const currentQuestion = questions[currentQuestionIndex];
   const totalQuestions = questions.length;
-  const progress = ((currentQuestionIndex + 1) / totalQuestions) * 100;
+  const progress = totalQuestions
+    ? ((currentQuestionIndex + 1) / totalQuestions) * 100
+    : 0;
 
   const handleAnswerSelect = (questionId: string, optionId: string) => {
+    if (expired) {
+      toast.error("El tiempo del challenge ha terminado");
+      return;
+    }
+
     setAnswers((prev) => ({
       ...prev,
       [questionId]: optionId,
@@ -82,6 +166,11 @@ export function SoftExecutionContainer({ id }: SoftExecutionContainerProps) {
   };
 
   const handleSubmit = async () => {
+    if (expired) {
+      toast.error("El tiempo del challenge ha terminado");
+      return;
+    }
+
     // Validate all questions are answered
     const unanswered = questions.filter((q) => !answers[q.id]);
     if (unanswered.length > 0) {
@@ -142,6 +231,7 @@ export function SoftExecutionContainer({ id }: SoftExecutionContainerProps) {
           JSON.stringify(resultData),
         );
         sessionStorage.setItem("last_submission_id", response.submission_id);
+        sessionStorage.removeItem(timerStorageKey);
       }
 
       toast.success("Challenge enviado exitosamente. Redirigiendo...");
@@ -160,6 +250,9 @@ export function SoftExecutionContainer({ id }: SoftExecutionContainerProps) {
   };
 
   const handleExit = () => {
+    if (typeof window !== "undefined") {
+      sessionStorage.removeItem(timerStorageKey);
+    }
     router.push(`/talent/challenges/${id}/details`);
   };
 
@@ -170,7 +263,11 @@ export function SoftExecutionContainer({ id }: SoftExecutionContainerProps) {
         progress={progress}
         currentQuestion={currentQuestionIndex + 1}
         totalQuestions={totalQuestions}
+        timeLabel={timeLabel}
         onExit={handleExit}
+        onSubmit={handleSubmit}
+        isSubmitting={isSubmitting}
+        expired={expired}
       />
 
       <div className="flex flex-1 overflow-hidden">
@@ -210,7 +307,7 @@ export function SoftExecutionContainer({ id }: SoftExecutionContainerProps) {
                 <button
                   type="button"
                   onClick={handleSubmit}
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || expired}
                   className="rounded-md bg-[#2EC27E] px-6 py-2 text-sm font-semibold text-white hover:bg-[#28b76a] disabled:bg-slate-200 disabled:text-slate-400"
                 >
                   {isSubmitting ? "Enviando..." : "Enviar Challenge"}
@@ -226,9 +323,7 @@ export function SoftExecutionContainer({ id }: SoftExecutionContainerProps) {
             challenge={challenge}
             questions={questions}
             answers={answers}
-            onQuestionClick={(index: SetStateAction<number>) =>
-              setCurrentQuestionIndex(index)
-            }
+            onQuestionClick={(index: number) => setCurrentQuestionIndex(index)}
             currentQuestionIndex={currentQuestionIndex}
           />
         </aside>

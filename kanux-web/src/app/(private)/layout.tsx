@@ -12,7 +12,7 @@ export default function PrivateLayout({
 }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const pathname = usePathname();
-  const fullBleedRoutes = ["/execute", "/results"];
+  const fullBleedRoutes = ["/execute", "/results", "/soft-execute"];
   const isFullBleed = fullBleedRoutes.some((route) =>
     pathname?.includes(route),
   );
