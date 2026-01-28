@@ -97,8 +97,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({
   return (
     <div className={styles.loginCard}>
       <div className={styles.header}>
-        <h1 className={styles.title}>Welcome back</h1>
-        <p className={styles.subtitle}>Continue your journey with Kánux</p>
+        <h1 className={styles.title}>Bienvenido de nuevo</h1>
+        <p className={styles.subtitle}>Continua tu jornada con Kánux</p>
       </div>
 
       {submitError && <div className={styles.submitError}>{submitError}</div>}
@@ -129,13 +129,13 @@ export const LoginForm: React.FC<LoginFormProps> = ({
               onChange={(e) => setRememberMe(e.target.checked)}
               disabled={isLoading}
             />
-            <label htmlFor="rememberMe">Remember me</label>
+            <label htmlFor="rememberMe">Recuerdame</label>
           </div>
           <Link
             href="/auth/forgot-password"
             className={styles.forgotPasswordLink}
           >
-            Forgot password?
+            ¿Olvidaste tu contraseña?
           </Link>
         </div>
 
@@ -150,13 +150,13 @@ export const LoginForm: React.FC<LoginFormProps> = ({
       </form>
 
       <div className={styles.footer}>
-        <span>Don't have an account?</span>
+        <span>No tiene cuenta?</span>
         <button
           type="button"
           onClick={handleSignUpClick}
           className={styles.getStartedLink}
         >
-          Get started
+          Regístrate
         </button>
       </div>
     </div>
