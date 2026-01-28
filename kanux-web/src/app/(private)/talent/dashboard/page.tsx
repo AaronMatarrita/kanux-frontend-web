@@ -63,7 +63,7 @@ export default function TalentDashboardPage() {
     if (!session) return 'Alex';
     
     if (session.user.userType === 'talent') {
-      return session.user.profile?.full_name || 'Talento';
+      return session.user.profile?.first_name + " " + session.user.profile?.last_name || 'Talento';
     }
     
   };

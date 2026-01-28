@@ -24,7 +24,7 @@ export const SidebarFooter = () => {
       name:
         session.user.userType === "company"
           ? session.user.profile.name ?? "Empresa"
-          : session.user.profile.full_name ?? "Talento",
+          : session.user.profile.first_name + " " + session.user.profile.last_name || "Talento",
       email: session.user.email,
       photoUrl:
         session.user.userType === "company"
