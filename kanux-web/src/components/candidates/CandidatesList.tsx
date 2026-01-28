@@ -15,7 +15,26 @@ export const MOCK_CANDIDATES: CandidateListItem[] = [
     last_name: "Martinez",
     title: "Frontend Developer",
     education: "Self-taught",
-    skills: ["React", "TypeScript", "Node.js"],
+    skills: [
+      {
+        id: "skill-react",
+        name: "React",
+        level: "Advanced",
+        category_id: "frontend",
+      },
+      {
+        id: "skill-ts",
+        name: "TypeScript",
+        level: "Intermediate",
+        category_id: "frontend",
+      },
+      {
+        id: "skill-node",
+        name: "Node.js",
+        level: "Intermediate",
+        category_id: "backend",
+      },
+    ],
     profile: {
       id: "1",
       first_name: "Sarah",
@@ -42,7 +61,26 @@ export const MOCK_CANDIDATES: CandidateListItem[] = [
     last_name: "Chen",
     title: "Backend Developer",
     education: "Bootcamp",
-    skills: ["Python", "Django", "PostgreSQL"],
+    skills: [
+      {
+        id: "skill-python",
+        name: "Python",
+        level: "Advanced",
+        category_id: "backend",
+      },
+      {
+        id: "skill-django",
+        name: "Django",
+        level: "Intermediate",
+        category_id: "backend",
+      },
+      {
+        id: "skill-postgresql",
+        name: "PostgreSQL",
+        level: "Intermediate",
+        category_id: "database",
+      },
+    ],
     profile: {
       id: "2",
       first_name: "James",
@@ -69,7 +107,26 @@ export const MOCK_CANDIDATES: CandidateListItem[] = [
     last_name: "Rodriguez",
     title: "Cloud Engineer",
     education: "University",
-    skills: ["Vue.js", "AWS", "Docker"],
+    skills: [
+      {
+        id: "skill-vue",
+        name: "Vue.js",
+        level: "Advanced",
+        category_id: "frontend",
+      },
+      {
+        id: "skill-aws",
+        name: "AWS",
+        level: "Intermediate",
+        category_id: "cloud",
+      },
+      {
+        id: "skill-docker",
+        name: "Docker",
+        level: "Intermediate",
+        category_id: "devops",
+      },
+    ],
     profile: {
       id: "3",
       first_name: "Emily",
@@ -96,7 +153,26 @@ export const MOCK_CANDIDATES: CandidateListItem[] = [
     last_name: "Kim",
     title: "Fullstack Developer",
     education: "Self-taught",
-    skills: ["Angular", "C#", ".NET"],
+    skills: [
+      {
+        id: "skill-angular",
+        name: "Angular",
+        level: "Advanced",
+        category_id: "frontend",
+      },
+      {
+        id: "skill-csharp",
+        name: "C#",
+        level: "Intermediate",
+        category_id: "backend",
+      },
+      {
+        id: "skill-dotnet",
+        name: ".NET",
+        level: "Intermediate",
+        category_id: "backend",
+      },
+    ],
     profile: {
       id: "4",
       first_name: "Michael",
@@ -123,7 +199,26 @@ export const MOCK_CANDIDATES: CandidateListItem[] = [
     last_name: "Johnson",
     title: "Java Engineer",
     education: "University",
-    skills: ["Java", "Spring Boot", "Kubernetes"],
+    skills: [
+      {
+        id: "skill-java",
+        name: "Java",
+        level: "Advanced",
+        category_id: "backend",
+      },
+      {
+        id: "skill-spring",
+        name: "Spring Boot",
+        level: "Intermediate",
+        category_id: "backend",
+      },
+      {
+        id: "skill-kubernetes",
+        name: "Kubernetes",
+        level: "Intermediate",
+        category_id: "cloud",
+      },
+    ],
     profile: {
       id: "5",
       first_name: "Alex",
@@ -195,7 +290,11 @@ export const CandidatesList: React.FC<CandidatesProps> = ({ onContact }) => {
         setSkillsOptions(Array.from(new Set(skills)));
       } catch {
         setSkillsOptions(
-          Array.from(new Set(MOCK_CANDIDATES.flatMap((c) => c.skills))),
+          Array.from(
+            new Set(
+              MOCK_CANDIDATES.flatMap((c) => c.skills.map((s) => s.name)),
+            ),
+          ),
         );
       }
     };
@@ -217,14 +316,16 @@ export const CandidatesList: React.FC<CandidatesProps> = ({ onContact }) => {
           `${c.first_name} ${c.last_name}`
             .toLowerCase()
             .includes(searchTerm.toLowerCase()) ||
-          c.skills.some((s: string) =>
-            s.toLowerCase().includes(searchTerm.toLowerCase()),
+          c.skills.some((s) =>
+            s.name.toLowerCase().includes(searchTerm.toLowerCase()),
           ),
       );
     }
 
     if (skillFilter !== "All Skills") {
-      filtered = filtered.filter((c) => c.skills.includes(skillFilter));
+      filtered = filtered.filter((c) =>
+        c.skills.some((s) => s.name === skillFilter),
+      );
     }
 
     if (backgroundFilter) {
@@ -324,12 +425,12 @@ export const CandidatesList: React.FC<CandidatesProps> = ({ onContact }) => {
                   </td>
 
                   <td className="px-6 py-4 flex gap-2 flex-wrap">
-                    {c.skills.map((s: string) => (
+                    {c.skills.map((skill) => (
                       <span
-                        key={s}
+                        key={`${c.talent_id}-${skill.id}`}
                         className="px-2 py-0.5 bg-blue-100 text-blue-800 rounded-full text-xs"
                       >
-                        {s}
+                        {skill.name}
                       </span>
                     ))}
                   </td>

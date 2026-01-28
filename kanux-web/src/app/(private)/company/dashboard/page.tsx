@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Zap, Users, FileText, MessageSquare } from "lucide-react";
+import { Users, FileText, MessageSquare, PaperclipIcon } from "lucide-react";
 import {
   StatCard,
   LatestSubmissions,
@@ -10,6 +10,11 @@ import {
 import { useAuth } from "@/context/AuthContext";
 import { useSyncExternalStore } from "react";
 import { companiesService } from "@/services/companies.service";
+import {
+  candidatesService,
+  CandidateListItem,
+  CandidateProfile,
+} from "@/services/candidates.service";
 
 function useIsClient() {
   return useSyncExternalStore(
@@ -27,77 +32,52 @@ const MOCK_STATS = {
   messages: { value: 8, change: "3 unread" },
 };
 
-const MOCK_SUBMISSIONS = [
+const MOCK_CANDIDATES: CandidateListItem[] = [
   {
-    id: "1",
-    candidateName: "Alex Smith",
-    challengeName: "React Patterns",
-    submittedAt: "2 hours ago",
-    score: 92,
-  },
-  {
-    id: "2",
-    candidateName: "Sarah Martinez",
-    challengeName: "Full-Stack API Challenge",
-    submittedAt: "4 hours ago",
-    score: 88,
-  },
-  {
-    id: "3",
-    candidateName: "Aaron Matarrita",
-    challengeName: "Full-Stack API Challenge",
-    submittedAt: "8 hours ago",
-    score: 90,
-  },
-  {
-    id: "4",
-    candidateName: "Josue Porras",
-    challengeName: "Full-Stack API Challenge",
-    submittedAt: "10 hours ago",
-    score: 90,
-  },
-];
-
-const MOCK_PROFILES = [
-  {
-    id: "1",
-    name: "Alex Smith",
-    matchScore: 92,
+    talent_id: "1",
+    first_name: "Alex",
+    last_name: "Smith",
+    title: "Frontend Developer",
+    education: "Computer Science",
     skills: [
-      { name: "React", level: "Expert" },
-      { name: "TypeScript", level: "Expert" },
-      { name: "Node.js", level: "Advanced" },
+      { id: "1", name: "React", level: "Expert", category_id: "frontend" },
+      { id: "2", name: "TypeScript", level: "Expert", category_id: "frontend" },
     ],
+    profile: null as unknown as CandidateProfile,
   },
   {
-    id: "2",
-    name: "Sarah Martinez",
-    matchScore: 88,
+    talent_id: "2",
+    first_name: "Sarah",
+    last_name: "Martinez",
+    title: "Full Stack Developer",
+    education: "Software Engineering",
     skills: [
-      { name: "React", level: "Expert" },
-      { name: "TypeScript", level: "Advanced" },
-      { name: "Node.js", level: "Expert" },
+      { id: "3", name: "Node.js", level: "Advanced", category_id: "backend" },
+      {
+        id: "4",
+        name: "PostgreSQL",
+        level: "Advanced",
+        category_id: "backend",
+      },
     ],
+    profile: null as unknown as CandidateProfile,
   },
   {
-    id: "3",
-    name: "Aaron Matarrita",
-    matchScore: 90,
+    talent_id: "3",
+    first_name: "Aaron",
+    last_name: "Matarrita",
+    title: "Backend Developer",
+    education: "Information Systems",
     skills: [
-      { name: "React", level: "Expert" },
-      { name: "TypeScript", level: "Expert" },
-      { name: "Node.js", level: "Advanced" },
+      { id: "5", name: "Java", level: "Expert", category_id: "backend" },
+      {
+        id: "6",
+        name: "Spring Boot",
+        level: "Advanced",
+        category_id: "backend",
+      },
     ],
-  },
-  {
-    id: "4",
-    name: "Josue Porras",
-    matchScore: 90,
-    skills: [
-      { name: "React", level: "Advanced" },
-      { name: "TypeScript", level: "Advanced" },
-      { name: "Node.js", level: "Expert" },
-    ],
+    profile: null as unknown as CandidateProfile,
   },
 ];
 
@@ -108,17 +88,17 @@ export default function DashboardPage() {
 
   const [stats, setStats] = React.useState(MOCK_STATS);
   const [loading, setLoading] = React.useState(false);
+  const [candidates, setCandidates] =
+    React.useState<CandidateListItem[]>(MOCK_CANDIDATES);
 
-   const greeting = React.useMemo(() => {
-    if (!isClient || !session) return 'Bienvenido de vuelta';
+  const greeting = React.useMemo(() => {
+    if (!isClient || !session) return "Bienvenido de vuelta";
 
-    if (session.user.userType === 'company') {
-      return `Bienvenido de vuelta, ${
-        session.user.profile?.name || 'Company'
-      }`;
+    if (session.user.userType === "company") {
+      return `Bienvenido de vuelta, ${session.user.profile?.name || "Company"}`;
     }
 
-    return 'Bienvenido de vuelta';
+    return "Bienvenido de vuelta";
   }, [isClient, session]);
 
   React.useEffect(() => {
@@ -129,31 +109,36 @@ export default function DashboardPage() {
 
       try {
         const response = await companiesService.getCompanyDashboard(
-          session.token
+          session.token,
         );
 
-      const dashboard = response.data;
-      setStats({
-        activeChallenges: {
-          value: dashboard.totalChallenges,
-          change: '',
-        },
-        candidatesEvaluated: {
-          value: dashboard.totalTalentsParticipated,
-          change: '',
-        },
-        newApplications: {
-          value: dashboard.totalUsersParticipated,
-          change: '',
-        },
-        messages: {
-          value: dashboard.unreadMessages,
-          change: '',
-        },
-      });
+        const dashboard = response.data;
+        setStats({
+          activeChallenges: {
+            value: dashboard.totalChallenges,
+            change: "",
+          },
+          candidatesEvaluated: {
+            value: dashboard.totalTalentsParticipated,
+            change: "",
+          },
+          newApplications: {
+            value: dashboard.totalUsersParticipated,
+            change: "",
+          },
+          messages: {
+            value: dashboard.unreadMessages,
+            change: "",
+          },
+        });
+        const candidatesRes = await candidatesService.getCandidatesDash(
+          session.token,
+        );
+
+        setCandidates(candidatesRes);
       } catch (error) {
-        console.error('Dashboard error, usando MOCK_STATS', error);
-        setStats(MOCK_STATS); 
+        console.error("Dashboard error, usando MOCK_STATS", error);
+        setStats(MOCK_STATS);
       } finally {
         setLoading(false);
       }
@@ -162,45 +147,41 @@ export default function DashboardPage() {
     fetchDashboard();
   }, [session?.token]);
 
-
   return (
     <div className="space-y-8">
-      {/* Header */}
       <div className="flex flex-col gap-2">
         <h1 className="text-3xl font-bold text-slate-900">{greeting}</h1>
         <p className="text-slate-600">
-          Here what happening with your hiring process today.
+          Aquí tienes un resumen de la actividad reciente en tu cuenta.
         </p>
       </div>
 
-      {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard
-          title="Active Challenges"
+          title="Desafíos Activos"
           value={stats.activeChallenges.value}
-          icon={Zap}
+          icon={PaperclipIcon}
         />
         <StatCard
-          title="Candidates Evaluated"
+          title="Candidatos Evaluados"
           value={stats.candidatesEvaluated.value}
           icon={Users}
         />
         <StatCard
-          title="New Applications"
+          title="Aplicaciones Nuevas"
           value={stats.newApplications.value}
           icon={FileText}
         />
         <StatCard
-          title="Messages"
+          title="Mensajes no Leídos"
           value={stats.messages.value}
           icon={MessageSquare}
         />
       </div>
 
-      {/* Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <LatestSubmissions submissions={MOCK_SUBMISSIONS} />
-        <RecentlyViewed profiles={MOCK_PROFILES} />
+      <div className="grid grid-cols-1 lg:grid-cols-[auto_380px] gap-12">
+        <LatestSubmissions candidates={candidates} />
+        <RecentlyViewed />
       </div>
     </div>
   );
