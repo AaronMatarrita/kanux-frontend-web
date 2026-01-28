@@ -10,10 +10,9 @@ import { useAuth } from "@/context/AuthContext";
 import { getDeviceId } from "@/lib/device";
 import { mapLoginResponseToSession } from "@/helper/mapper";
 
-
 export const LoginPage: React.FC = () => {
   const { login } = useAuth();
-  const deviceId=getDeviceId();
+  const deviceId = getDeviceId();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [submitError, setSubmitError] = useState<string>();
@@ -31,17 +30,17 @@ export const LoginPage: React.FC = () => {
       });
 
       console.log("Login successful:", response);
-     const session = mapLoginResponseToSession(response); 
+      const session = mapLoginResponseToSession(response);
 
-console.log("session successful:", session);
+      console.log("session successful:", session);
 
       await login(session);
 
       router.push(
-      response.user.userType === "talent"
-        ? "/talent/dashboard"
-        : "/company/dashboard"
-    );
+        response.user.userType === "talent"
+          ? "/talent/dashboard"
+          : "/company/dashboard",
+      );
     } catch (error) {
       let errorMessage = "Error al iniciar sesión";
 

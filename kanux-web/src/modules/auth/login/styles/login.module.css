@@ -76,7 +76,8 @@
 .header {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
+  text-align: center;
   margin-bottom: 32px;
 }
 
@@ -85,21 +86,73 @@
 }
 
 .title {
-  font-size: 28px;
+  font-size: 32px;
   font-weight: 600;
-  color: #1a1a1a;
-  margin-bottom: 4px;
+  color: #1e5ba8;
+  margin-bottom: 8px;
+  margin-top: 0;
 }
 
 .subtitle {
   font-size: 14px;
   color: #999;
+  margin: 0;
+}
+
+.googleButton {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: white;
+  font-size: 14px;
+  font-weight: 500;
+  color: #1a1a1a;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.googleButton:hover:not(:disabled) {
+  background: #f9f9f9;
+  border-color: #bbb;
+}
+
+.googleButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 24px 0;
+  font-size: 13px;
+  color: #999;
+  position: relative;
+}
+
+.divider::before,
+.divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background-color: #e5e5e5;
+}
+
+.divider span {
+  flex-shrink: 0;
 }
 
 .form {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
 }
 
 .formGroup {
@@ -157,6 +210,7 @@
   align-items: center;
   gap: 8px;
   font-size: 14px;
+  color: #1a1a1a;
 }
 
 .rememberMe input[type="checkbox"] {
@@ -169,21 +223,25 @@
 .rememberMe label {
   cursor: pointer;
   color: #1a1a1a;
+  margin: 0;
 }
 
-.forgotPassword {
-  text-align: right;
-  margin-top: -8px;
+.rememberForgot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
 }
 
-.forgotPassword a {
+.forgotPasswordLink {
   font-size: 13px;
   color: #2ba8d6;
   text-decoration: none;
   transition: color 0.3s ease;
+  white-space: nowrap;
 }
 
-.forgotPassword a:hover {
+.forgotPasswordLink:hover {
   color: #0d2851;
   text-decoration: underline;
 }
@@ -199,6 +257,10 @@
   cursor: pointer;
   transition: all 0.3s ease;
   margin-top: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 .submitButton:hover:not(:disabled) {
@@ -292,6 +354,23 @@
 }
 
 .footer a:hover {
+  color: #0d2851;
+  text-decoration: underline;
+}
+
+.getStartedLink {
+  background: none;
+  border: none;
+  color: #2ba8d6;
+  cursor: pointer;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s ease;
+  padding: 0;
+  font-size: 14px;
+}
+
+.getStartedLink:hover {
   color: #0d2851;
   text-decoration: underline;
 }

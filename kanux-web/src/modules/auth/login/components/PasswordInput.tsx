@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import styles from '../styles/login.module.css';
+import React, { useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 
 interface PasswordInputProps {
   value: string;
@@ -16,7 +16,7 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
   error,
   onChange,
   disabled = false,
-  placeholder = '••••••••',
+  placeholder = "••••••••",
 }) => {
   const [showPassword, setShowPassword] = useState(false);
 
@@ -25,15 +25,22 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
   };
 
   return (
-    <div className={styles.formGroup}>
-      <label className={styles.label} htmlFor="password">
+    <div className="w-full mb-4 font-comfortaa">
+      <label
+        className="block text-sm font-medium text-gray-700 mb-2"
+        htmlFor="password"
+      >
         Contraseña
       </label>
-      <div style={{ position: 'relative' }}>
+      <div className="relative">
         <input
           id="password"
-          type={showPassword ? 'text' : 'password'}
-          className={`${styles.input} ${error ? styles.error : ''}`}
+          type={showPassword ? "text" : "password"}
+          className={`w-full p-3 border-1px rounded-md text-sm transition-all focus:outline-none ${
+            error
+              ? "border-red-500 bg-red-50 focus:ring-1 focus:ring-red-500"
+              : "border-gray-200 bg-slate-50 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+          } pr-12`}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           disabled={disabled}
@@ -46,24 +53,13 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
           type="button"
           onClick={togglePasswordVisibility}
           disabled={disabled}
-          style={{
-            position: 'absolute',
-            right: '12px',
-            top: '50%',
-            transform: 'translateY(-50%)',
-            background: 'none',
-            border: 'none',
-            cursor: disabled ? 'not-allowed' : 'pointer',
-            color: '#666',
-            fontSize: '16px',
-            opacity: disabled ? 0.5 : 1,
-          }}
-          aria-label={showPassword ? 'Hide password' : 'Show password'}
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors disabled:opacity-50"
+          aria-label={showPassword ? "Hide password" : "Show password"}
         >
-          {showPassword ? '👁️' : '👁️‍🗨️'}
+          {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
         </button>
       </div>
-      {error && <span className={styles.errorMessage}>{error}</span>}
+      {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
     </div>
   );
 };

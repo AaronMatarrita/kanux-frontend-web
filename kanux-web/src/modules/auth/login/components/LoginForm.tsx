@@ -1,12 +1,13 @@
-'use client';
+"use client";
 
-import React, { useState, FormEvent } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import EmailInput from './EmailInput';
-import PasswordInput from './PasswordInput';
-import styles from '../styles/login.module.css';
-import type { LoginFormData, LoginFormErrors } from '../types';
+import React, { useState, FormEvent } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { ArrowRight } from "lucide-react";
+import EmailInput from "./EmailInput";
+import PasswordInput from "./PasswordInput";
+import styles from "../styles/login.module.css";
+import type { LoginFormData, LoginFormErrors } from "../types";
 
 interface LoginFormProps {
   onSubmit?: (data: LoginFormData) => Promise<void> | void;
@@ -20,10 +21,10 @@ export const LoginForm: React.FC<LoginFormProps> = ({
   submitError,
 }) => {
   const router = useRouter();
-  
+
   const [formData, setFormData] = useState<LoginFormData>({
-    email: '',
-    password: '',
+    email: "",
+    password: "",
   });
 
   const [errors, setErrors] = useState<LoginFormErrors>({});
@@ -31,14 +32,14 @@ export const LoginForm: React.FC<LoginFormProps> = ({
 
   const validateEmail = (email: string): string | undefined => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!email) return 'Email is required';
-    if (!emailRegex.test(email)) return 'Please enter a valid email address';
+    if (!email) return "Email is required";
+    if (!emailRegex.test(email)) return "Please enter a valid email address";
     return undefined;
   };
 
   const validatePassword = (password: string): string | undefined => {
-    if (!password) return 'Password is required';
-    if (password.length < 4) return 'Password must be at least 4 characters';
+    if (!password) return "Password is required";
+    if (password.length < 4) return "Password must be at least 4 characters";
     return undefined;
   };
 
@@ -84,20 +85,20 @@ export const LoginForm: React.FC<LoginFormProps> = ({
     } catch (error) {
       setErrors({
         ...errors,
-        submit: error instanceof Error ? error.message : 'An error occurred',
+        submit: error instanceof Error ? error.message : "An error occurred",
       });
     }
   };
 
   const handleSignUpClick = () => {
-    router.push('/onboarding/account-selection');
+    router.push("/onboarding/account-selection");
   };
 
   return (
     <div className={styles.loginCard}>
       <div className={styles.header}>
-        <h1 className={styles.title}>Bienvenido de vuelta</h1>
-        <p className={styles.subtitle}>Continua tu jornada con Kánux</p>
+        <h1 className={styles.title}>Welcome back</h1>
+        <p className={styles.subtitle}>Continue your journey with Kánux</p>
       </div>
 
       {submitError && <div className={styles.submitError}>{submitError}</div>}
@@ -111,28 +112,31 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           placeholder="your@email.com"
         />
 
-        <div>
-          <PasswordInput
-            value={formData.password}
-            error={errors.password}
-            onChange={handlePasswordChange}
-            disabled={isLoading}
-            placeholder="••••••••"
-          />
-          <div className={styles.forgotPassword}>
-            <Link href="/auth/forgot-password">Olvidaste tu contraseña?</Link>
-          </div>
-        </div>
+        <PasswordInput
+          value={formData.password}
+          error={errors.password}
+          onChange={handlePasswordChange}
+          disabled={isLoading}
+          placeholder="••••••••"
+        />
 
-        <div className={styles.rememberMe}>
-          <input
-            type="checkbox"
-            id="rememberMe"
-            checked={rememberMe}
-            onChange={(e) => setRememberMe(e.target.checked)}
-            disabled={isLoading}
-          />
-          <label htmlFor="rememberMe">Recuerdame</label>
+        <div className={styles.rememberForgot}>
+          <div className={styles.rememberMe}>
+            <input
+              type="checkbox"
+              id="rememberMe"
+              checked={rememberMe}
+              onChange={(e) => setRememberMe(e.target.checked)}
+              disabled={isLoading}
+            />
+            <label htmlFor="rememberMe">Remember me</label>
+          </div>
+          <Link
+            href="/auth/forgot-password"
+            className={styles.forgotPasswordLink}
+          >
+            Forgot password?
+          </Link>
         </div>
 
         <button
@@ -140,24 +144,19 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           className={styles.submitButton}
           disabled={isLoading}
         >
-          {isLoading ? 'Signing in...' : 'Iniciar sesión'}
+          {isLoading ? "Signing in..." : "Sign in"}
+          {!isLoading && <ArrowRight size={18} />}
         </button>
       </form>
 
       <div className={styles.footer}>
-        <span>No tienes una cuenta?</span>
+        <span>Don't have an account?</span>
         <button
           type="button"
           onClick={handleSignUpClick}
-          style={{
-            background: 'none',
-            border: 'none',
-            color: '#2ba8d6',
-            cursor: 'pointer',
-            textDecoration: 'underline',
-          }}
+          className={styles.getStartedLink}
         >
-         Regístrate
+          Get started
         </button>
       </div>
     </div>
