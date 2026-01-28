@@ -1,10 +1,12 @@
 import { Conversation } from "@/services/messages.service";
 import Image from "next/image";
+import { formatMessageTime } from "@/lib/dateUtils";
 
 interface ConversationItemProps {
   conversation: Conversation;
   isSelected?: boolean;
   userRole: "company" | "talent";
+  userPhoto?: string | null;
   onClick?: () => void;
 }
 
@@ -12,6 +14,7 @@ export function ConversationItem({
   conversation,
   isSelected = false,
   userRole,
+  userPhoto,
   onClick,
 }: ConversationItemProps) {
   const otherParty =
@@ -26,6 +29,15 @@ export function ConversationItem({
     userRole === "company"
       ? `https://ui-avatars.com/api/?name=${(otherParty as any)?.first_name}+${(otherParty as any)?.last_name}`
       : (otherParty as any)?.url_logo;
+
+  const isLastMessageFromUser =
+    conversation.last_message?.sender_type === "Companhia"
+      ? userRole === "company"
+      : userRole === "talent";
+
+  const lastMessagePreview = isLastMessageFromUser
+    ? `Tu: ${conversation.last_message?.content || "Sin mensajes"}`
+    : conversation.last_message?.content || "Sin mensajes";
 
   return (
     <button
@@ -66,14 +78,8 @@ export function ConversationItem({
             {displayName || "Sin nombre"}
           </p>
           <span className="text-xs text-gray-400 shrink-0">
-            {conversation.last_message_at
-              ? new Date(conversation.last_message_at).toLocaleTimeString(
-                  "es-ES",
-                  {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  },
-                )
+            {conversation.last_message?.created_at
+              ? formatMessageTime(conversation.last_message.created_at)
               : ""}
           </span>
         </div>
@@ -83,7 +89,7 @@ export function ConversationItem({
             isSelected ? "text-blue-600" : "text-gray-600"
           }`}
         >
-          {conversation.last_message?.content || "Sin mensajes"}
+          {lastMessagePreview}
         </p>
       </div>
     </button>

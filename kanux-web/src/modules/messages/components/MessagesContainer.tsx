@@ -4,12 +4,15 @@ import { ConversationsList } from "@/modules/messages/components/ConversationsLi
 import { ConversationDetail } from "@/modules/messages/components/ConversationDetail";
 import { MessagesPanel } from "@/modules/messages/components/MessagesPanel";
 import { useMessagesState } from "@/modules/messages/hooks/useMessagesState";
+import { useConversationMessages } from "@/modules/messages/hooks/useConversationMessages";
 
 interface MessagesContainerProps {
   conversations: Conversation[];
   loading?: boolean;
   error?: string | null;
   userRole: "company" | "talent";
+  userPhoto?: string | null;
+  userName?: string;
   onSendMessage?: (conversationId: string, content: string) => Promise<void>;
 }
 
@@ -18,16 +21,31 @@ export function MessagesContainer({
   loading = false,
   error = null,
   userRole,
+  userPhoto,
+  userName,
   onSendMessage,
 }: MessagesContainerProps) {
   const {
     selectedConversation,
+    conversationMessages,
     searchQuery,
     sending,
     setSelectedConversation,
     setSearchQuery,
+    setConversationMessages,
+    addMessage,
     handleSendMessage,
   } = useMessagesState();
+
+  const {
+    messages: loadedMessages,
+    loading: messagesLoading,
+    error: messagesError,
+  } = useConversationMessages(selectedConversation?.id);
+
+  React.useEffect(() => {
+    setConversationMessages(loadedMessages);
+  }, [loadedMessages, setConversationMessages]);
 
   const onSend = async (content: string) => {
     if (!selectedConversation) return;
@@ -47,6 +65,7 @@ export function MessagesContainer({
           error={error}
           selectedId={selectedConversation?.id}
           userRole={userRole}
+          userPhoto={userPhoto}
           onSelectConversation={setSelectedConversation}
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
@@ -56,12 +75,12 @@ export function MessagesContainer({
       <MessagesPanel isVisible={!!selectedConversation} className="flex-1">
         <ConversationDetail
           conversation={selectedConversation}
-          messages={
-            selectedConversation?.last_message
-              ? [selectedConversation.last_message]
-              : []
-          }
+          messages={conversationMessages}
+          loading={messagesLoading}
+          error={messagesError}
           userRole={userRole}
+          userPhoto={userPhoto}
+          userName={userName}
           onClose={() => setSelectedConversation(undefined)}
           onSendMessage={onSend}
           sending={sending}
