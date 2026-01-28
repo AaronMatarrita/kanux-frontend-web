@@ -13,7 +13,11 @@ export function RegisterBackground({ children, step }: Props) {
     <div className="relative min-h-screen w-full bg-[#0D2A4E] overflow-hidden flex flex-col items-center py-8">
       {/* App logo */}
       <div className="z-10 mb-8">
-        <img src="/brand/kanux-logo.svg" alt="Kánux" className="h-20 w-auto" />
+        <img
+          src="/brand/kanux-logo-variant-white.svg"
+          alt="Kánux"
+          className="h-20 w-auto"
+        />
       </div>
 
       {/* steps views */}
