@@ -1,119 +1,326 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { CheckCircle, Trophy, Zap, Award } from 'lucide-react';
-import { StatCard, ProfileCompletion, RecommendedChallenges, SkillsToImprove } from '@/components/dashboard';
+import React, { useEffect, useState } from "react";
+import {
+  CheckCircle,
+  Trophy,
+  MessageCircleHeart,
+  MessageSquareText,
+} from "lucide-react";
+import {
+  StatCard,
+  ProfileCompletion,
+  RecommendedChallenges,
+  Feed,
+} from "@/components/dashboard";
 
-import { useSyncExternalStore } from 'react';
-import { useAuth } from '@/context/AuthContext';
+import { useSyncExternalStore } from "react";
+import { useAuth } from "@/context/AuthContext";
+import {
+  profilesService,
+  FeedPost,
+  DashboardStats,
+} from "@/services/profiles.service";
+import { DashboardChallenge } from "@/components/dashboard/RecommendedChallenges";
 
 function useIsClient() {
   return useSyncExternalStore(
     () => () => {},
     () => true,
-    () => false
+    () => false,
   );
 }
 
-
 const MOCK_STATS = {
-  skillsVerified: { value: 4, change: '+1 this month' },
-  challengesCompleted: { value: 23, change: '92% average score' },
-  activeChallenges: { value: 2, change: 'In progress' },
-  profileCompletion: { value: 85, change: '' },
+  skillsVerified: { value: 4, change: "+1 this month" },
+  challengesCompleted: { value: 23, change: "92% average score" },
+  activeChallenges: { value: 2, change: "In progress" },
+  profileCompletion: { value: 85, change: "" },
 };
 
-const MOCK_RECOMMENDED_CHALLENGES = [
+const MOCK_RECOMMENDED_CHALLENGES: DashboardChallenge[] = [
   {
-    id: '1',
-    name: 'Advanced React Patterns',
-    description: 'Master advanced patterns and best practices in React development.',
-    difficulty: 'Advanced' as const,
-    skills: ['React', 'Advanced', 'TypeScript'],
+    id: "1",
+    title: "Advanced React Patterns",
+    description: "Master advanced patterns and best practices in React.",
+    difficulty: "Avanzado",
+    created_at: new Date().toISOString(),
   },
   {
-    id: '2',
-    name: 'API Integration Challenge',
-    description: 'Intermediate level challenge for building RESTful APIs.',
-    difficulty: 'Intermediate' as const,
-    skills: ['Intermediate', 'REST APIs', 'Node.js'],
+    id: "2",
+    title: "API Integration Challenge",
+    description: "Build RESTful APIs using Node.js.",
+    difficulty: "Intermedio",
+    created_at: new Date().toISOString(),
   },
   {
-    id: '3',
-    name: 'Database Design',
-    description: 'Learn database design principles and optimization techniques.',
-    difficulty: 'Intermediate' as const,
-    skills: ['Intermediate', 'PostgreSQL', 'SQL'],
+    id: "3",
+    title: "Database Design",
+    description: "Learn database design principles.",
+    difficulty: "Intermedio",
+    created_at: new Date().toISOString(),
   },
 ];
 
-const MOCK_SKILLS_TO_IMPROVE = [
-  { name: 'TypeScript', level: 75 },
-  { name: 'Docker', level: 45 },
-  { name: 'PostgreSQL', level: 35 },
+const MOCK_FEED_POSTS: FeedPost[] = [
+  {
+    id: "1",
+    content:
+      "Just completed an amazing project! Learning so much every day about React and TypeScript.",
+    created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 horas atrás
+    author: {
+      id: "user1",
+      name: "Alex Johnson",
+    },
+    commentsCount: 5,
+    reactionsCount: 24,
+    comments: [],
+    reactions: [],
+    isOwner: false,
+    isLikedByMe: true,
+  },
+  {
+    id: "2",
+    content:
+      "Working on a new full-stack application with Next.js 14 and Prisma. The new features are amazing!",
+    created_at: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(), // 5 horas atrás
+    author: {
+      id: "user2",
+      name: "Maria Rodriguez",
+    },
+    commentsCount: 12,
+    reactionsCount: 42,
+    comments: [],
+    reactions: [],
+    isOwner: false,
+    isLikedByMe: false,
+  },
+  {
+    id: "3",
+    content:
+      "Just started a new challenge in the platform. The algorithm section looks challenging but exciting!",
+    created_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(), // 1 día atrás
+    author: {
+      id: "user3",
+      name: "David Chen",
+    },
+    commentsCount: 3,
+    reactionsCount: 18,
+    comments: [],
+    reactions: [],
+    isOwner: true,
+    isLikedByMe: true,
+  },
+  {
+    id: "4",
+    content:
+      "Completed the React performance optimization challenge with 95% score! The debugging section was particularly helpful.",
+    created_at: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(), // 3 días atrás
+    author: {
+      id: "user4",
+      name: "Sarah Williams",
+    },
+    commentsCount: 8,
+    reactionsCount: 31,
+    comments: [],
+    reactions: [],
+    isOwner: false,
+    isLikedByMe: false,
+  },
 ];
 
 export default function TalentDashboardPage() {
-   const { session } = useAuth();
+  const { session } = useAuth();
   const isClient = useIsClient();
 
+  const [recommendedChallenges, setRecommendedChallenges] = useState<
+    DashboardChallenge[]
+  >(MOCK_RECOMMENDED_CHALLENGES);
+
+  const [feedPosts, setFeedPosts] = useState<FeedPost[]>(MOCK_FEED_POSTS);
+  const [isLoadingFeed, setIsLoadingFeed] = useState(true);
+  const [feedError, setFeedError] = useState<string | null>(null);
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [isLoadingStats, setIsLoadingStats] = useState(true);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        setIsLoadingStats(true);
+        const data = await profilesService.getDashboardStats();
+        setStats(data);
+      } catch (error) {
+        console.error("Error loading dashboard stats, using mocks", error);
+        setStats({
+          skillsCount: MOCK_STATS.skillsVerified.value,
+          completedChallengesCount: MOCK_STATS.challengesCompleted.value,
+          unreadMessagesCount: 0,
+          postsCount: MOCK_STATS.activeChallenges.value,
+        });
+      } finally {
+        setIsLoadingStats(false);
+      }
+    };
+
+    fetchStats();
+  }, []);
+
+  useEffect(() => {
+    const fetchChallenges = async () => {
+      try {
+        const data = await profilesService.getFirstChallenges();
+
+        if (Array.isArray(data) && data.length > 0) {
+          setRecommendedChallenges(data as DashboardChallenge[]);
+        }
+      } catch (error) {
+        console.error(
+          "Error loading recommended challenges, using mocks",
+          error,
+        );
+        setRecommendedChallenges(MOCK_RECOMMENDED_CHALLENGES);
+      }
+    };
+
+    fetchChallenges();
+  }, []);
+
+  useEffect(() => {
+    const fetchFeedPosts = async () => {
+      try {
+        setIsLoadingFeed(true);
+        setFeedError(null);
+
+        const posts = await profilesService.getDashboardFeed();
+
+        if (Array.isArray(posts) && posts.length > 0) {
+          setFeedPosts(posts);
+        } else {
+          console.log("No feed posts returned from API, using mock data");
+          setFeedPosts(MOCK_FEED_POSTS);
+        }
+      } catch (error) {
+        console.error("Error loading feed posts:", error);
+        setFeedError("Could not load feed posts");
+        setFeedPosts(MOCK_FEED_POSTS);
+      } finally {
+        setIsLoadingFeed(false);
+      }
+    };
+
+    fetchFeedPosts();
+  }, []);
+
   const getUserName = () => {
-    if (!isClient) return 'Alex';
-    
-    if (!session) return 'Alex';
-    
-    if (session.user.userType === 'talent') {
-      return session.user.profile?.first_name + " " + session.user.profile?.last_name || 'Talento';
+    if (!isClient) return "Alex";
+    if (!session) return "Alex";
+
+    if (session.user.userType === "talent") {
+      return (
+        `${session.user.profile?.first_name ?? ""} ${
+          session.user.profile?.last_name ?? ""
+        }`.trim() || "Talento"
+      );
     }
-    
+
+    return "Alex";
+  };
+
+  const renderFeedContent = () => {
+    if (isLoadingFeed) {
+      return (
+        <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-8">
+          <div className="flex flex-col items-center justify-center">
+            <div className="w-16 h-16 mb-4 rounded-full bg-gray-100 animate-pulse"></div>
+            <div className="h-4 w-32 bg-gray-200 rounded mb-2 animate-pulse"></div>
+            <div className="h-3 w-48 bg-gray-100 rounded animate-pulse"></div>
+          </div>
+        </div>
+      );
+    }
+
+    if (feedError) {
+      return (
+        <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
+          <div className="text-center py-8">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-red-50 flex items-center justify-center">
+              <svg
+                className="w-8 h-8 text-red-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              Las publicaciones no se pudieron cargar correctamente.
+            </h3>
+            <p className="text-gray-600 mb-4">{feedError}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Intenta de nuevo
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    return <Feed posts={feedPosts} />;
   };
 
   return (
     <div className="space-y-8">
-      {/* Header */}
       <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold text-slate-900">Bienvenido de vuelta, {getUserName()}</h1>
-        <p className="text-slate-600">Keep building your skills and unlocking new opportunities.</p>
+        <h1 className="text-3xl font-bold text-slate-900">
+          Bienvenido de vuelta, {getUserName()}
+        </h1>
+        <p className="text-slate-600">
+          Aquí está lo que ha estado pasando mientras estabas fuera.
+        </p>
       </div>
 
-      {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard
-          title="Skills Verified"
-          value={MOCK_STATS.skillsVerified.value}
-          change={MOCK_STATS.skillsVerified.change}
+          title="Habilidades Verificadas"
+          value={stats?.skillsCount ?? "—"}
           icon={CheckCircle}
         />
+
         <StatCard
-          title="Challenges Completed"
-          value={MOCK_STATS.challengesCompleted.value}
-          change={MOCK_STATS.challengesCompleted.change}
+          title="Desafíos Completados"
+          value={stats?.completedChallengesCount ?? "—"}
           icon={Trophy}
         />
+
         <StatCard
-          title="Active Challenges"
-          value={MOCK_STATS.activeChallenges.value}
-          change={MOCK_STATS.activeChallenges.change}
-          icon={Zap}
+          title="Publicaciones Realizadas"
+          value={stats?.postsCount ?? "—"}
+          icon={MessageCircleHeart}
         />
+
         <StatCard
-          title="Profile Completeness"
-          value={`${MOCK_STATS.profileCompletion.value}%`}
-          change="Almost there!"
-          icon={Award}
+          title="Mensajes Sin Leer"
+          value={stats?.unreadMessagesCount ?? "—"}
+          icon={MessageSquareText}
         />
       </div>
 
-      {/* Profile Completion */}
       <ProfileCompletion
         completionPercentage={MOCK_STATS.profileCompletion.value}
-        message="Add your profile picture to reach 100%"
+        message="Mas información completa tu perfil, mejores oportunidades recibirás."
       />
 
-      {/* Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <RecommendedChallenges challenges={MOCK_RECOMMENDED_CHALLENGES} />
-        <SkillsToImprove skills={MOCK_SKILLS_TO_IMPROVE} />
+        <RecommendedChallenges challenges={recommendedChallenges} />
+        {renderFeedContent()}
       </div>
     </div>
   );

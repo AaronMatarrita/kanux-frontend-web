@@ -1,66 +1,103 @@
-'use client';
+"use client";
 
-import React from 'react';
+import React from "react";
+import Link from "next/link";
 
-interface Challenge {
+export interface DashboardChallenge {
   id: string;
-  name: string;
-  description: string;
-  difficulty: 'Beginner' | 'Intermediate' | 'Advanced';
-  skills: string[];
+  title: string;
+  description: string | null;
+  difficulty: "Básico" | "Intermedio" | "Avanzado";
+  created_at: string;
 }
 
 interface RecommendedChallengesProps {
-  challenges: Challenge[];
+  challenges: DashboardChallenge[];
 }
 
-export const RecommendedChallenges: React.FC<RecommendedChallengesProps> = ({ challenges }) => {
+export const RecommendedChallenges: React.FC<RecommendedChallengesProps> = ({
+  challenges,
+}) => {
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
-      case 'Beginner':
-        return 'bg-green-100 text-green-700';
-      case 'Intermediate':
-        return 'bg-yellow-100 text-yellow-700';
-      case 'Advanced':
-        return 'bg-red-100 text-red-700';
+      case "Básico":
+        return "bg-emerald-50 text-emerald-700 border border-emerald-200";
+      case "Intermedio":
+        return "bg-amber-50 text-amber-700 border border-amber-200";
+      case "Avanzado":
+        return "bg-rose-50 text-rose-700 border border-rose-200";
       default:
-        return 'bg-slate-100 text-slate-700';
+        return "bg-slate-50 text-slate-700 border border-slate-200";
     }
   };
 
   return (
-    <div className="bg-white rounded-lg border border-slate-200 p-6">
-      <h2 className="text-lg font-semibold text-slate-900 mb-6">Recommended Challenges</h2>
-      
-      <div className="space-y-6">
-        {challenges.map((challenge) => (
-          <div key={challenge.id} className="pb-6 border-b border-slate-200 last:border-b-0 last:pb-0">
-            <div className="flex justify-between items-start mb-3">
+    <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-6 hover:shadow-md transition-shadow duration-300">
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-xl font-bold text-slate-900">
+          Desafíos recomendados
+        </h2>
+        <span className="px-3 py-1 bg-blue-50 text-blue-600 text-sm font-medium rounded-full">
+          {challenges.length} disponibles
+        </span>
+      </div>
+
+      <div className="space-y-4">
+        {challenges.map((challenge, index) => (
+          <div
+            key={challenge.id}
+            className="group p-4 rounded-lg border border-slate-200 hover:border-blue-300 hover:bg-blue-50/30 transition-all duration-200"
+          >
+            <div className="flex justify-between items-start gap-4">
               <div className="flex-1">
-                <h3 className="font-semibold text-slate-900">{challenge.name}</h3>
-                <p className="text-sm text-slate-600 mt-1">{challenge.description}</p>
+                <div className="flex items-center gap-2 mb-2">
+                  <h3 className="font-semibold text-slate-900 text-base group-hover:text-blue-700 transition-colors">
+                    {challenge.title}
+                  </h3>
+                </div>
+
+                {challenge.description && (
+                  <p className="text-sm text-slate-600 line-clamp-2">
+                    {challenge.description}
+                  </p>
+                )}
               </div>
-              <button className="px-3 py-1 rounded bg-blue-50 text-blue-600 text-sm font-medium hover:bg-blue-100 transition-colors">
-                Start
-              </button>
+
+              <Link
+                href={`/talent/challenges/${challenge.id}/details`}
+                className="inline-block px-4 py-2 rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 text-white text-sm font-semibold hover:from-blue-600 hover:to-blue-700 transition-all duration-200 shadow-sm hover:shadow transform hover:-translate-y-0.5"
+              >
+                Más detalles
+              </Link>
             </div>
-            
-            <div className="flex gap-2 flex-wrap">
-              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getDifficultyColor(challenge.difficulty)}`}>
-                {challenge.difficulty}
-              </span>
-              {challenge.skills.map((skill) => (
+
+            <div className="flex items-center justify-between mt-4">
+              <div className="flex gap-2">
                 <span
-                  key={skill}
-                  className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-700"
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold ${getDifficultyColor(
+                    challenge.difficulty,
+                  )}`}
                 >
-                  {skill}
+                  {challenge.difficulty}
                 </span>
-              ))}
+              </div>
+
+              <span className="text-xs text-slate-400">
+                #{String(index + 1).padStart(2, "0")}
+              </span>
             </div>
           </div>
         ))}
       </div>
+
+      {challenges.length === 0 && (
+        <div className="text-center py-8">
+          <div className="text-4xl mb-3">🎯</div>
+          <p className="text-slate-500">
+            No hay desafíos recomendados en este momento.
+          </p>
+        </div>
+      )}
     </div>
   );
 };
