@@ -1,8 +1,25 @@
+"use client";
+
+import { CompanyChallengesList } from "@/components/challenges";
+import { useRouter } from "next/navigation";
+
 export default function Page() {
+  const router = useRouter();
+
+  const handleViewDetails = (challengeId: string) => {
+    router.push(`/company/challenges/${challengeId}`);
+  };
+
+  const handleCreateChallenge = () => {
+    router.push("/company/challenges/create");
+  };
+
   return (
-    <div className="space-y-4">
-      <h1 className="text-2xl font-semibold">Company · Challenges</h1>
-      <p className="text-slate-600">Placeholder content</p>
+    <div className="container mx-auto py-6 px-4 max-w-7xl">
+      <CompanyChallengesList
+        onViewDetails={handleViewDetails}
+        onCreateChallenge={handleCreateChallenge}
+      />
     </div>
   );
 }
