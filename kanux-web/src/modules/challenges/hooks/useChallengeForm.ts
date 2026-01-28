@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import type { CreateSoftChallengeDto } from "../types/challenge";
+import { challengesService } from "@/services/challenges.service";
 
 export type QuestionFormData = {
   id: string;
@@ -26,7 +27,7 @@ const createInitialQuestion = (): QuestionFormData => ({
   ],
 });
 
-export function useCreateSoftChallenge() {
+export function useCreateSoftChallenge(companyId: string) {
   const router = useRouter();
 
   const [title, setTitle] = useState("");
@@ -142,11 +143,17 @@ export function useCreateSoftChallenge() {
 
     setIsSubmitting(true);
 
+    const difficultyMap = {
+      Básico: "BASICO",
+      Intermedio: "INTERMEDIO",
+      Avanzado: "AVANZADO",
+    } as const;
+
     const payload: CreateSoftChallengeDto = {
       title,
       description,
       challenge_type: "No Técnico",
-      difficulty,
+      difficulty: difficultyMap[difficulty],
       duration_minutes: durationMinutes,
       details: {
         instructions,
@@ -162,13 +169,17 @@ export function useCreateSoftChallenge() {
     };
 
     try {
-      console.log("Creating challenge:", payload);
-      await new Promise((r) => setTimeout(r, 800));
+      await challengesService.createSoftChallenge(companyId, payload);
 
       toast.success("Soft challenge created successfully");
       router.push("/challenges");
-    } catch {
-      toast.error("Failed to create challenge");
+    } catch (err: any) {
+      console.error(err);
+
+      const message =
+        err?.response?.data?.message ?? "Failed to create soft challenge";
+
+      toast.error(message);
     } finally {
       setIsSubmitting(false);
     }

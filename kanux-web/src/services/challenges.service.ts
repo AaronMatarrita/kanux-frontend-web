@@ -6,6 +6,7 @@
  */
 
 import { httpClient } from "@/services/http";
+import { CreateSoftChallengeDto } from "@/modules/challenges/types/challenge";
 
 // ============================================================================
 // Request DTOs
@@ -404,6 +405,21 @@ export const challengesService = {
   ): Promise<PublicTechnicalChallengeDetailResponse> => {
     const res = await httpClient.get<PublicTechnicalChallengeDetailResponse>(
       `/challenges/technical-challenges/public/${challengeId}`,
+    );
+    return res.data;
+  },
+
+  /**
+   * POST /challenges/company/:id_company
+   * Create non-technical (soft) challenge
+   */
+  createSoftChallenge: async (
+    companyId: string,
+    payload: CreateSoftChallengeDto,
+  ) => {
+    const res = await httpClient.post(
+      `/challenges/company/${companyId}`,
+      payload,
     );
     return res.data;
   },

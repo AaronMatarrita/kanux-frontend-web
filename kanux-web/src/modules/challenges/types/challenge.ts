@@ -13,7 +13,7 @@ export type CreateSoftChallengeDto = {
   title: string;
   description: string;
   challenge_type: "No Técnico";
-  difficulty: "Básico" | "Intermedio" | "Avanzado";
+  difficulty: "BASICO" | "INTERMEDIO" | "AVANZADO";
   duration_minutes: number;
   details: {
     instructions: string;

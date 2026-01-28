@@ -1,14 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import {
-  ArrowLeft,
-  Plus,
-  Trash2,
-  GripVertical,
-  AlertCircle,
-  Loader2,
-} from "lucide-react";
+import { ArrowLeft, Plus, Trash2, GripVertical, Loader2 } from "lucide-react";
 
 import { useCreateSoftChallenge } from "../hooks/useChallengeForm";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -31,15 +24,15 @@ const questionTypeOptions: SelectOption[] = [
   { label: "Respuesta múltiple", value: "Multiple" },
 ];
 
-export function CreateSoftChallengeForm() {
-  const form = useCreateSoftChallenge();
-
+export function CreateSoftChallengeForm({ companyId }: { companyId: string }) {
+  const form = useCreateSoftChallenge(companyId);
+  console.log("Rendering CreateSoftChallengeForm with form state:", companyId);
   return (
     <div className="px-8 py-8">
       {/* Header */}
       <div className="mb-8">
         <Link
-          href="/challenges"
+          href="/company/challenges"
           className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-4"
         >
           <ArrowLeft className="w-4 h-4" />
