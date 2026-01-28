@@ -62,8 +62,9 @@ export function ProfilePage() {
         contact: contactsArrayToBackend(data.contacts),
         image_profile: data.image_profile
       }
-      const response: TalentProfile = await profilesService.updateMyProfile(request);
-      setProfile(response)
+       await profilesService.updateMyProfile(request);
+      const resprofile: TalentProfile = await profilesService.getMyProfile();
+      setProfile(resprofile);
       setOpenModal("none");
     } catch (error) {
       console.error("Error updating user info:", error);
@@ -77,8 +78,9 @@ export function ProfilePage() {
         last_name: profile?.last_name,
         about: data.about
       }
-      const response: TalentProfile = await profilesService.updateMyProfile(request);
-      setProfile(response)
+      await profilesService.updateMyProfile(request);
+      const resprofile: TalentProfile = await profilesService.getMyProfile();
+      setProfile(resprofile);
       setOpenModal("none");
     } catch (error) {
       console.error("Error updating user info:", error);
