@@ -115,10 +115,10 @@ export const CandidateProfileDetails: React.FC<
                   <div className="flex flex-wrap gap-2">
                     {skills.map((skill) => (
                       <span
-                        key={skill}
+                        key={skill.id}
                         className="px-3 py-1.5 bg-gradient-to-r from-blue-50 to-blue-100 text-blue-700 font-medium rounded-lg border border-blue-200 transition-transform duration-200 hover:scale-105"
                       >
-                        {skill}
+                        {skill.name}
                       </span>
                     ))}
                   </div>

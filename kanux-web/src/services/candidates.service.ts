@@ -29,7 +29,6 @@ export interface CandidateProfile {
   created_at: string;
 }
 
-
 export interface CandidatesResponse {
   candidates: Candidate[];
   total: number;
@@ -47,7 +46,7 @@ export interface CandidatesFilter {
 interface CandidateRawApiResponse {
   talent_id: string;
   talent_profile: CandidateProfile;
-  skills: string[];
+  skills: Skill[];
 }
 
 export interface CandidateListItem {
@@ -56,100 +55,130 @@ export interface CandidateListItem {
   last_name: string;
   title: string | null;
   education: string | null;
-  skills: string[];
-  profile: CandidateProfile; 
+  skills: Skill[];
+  profile: CandidateProfile;
 }
 
+export type Skill = {
+  id: string;
+  name: string;
+  level: string;
+  category_id: string;
+};
+
+interface CandidateRawApiDash {
+  talent_id: string;
+  first_name: string;
+  last_name: string;
+  title: string | null;
+  education: string | null;
+  skills: Skill[];
+}
 
 class CandidatesService {
-  
-async getCandidates(token: string): Promise<CandidateListItem[]> {
-  const res = await httpClient.get<{ data: CandidateRawApiResponse[] }>(
-    "/companies/company/candidates",
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
+  async getCandidates(token: string): Promise<CandidateListItem[]> {
+    const res = await httpClient.get<{ data: CandidateRawApiResponse[] }>(
+      "/companies/company/candidates",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       },
-    },
-  );
+    );
 
-  return res.data.data.map((c) => ({
-    talent_id: c.talent_id,
-    first_name: c.talent_profile.first_name,
-    last_name: c.talent_profile.last_name,
-    title: c.talent_profile.title,
-    education: c.talent_profile.education,
-    skills: c.skills ?? [],
-    profile: c.talent_profile, 
-  }));
-}
+    return res.data.data.map((c) => ({
+      talent_id: c.talent_id,
+      first_name: c.talent_profile.first_name,
+      last_name: c.talent_profile.last_name,
+      title: c.talent_profile.title,
+      education: c.talent_profile.education,
+      skills: c.skills ?? [],
+      profile: c.talent_profile,
+    }));
+  }
+  async getCandidatesDash(token: string): Promise<CandidateListItem[]> {
+    const res = await httpClient.get<{ data: CandidateRawApiDash[] }>(
+      "/companies/company/dashboard/candidates",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
 
-
-
-
-
-
+    return res.data.data.map((c) => ({
+      talent_id: c.talent_id,
+      first_name: c.first_name,
+      last_name: c.last_name,
+      title: c.title,
+      education: c.education,
+      skills: c.skills ?? [],
+      profile: null as unknown as CandidateProfile,
+    }));
+  }
 
   async getCandidateById(id: string): Promise<Candidate> {
     try {
       const response = await httpClient.get(`/api/candidates/${id}`);
       return response.data;
     } catch (error) {
-      console.error('Error fetching candidate:', error);
+      console.error("Error fetching candidate:", error);
       throw error;
     }
   }
 
   private convertToString(item: unknown): string {
-    if (typeof item === 'string') {
+    if (typeof item === "string") {
       return item;
     }
-    
-    if (typeof item === 'object' && item !== null && 'name' in item) {
+
+    if (typeof item === "object" && item !== null && "name" in item) {
       const obj = item as Record<string, unknown>;
       return String(obj.name);
     }
-    
+
     return String(item);
   }
 
   async getSkillFilters(): Promise<string[]> {
     try {
-      const response = await httpClient.get('/profiles/skills/all-skills');
+      const response = await httpClient.get("/profiles/skills/all-skills");
       const data = response.data;
-      
+
       if (Array.isArray(data)) {
-        return data.map(item => this.convertToString(item));
+        return data.map((item) => this.convertToString(item));
       }
-      
+
       const dataObj = data as Record<string, unknown>;
       if (dataObj.skills && Array.isArray(dataObj.skills)) {
-        return dataObj.skills.map(item => this.convertToString(item));
+        return dataObj.skills.map((item) => this.convertToString(item));
       }
-      
+
       return [];
     } catch (error) {
-      console.error('Error fetching skill filters:', error);
+      console.error("Error fetching skill filters:", error);
       throw error;
     }
   }
 
   async getBackgroundFilters(): Promise<string[]> {
     try {
-      const response = await httpClient.get('/api/candidates/filters/background');
+      const response = await httpClient.get(
+        "/api/candidates/filters/background",
+      );
       return response.data;
     } catch (error) {
-      console.error('Error fetching background filters:', error);
+      console.error("Error fetching background filters:", error);
       throw error;
     }
   }
 
   async getLocationFilters(): Promise<string[]> {
     try {
-      const response = await httpClient.get('/api/candidates/filters/location');
+      const response = await httpClient.get("/api/candidates/filters/location");
       return response.data;
     } catch (error) {
-      console.error('Error fetching location filters:', error);
+      console.error("Error fetching location filters:", error);
       throw error;
     }
   }
