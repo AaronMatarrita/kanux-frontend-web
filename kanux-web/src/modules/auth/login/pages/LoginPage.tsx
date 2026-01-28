@@ -58,7 +58,15 @@ export const LoginPage: React.FC = () => {
   return (
     <div className={styles.loginContainer}>
       {/* Branding Side */}
-      <div className={styles.brandingSide}>
+      <div
+        className={styles.brandingSide}
+        style={{
+          backgroundImage: "url('/bg.svg')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+        }}
+      >
         <div className={styles.brandingHeader}>
           <svg
             width="400"
