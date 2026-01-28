@@ -308,7 +308,7 @@ export const challengesService = {
     limit: number = 10,
   ): Promise<ChallengeListResponse> => {
     const res = await httpClient.get<ChallengeListResponse>(
-      `/challenges/challenges/${companyId}`,
+      `/challenges/company/${companyId}`,
       { params: { page, limit } },
     );
     return res.data;
@@ -322,7 +322,7 @@ export const challengesService = {
     companyId: string,
   ): Promise<ChallengeSubmissionsResponse> => {
     const res = await httpClient.get<ChallengeSubmissionsResponse>(
-      `/challenges/challenges/${challengeId}/submissions/${companyId}`,
+      `/challenges/${challengeId}/submissions/${companyId}`,
     );
     return res.data;
   },

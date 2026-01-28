@@ -10,6 +10,8 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { challengesService } from "@/services/challenges.service";
+import { useAuth } from "@/context/AuthContext";
+import { Pagination } from "@/components/ui/pagination";
 import { Badge } from "@/components/ui/badge";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -54,26 +56,52 @@ const DIFFICULTY_COLORS: Record<Difficulty, string> = {
   advanced: "bg-purple-100 text-purple-700 border-purple-200",
 };
 
+const normalizeDifficulty = (difficulty: string) => {
+  const d = difficulty?.toLowerCase();
+  if (["beginner", "principiante", "básico", "basico"].includes(d))
+    return "beginner";
+  if (["intermediate", "intermedio"].includes(d)) return "intermediate";
+  if (["advanced", "avanzado"].includes(d)) return "advanced";
+  return "beginner";
+};
+
 const mapApiChallengeToCompanyChallenge = (ch: any): CompanyChallenge => ({
   id: ch.id,
   title: ch.title,
-  type:
-    ch.type === "logical" || ch.type === "soft_skill" ? ch.type : "soft_skill",
-  difficulty:
-    ch.difficulty === "beginner" ||
-    ch.difficulty === "intermediate" ||
-    ch.difficulty === "advanced"
-      ? ch.difficulty
-      : "beginner",
+  type: ch.challenge_type?.toLowerCase().includes("técnico")
+    ? "logical"
+    : "soft_skill",
+  difficulty: normalizeDifficulty(ch.difficulty),
   status: "active",
   created_at: typeof ch.created_at === "string" ? ch.created_at : "",
   submissions_count:
-    typeof ch.submissions_count === "number" ? ch.submissions_count : 0,
+    ch.metrics?.total_submissions ??
+    (Array.isArray(ch.challenge_submissions)
+      ? ch.challenge_submissions.length
+      : 0),
 });
 
-const fetchChallenges = async (): Promise<CompanyChallenge[]> => {
-  const res = await challengesService.listSoftChallenges(1, 50);
-  return res.data.map(mapApiChallengeToCompanyChallenge);
+const fetchChallengesByCompany = async (
+  companyId: string,
+  page: number,
+  limit: number,
+): Promise<{
+  challenges: CompanyChallenge[];
+  total: number;
+  lastPage: number;
+}> => {
+  const res = await challengesService.getChallengesByCompany(
+    companyId,
+    page,
+    limit,
+  );
+  return {
+    challenges: Array.isArray(res.data)
+      ? res.data.map(mapApiChallengeToCompanyChallenge)
+      : [],
+    total: res.meta?.total ?? 0,
+    lastPage: res.meta?.lastPage ?? 1,
+  };
 };
 
 const formatDate = (dateString: string) => {
@@ -89,19 +117,33 @@ export const CompanyChallengesList: React.FC<CompanyChallengesListProps> = ({
   onViewDetails,
   onCreateChallenge,
 }) => {
+  const { session } = useAuth();
+  const companyId =
+    session?.user.userType === "company" ? session.user.profile.id : undefined;
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [difficultyFilter, setDifficultyFilter] =
     useState<DifficultyFilter>("all");
   const [challenges, setChallenges] = useState<CompanyChallenge[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalChallenges, setTotalChallenges] = useState(0);
+  const PAGE_SIZE = 10;
 
-  const loadChallenges = async () => {
+  const loadChallenges = async (page = 1) => {
+    if (!companyId) return;
     try {
       setIsLoading(true);
       setError(null);
-      const data = await fetchChallenges();
-      setChallenges(data);
+      const { challenges, total, lastPage } = await fetchChallengesByCompany(
+        companyId,
+        page,
+        PAGE_SIZE,
+      );
+      setChallenges(challenges);
+      setTotalChallenges(total);
+      setTotalPages(lastPage);
     } catch (e) {
       console.error(e);
       setError(
@@ -113,18 +155,23 @@ export const CompanyChallengesList: React.FC<CompanyChallengesListProps> = ({
   };
 
   useEffect(() => {
-    loadChallenges();
-  }, []);
+    setCurrentPage(1);
+    loadChallenges(1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [companyId]);
+
+  useEffect(() => {
+    loadChallenges(currentPage);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPage]);
 
   const filteredChallenges = useMemo(() => {
     return challenges.filter((challenge) => {
       const matchesSearch = challenge.title
         .toLowerCase()
         .includes(searchTerm.toLowerCase());
-
       const matchesDifficulty =
         difficultyFilter === "all" || challenge.difficulty === difficultyFilter;
-
       return matchesSearch && matchesDifficulty;
     });
   }, [challenges, searchTerm, difficultyFilter]);
@@ -190,9 +237,8 @@ export const CompanyChallengesList: React.FC<CompanyChallengesListProps> = ({
 
       {/* Results count */}
       <div className="text-sm text-slate-600">
-        {filteredChallenges.length} challenge
-        {filteredChallenges.length !== 1 ? "s" : ""} encontrado
-        {filteredChallenges.length !== 1 ? "s" : ""}
+        {totalChallenges} challenge{totalChallenges !== 1 ? "s" : ""} encontrado
+        {totalChallenges !== 1 ? "s" : ""}
       </div>
 
       {/* Empty State */}
@@ -230,62 +276,71 @@ export const CompanyChallengesList: React.FC<CompanyChallengesListProps> = ({
 
       {/* Grid */}
       {filteredChallenges.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {filteredChallenges.map((challenge) => (
-            <div
-              key={challenge.id}
-              onClick={() => onViewDetails?.(challenge.id)}
-              className="bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer group"
-            >
-              <div className="p-6 space-y-4">
-                {/* Header */}
-                <div className="flex items-start justify-between">
-                  <h3 className="text-xl font-semibold text-slate-900 group-hover:text-emerald-600 transition-colors">
-                    {challenge.title}
-                  </h3>
-                  <ChevronRight className="w-5 h-5 text-slate-400 group-hover:text-emerald-600 transition-colors" />
-                </div>
-
-                {/* Difficulty */}
-                <Badge
-                  variant="outline"
-                  className={DIFFICULTY_COLORS[challenge.difficulty]}
-                >
-                  {DIFFICULTY_LABELS[challenge.difficulty]}
-                </Badge>
-
-                {/* Stats */}
-                <div className="flex items-center gap-6 pt-4 border-t border-slate-100">
-                  <div className="flex items-center gap-2 text-sm text-slate-600">
-                    <Users className="w-4 h-4" />
-                    <span className="font-medium">
-                      {challenge.submissions_count} submissions
-                    </span>
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {filteredChallenges.map((challenge) => (
+              <div
+                key={challenge.id}
+                onClick={() => onViewDetails?.(challenge.id)}
+                className="bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer group"
+              >
+                <div className="p-6 space-y-4">
+                  {/* Header */}
+                  <div className="flex items-start justify-between">
+                    <h3 className="text-xl font-semibold text-slate-900 group-hover:text-emerald-600 transition-colors">
+                      {challenge.title}
+                    </h3>
+                    <ChevronRight className="w-5 h-5 text-slate-400 group-hover:text-emerald-600 transition-colors" />
                   </div>
 
-                  <div className="flex items-center gap-2 text-sm text-slate-600">
-                    <Calendar className="w-4 h-4" />
-                    <span>{formatDate(challenge.created_at)}</span>
-                  </div>
-                </div>
-
-                {/* Footer */}
-                <div className="flex items-center justify-end pt-2">
-                  <button
-                    className="flex items-center gap-1 text-sm font-medium text-emerald-600 hover:text-emerald-700 group-hover:gap-2 transition-all"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onViewDetails?.(challenge.id);
-                    }}
+                  {/* Difficulty */}
+                  <Badge
+                    variant="outline"
+                    className={DIFFICULTY_COLORS[challenge.difficulty]}
                   >
-                    Ver detalles
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
+                    {DIFFICULTY_LABELS[challenge.difficulty]}
+                  </Badge>
+
+                  {/* Stats */}
+                  <div className="flex items-center gap-6 pt-4 border-t border-slate-100">
+                    <div className="flex items-center gap-2 text-sm text-slate-600">
+                      <Users className="w-4 h-4" />
+                      <span className="font-medium">
+                        {challenge.submissions_count} submissions
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-2 text-sm text-slate-600">
+                      <Calendar className="w-4 h-4" />
+                      <span>{formatDate(challenge.created_at)}</span>
+                    </div>
+                  </div>
+
+                  {/* Footer */}
+                  <div className="flex items-center justify-end pt-2">
+                    <button
+                      className="flex items-center gap-1 text-sm font-medium text-emerald-600 hover:text-emerald-700 group-hover:gap-2 transition-all"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onViewDetails?.(challenge.id);
+                      }}
+                    >
+                      Ver detalles
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+          <div className="flex justify-center mt-6">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
+          </div>
+        </>
       )}
     </div>
   );
