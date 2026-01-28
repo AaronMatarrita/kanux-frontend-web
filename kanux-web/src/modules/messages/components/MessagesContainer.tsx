@@ -13,7 +13,6 @@ interface MessagesContainerProps {
   userRole: "company" | "talent";
   userPhoto?: string | null;
   userName?: string;
-  onSendMessage?: (conversationId: string, content: string) => Promise<void>;
 }
 
 export function MessagesContainer({
@@ -23,35 +22,21 @@ export function MessagesContainer({
   userRole,
   userPhoto,
   userName,
-  onSendMessage,
 }: MessagesContainerProps) {
   const {
     selectedConversation,
-    conversationMessages,
     searchQuery,
-    sending,
     setSelectedConversation,
     setSearchQuery,
-    setConversationMessages,
-    addMessage,
-    handleSendMessage,
   } = useMessagesState();
 
   const {
-    messages: loadedMessages,
+    messages,
     loading: messagesLoading,
     error: messagesError,
-  } = useConversationMessages(selectedConversation?.id);
-
-  React.useEffect(() => {
-    setConversationMessages(loadedMessages);
-  }, [loadedMessages, setConversationMessages]);
-
-  const onSend = async (content: string) => {
-    if (!selectedConversation) return;
-
-    await handleSendMessage(selectedConversation.id, content, onSendMessage);
-  };
+    sending,
+    sendMessage,
+  } = useConversationMessages(selectedConversation?.id, userRole);
 
   return (
     <div className="h-full flex bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
@@ -75,14 +60,14 @@ export function MessagesContainer({
       <MessagesPanel isVisible={!!selectedConversation} className="flex-1">
         <ConversationDetail
           conversation={selectedConversation}
-          messages={conversationMessages}
+          messages={messages}
           loading={messagesLoading}
           error={messagesError}
           userRole={userRole}
           userPhoto={userPhoto}
           userName={userName}
           onClose={() => setSelectedConversation(undefined)}
-          onSendMessage={onSend}
+          onSendMessage={sendMessage}
           sending={sending}
         />
       </MessagesPanel>

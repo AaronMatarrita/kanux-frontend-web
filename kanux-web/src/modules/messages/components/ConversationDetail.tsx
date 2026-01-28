@@ -47,10 +47,16 @@ export function ConversationDetail({
     scrollToBottom();
   }, [messages]);
 
-  const handleSendMessage = () => {
-    if (messageInput.trim()) {
-      onSendMessage?.(messageInput.trim());
+  const handleSendMessage = async () => {
+    if (messageInput.trim() && onSendMessage) {
+      const content = messageInput.trim();
       setMessageInput("");
+      try {
+        await onSendMessage(content);
+      } catch (err) {
+        console.error("Error sending message:", err);
+        setMessageInput(content);
+      }
     }
   };
 

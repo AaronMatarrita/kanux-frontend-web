@@ -27,7 +27,7 @@ export function ConversationItem({
 
   const avatar =
     userRole === "company"
-      ? `https://ui-avatars.com/api/?name=${(otherParty as any)?.first_name}+${(otherParty as any)?.last_name}`
+      ? (otherParty as any)?.url_logo
       : (otherParty as any)?.url_logo;
 
   const isLastMessageFromUser =
@@ -78,8 +78,8 @@ export function ConversationItem({
             {displayName || "Sin nombre"}
           </p>
           <span className="text-xs text-gray-400 shrink-0">
-            {conversation.last_message?.created_at
-              ? formatMessageTime(conversation.last_message.created_at)
+            {conversation.last_message_at
+              ? formatMessageTime(conversation.last_message_at)
               : ""}
           </span>
         </div>

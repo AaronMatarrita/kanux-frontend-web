@@ -42,20 +42,6 @@ export default function Page() {
     }
   }, [session?.token]);
 
-  const handleSendMessage = async (conversationId: string, content: string) => {
-    try {
-      await messagesService.sendMessage({
-        conversation_id: conversationId,
-        content,
-      });
-
-      const data = await messagesService.getUserConversations();
-      setConversations(data);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
   const userPhoto =
     session?.user.userType === "talent"
       ? (session?.user as any).profile?.photo_url
@@ -75,7 +61,6 @@ export default function Page() {
           userRole="talent"
           userPhoto={userPhoto}
           userName={userName}
-          onSendMessage={handleSendMessage}
         />
       </MessagesLayout>
     </div>

@@ -52,20 +52,6 @@ export default function Page() {
     }
   }, [session?.token]);
 
-  const handleSendMessage = async (conversationId: string, content: string) => {
-    try {
-      await messagesService.sendMessage({
-        conversation_id: conversationId,
-        content,
-      });
-      // Recargar conversaciones para actualizar último mensaje
-      const data = await messagesService.getUserConversations();
-      setConversations(data);
-    } catch (err) {
-      console.error("Error enviando mensaje:", err);
-    }
-  };
-
   return (
     <div className="h-[calc(100vh-7rem)] flex flex-col">
       <MessagesLayout>
@@ -74,7 +60,6 @@ export default function Page() {
           loading={loading}
           error={error}
           userRole="company"
-          onSendMessage={handleSendMessage}
         />
       </MessagesLayout>
     </div>
