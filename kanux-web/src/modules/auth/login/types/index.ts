@@ -23,6 +23,8 @@ export type BackendTalentProfile = {
   id: string;
   user_id: string;
   title: string | null;
+  first_name: string | null;
+  last_name: string | null;
   about: string | null;
   location: string | null;
   experience_level: string | null;

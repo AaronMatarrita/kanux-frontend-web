@@ -19,7 +19,9 @@ export const mapUserTypeToRole = (
 const mapTalentProfile = (profile: BackendTalentProfile): TalentProfile => ({
   id: profile.id,
   id_user: profile.user_id, 
-  full_name: profile.title ?? null,
+  first_name: profile.first_name ?? null,
+  last_name: profile.last_name ?? null,
+  title: profile.title ?? null,
   bio: profile.about ?? null,
   location: profile.location ?? null,
   skills: null,
