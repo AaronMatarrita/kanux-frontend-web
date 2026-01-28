@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { challengesService } from "@/services/challenges.service";
 import { EmptyState } from "@/components/ui/empty-state";
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import {
   ChallengeHero,
   ChallengeDescription,
@@ -49,7 +50,7 @@ export function TechnicalChallengeDetail({
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
-        <p className="text-slate-500">Cargando challenge…</p>
+        <LoadingSpinner size="lg" message="Cargando challenge…" />
       </div>
     );
   }

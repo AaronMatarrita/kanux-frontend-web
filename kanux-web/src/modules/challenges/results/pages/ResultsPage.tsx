@@ -92,9 +92,8 @@ export function ResultsPage({
       }
 
       try {
-        const res = await challengesService.getTechnicalChallengeResult(
-          submissionId,
-        );
+        const res =
+          await challengesService.getTechnicalChallengeResult(submissionId);
 
         setResultData(res);
         setLoadingState("idle");

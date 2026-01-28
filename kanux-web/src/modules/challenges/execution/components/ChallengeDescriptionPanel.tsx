@@ -5,6 +5,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 
 interface ChallengeAssets {
   description?: string;
@@ -149,7 +150,7 @@ export function ChallengeDescriptionPanel({
   if (loading) {
     return (
       <div className="h-full flex items-center justify-center">
-        <span className="text-sm text-slate-500">Cargando challenge...</span>
+        <LoadingSpinner size="md" message="Cargando challenge..." />
       </div>
     );
   }

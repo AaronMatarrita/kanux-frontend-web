@@ -2,6 +2,7 @@
 
 import { useTalentGuard } from "@/guards/useTalentGuard";
 import { useState, useEffect } from "react";
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 
 export default function TalentLayout({
   children,
@@ -20,8 +21,7 @@ export default function TalentLayout({
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#f8f8f8]">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0B2A4A] mx-auto mb-4"></div>
-          <p className="text-slate-600">Verificando acceso...</p>
+          <LoadingSpinner size="lg" message="Verificando acceso..." />
         </div>
       </div>
     );

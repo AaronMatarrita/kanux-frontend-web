@@ -11,3 +11,4 @@ export { messagesService } from "./messages.service";
 export { subscriptionsService } from "./subscriptions.service";
 export { feedService } from "./feed.service";
 export { candidatesService } from "./candidates.service";
+export { socketService } from "./socket.service";

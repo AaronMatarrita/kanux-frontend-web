@@ -10,9 +10,11 @@ import {
   MessagesLayout,
 } from "@/modules/messages/components";
 import { useAuth } from "@/context/AuthContext";
+import { useMessagesGuard } from "@/guards/useMessagesGuard";
 
 export default function Page() {
   const { session } = useAuth();
+  const isAuthorized = useMessagesGuard();
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -23,48 +25,24 @@ export default function Page() {
         setLoading(true);
         setError(null);
 
-        console.log("🔵 [Company Messages] Cargando conversaciones...");
-        console.log(
-          "🔵 [Company Messages] Usuario autenticado:",
-          session?.user,
-        );
-
         const data = await messagesService.getUserConversations();
-
-        console.log("✅ [Company Messages] Conversaciones cargadas:", data);
         setConversations(data);
       } catch (err) {
-        console.error(
-          "❌ [Company Messages] Error al cargar conversaciones:",
-          err,
-        );
+        console.error("Error al cargar conversaciones:", err);
         setError(err instanceof Error ? err.message : "Error desconocido");
       } finally {
         setLoading(false);
       }
     };
 
-    if (session?.token) {
+    if (isAuthorized && session?.token) {
       loadConversations();
-    } else {
-      console.warn("⚠️ [Company Messages] No hay sesión activa");
-      setLoading(false);
     }
-  }, [session?.token]);
+  }, [session?.token, isAuthorized]);
 
-  const handleSendMessage = async (conversationId: string, content: string) => {
-    try {
-      await messagesService.sendMessage({
-        conversation_id: conversationId,
-        content,
-      });
-      // Recargar conversaciones para actualizar último mensaje
-      const data = await messagesService.getUserConversations();
-      setConversations(data);
-    } catch (err) {
-      console.error("Error enviando mensaje:", err);
-    }
-  };
+  if (!isAuthorized) {
+    return null;
+  }
 
   return (
     <div className="h-[calc(100vh-7rem)] flex flex-col">
@@ -74,7 +52,6 @@ export default function Page() {
           loading={loading}
           error={error}
           userRole="company"
-          onSendMessage={handleSendMessage}
         />
       </MessagesLayout>
     </div>

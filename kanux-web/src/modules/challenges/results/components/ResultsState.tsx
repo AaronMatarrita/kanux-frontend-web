@@ -1,19 +1,12 @@
 import { AlertCircle, Zap, ArrowLeft } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 
 interface ResultsStateProps {
   state: "error" | "loading" | "empty";
   error?: string;
   onBack: () => void;
-}
-
-function LoadingSpinner() {
-  return (
-    <div className="flex items-center justify-center">
-      <div className="h-8 w-8 animate-spin rounded-full border-4 border-muted border-t-primary" />
-    </div>
-  );
 }
 
 export function ResultsState({ state, error, onBack }: ResultsStateProps) {
@@ -45,10 +38,7 @@ export function ResultsState({ state, error, onBack }: ResultsStateProps) {
     return (
       <div className="min-h-screen bg-linear-to-b from-background to-muted/30 flex items-center justify-center">
         <div className="text-center">
-          <LoadingSpinner />
-          <p className="mt-4 text-muted-foreground font-medium">
-            Cargando tu resultado...
-          </p>
+          <LoadingSpinner size="lg" message="Cargando tu resultado..." />
         </div>
       </div>
     );
