@@ -92,7 +92,7 @@ export function CreateAboutCompany() {
         }
     };
     if (success) {
-        return <SuccessModal redirectPath="/company/dashboard" />;
+        return <SuccessModal redirectPath="/auth/login" />;
     }
     return (
         <div className="w-full">

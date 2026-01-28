@@ -6,7 +6,7 @@ interface SuccessModalProps {
   redirectPath?: string;
 }
 
-export function SuccessModal({ redirectPath = "/" }: SuccessModalProps) {
+export function SuccessModal({ redirectPath = "/auth/login" }: SuccessModalProps) {
   const router = useRouter();
 
   return (
@@ -30,7 +30,7 @@ export function SuccessModal({ redirectPath = "/" }: SuccessModalProps) {
         onClick={() => router.push(redirectPath)}
         className="w-full bg-green-500 hover:bg-green-600 text-white py-3 rounded-lg font-medium transition-colors shadow-md hover:shadow-lg active:scale-95"
       >
-        Ir al dashboard
+        Iniciar sesión
       </button>
     </div>
   );
