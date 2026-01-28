@@ -156,7 +156,7 @@ export function ProfilePage() {
                 onExecute={() => setOpenModal("basicInfo")}
                 label="Edit Basic Info"
               />
-              <InfoItem label="Experience Level" value={`${profile?.experience_level}`} />
+              <InfoItem label="Experience Level" value={`${profile?.experience_level??""}`} />
 
               <div className="flex flex-col gap-2">
                 <span className="text-base font-semibold text-gray-900">Lenguages</span>
@@ -167,8 +167,8 @@ export function ProfilePage() {
                 ))}
               </div>
 
-              <InfoItem label="Learning Background" value={`${profile?.learning_backgrounds?.name}`} />
-              <InfoItem label="Open to Opportunities" value={`${profile?.opportunity_statuses?.name}`} />
+              <InfoItem label="Learning Background" value={`${profile?.learning_backgrounds?.name??""}`} />
+              <InfoItem label="Open to Opportunities" value={`${profile?.opportunity_statuses?.name??""}`} />
             </div>
           )}
 
