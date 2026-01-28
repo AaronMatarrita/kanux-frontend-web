@@ -56,6 +56,15 @@ export default function Page() {
     }
   };
 
+  const userPhoto =
+    session?.user.userType === "talent"
+      ? (session?.user as any).profile?.photo_url
+      : (session?.user as any).profile?.url_logo;
+
+  const userName =
+    session?.user.userType === "talent"
+      ? (session?.user as any).profile?.full_name || "Talento"
+      : (session?.user as any).profile?.name || "Empresa";
   return (
     <div className="h-[calc(100vh-7rem)] flex flex-col">
       <MessagesLayout header={<MessagesHeader />}>
@@ -64,6 +73,8 @@ export default function Page() {
           loading={loading}
           error={error}
           userRole="talent"
+          userPhoto={userPhoto}
+          userName={userName}
           onSendMessage={handleSendMessage}
         />
       </MessagesLayout>

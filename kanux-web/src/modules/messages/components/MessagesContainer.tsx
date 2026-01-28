@@ -11,6 +11,8 @@ interface MessagesContainerProps {
   loading?: boolean;
   error?: string | null;
   userRole: "company" | "talent";
+  userPhoto?: string | null;
+  userName?: string;
   onSendMessage?: (conversationId: string, content: string) => Promise<void>;
 }
 
@@ -19,6 +21,8 @@ export function MessagesContainer({
   loading = false,
   error = null,
   userRole,
+  userPhoto,
+  userName,
   onSendMessage,
 }: MessagesContainerProps) {
   const {
@@ -61,6 +65,7 @@ export function MessagesContainer({
           error={error}
           selectedId={selectedConversation?.id}
           userRole={userRole}
+          userPhoto={userPhoto}
           onSelectConversation={setSelectedConversation}
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
@@ -74,6 +79,8 @@ export function MessagesContainer({
           loading={messagesLoading}
           error={messagesError}
           userRole={userRole}
+          userPhoto={userPhoto}
+          userName={userName}
           onClose={() => setSelectedConversation(undefined)}
           onSendMessage={onSend}
           sending={sending}

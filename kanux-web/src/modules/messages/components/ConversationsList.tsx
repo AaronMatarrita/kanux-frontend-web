@@ -8,6 +8,7 @@ interface ConversationsListProps {
   error?: string | null;
   selectedId?: string | null;
   userRole: "company" | "talent";
+  userPhoto?: string | null;
   onSelectConversation?: (conversation: Conversation) => void;
   searchQuery?: string;
   onSearchChange?: (query: string) => void;
@@ -19,6 +20,7 @@ export function ConversationsList({
   error = null,
   selectedId = null,
   userRole,
+  userPhoto,
   onSelectConversation,
   searchQuery = "",
   onSearchChange,
@@ -40,7 +42,6 @@ export function ConversationsList({
 
   return (
     <div className="h-full flex flex-col bg-white border-r border-gray-200">
-      {/* Header - mismo height que ConversationDetail */}
       <div className="h-16 px-4 flex items-center border-b border-gray-200">
         <div className="relative w-full">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -69,7 +70,7 @@ export function ConversationsList({
           <div className="p-4 text-center text-gray-500">
             <div className="animate-pulse space-y-3">
               {[...Array(5)].map((_, i) => (
-                <div key={i} className="h-14 bg-gray-200 rounded-lg" />
+                <div key={i} className="h-14 bg-red-200 rounded-lg" />
               ))}
             </div>
           </div>
@@ -111,6 +112,7 @@ export function ConversationsList({
               conversation={conversation}
               isSelected={selectedId === conversation.id}
               userRole={userRole}
+              userPhoto={userPhoto}
               onClick={() => onSelectConversation?.(conversation)}
             />
           ))}
