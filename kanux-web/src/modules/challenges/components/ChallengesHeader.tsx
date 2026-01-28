@@ -11,9 +11,9 @@ interface ChallengesHeaderProps {
 }
 
 const CHALLENGE_TYPE_OPTIONS = [
-  { value: "all", label: "All" },
-  { value: "technical", label: "Code challenges" },
-  { value: "soft", label: "Soft Skills" },
+  { value: "all", label: "Todos" },
+  { value: "technical", label: "Desafíos de código" },
+  { value: "soft", label: "Habilidades blandas" },
 ];
 
 export function ChallengesHeader({
@@ -22,12 +22,12 @@ export function ChallengesHeader({
 }: ChallengesHeaderProps) {
   return (
     <GenericHeader
-      title="Challenges"
-      description="Practice your skills, track your progress and demonstrate your capabilities."
+      title="Desafíos"
+      description="Practica tus habilidades, sigue tu progreso y demuestra tus capacidades."
       rightContent={
         <>
           <span className="text-sm font-medium text-slate-700 whitespace-nowrap">
-            Type
+            Tipo
           </span>
           <Select
             value={challengeType}

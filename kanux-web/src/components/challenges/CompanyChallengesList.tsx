@@ -197,7 +197,7 @@ export const CompanyChallengesList: React.FC<CompanyChallengesListProps> = ({
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">Challenges</h1>
+          <h1 className="text-3xl font-bold text-slate-900">Desafíos</h1>
           <p className="text-slate-600 mt-1">
             Gestiona y revisa los retos no técnicos que has creado.
           </p>
