@@ -15,16 +15,21 @@ import { useMessagesGuard } from "@/guards/useMessagesGuard";
 export default function Page() {
   const { session } = useAuth();
   const isAuthorized = useMessagesGuard();
+
+  const [mounted, setMounted] = useState(false);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const loadConversations = async () => {
       try {
         setLoading(true);
         setError(null);
-
         const data = await messagesService.getUserConversations();
         setConversations(data);
       } catch (err) {
@@ -35,13 +40,25 @@ export default function Page() {
       }
     };
 
-    if (isAuthorized && session?.token) {
+    if (mounted && isAuthorized && session?.token) {
       loadConversations();
     }
-  }, [session?.token, isAuthorized]);
+  }, [mounted, session?.token, isAuthorized]);
+
+  if (!mounted) {
+    return (
+      <div className="h-[calc(100vh-7rem)] flex items-center justify-center">
+        Cargando...
+      </div>
+    );
+  }
 
   if (!isAuthorized) {
-    return null;
+    return (
+      <div className="h-[calc(100vh-7rem)] flex items-center justify-center">
+        No autorizado
+      </div>
+    );
   }
 
   return (
