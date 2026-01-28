@@ -53,25 +53,28 @@ export interface PublicTechnicalChallenge extends Challenge {
 export interface SoftChallenge {
   id: string;
   title: string;
-  description?: string;
-  difficulty?: string;
-  duration_minutes?: number;
-  non_technical_challenges: Array<{
-    instructions?: string;
-    non_technical_questions: Array<{
+  description: string;
+  type?: string;
+  difficulty: string;
+  duration_minutes: number;
+  created_at: string;
+  company: {
+    name: string;
+  };
+  non_technical_challenges: {
+    id: string;
+    instructions: string;
+    non_technical_questions: {
       id: string;
       question: string;
-      non_technical_question_options: Array<{
+      question_type: string;
+      non_technical_question_options: {
         id: string;
         option_text: string;
-      }>;
-    }>;
-  }>;
-  company?: {
-    name: string;
-    about: string;
-    url_logo: string | null;
-  };
+        is_correct?: boolean;
+      }[];
+    }[];
+  }[];
 }
 
 export interface ChallengeListResponse {
