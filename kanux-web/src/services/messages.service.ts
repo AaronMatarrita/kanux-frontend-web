@@ -68,7 +68,10 @@ export const messagesService = {
   createConversation: async (
     data: CreateConversationRequest,
   ): Promise<Conversation> => {
-    const res = await httpClient.post<Conversation>("/conversations", data);
+    const res = await httpClient.post<Conversation>(
+      "/messages/conversations",
+      data,
+    );
     return res.data;
   },
 
@@ -77,7 +80,7 @@ export const messagesService = {
    * Get all conversations for current user (requires auth)
    */
   getUserConversations: async (): Promise<Conversation[]> => {
-    const res = await httpClient.get<Conversation[]>("/conversations");
+    const res = await httpClient.get<Conversation[]>("/messages/conversations");
     return res.data;
   },
 
