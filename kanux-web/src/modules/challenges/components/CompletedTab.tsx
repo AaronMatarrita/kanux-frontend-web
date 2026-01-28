@@ -48,10 +48,10 @@ export function CompletedTab({
       <div className="rounded-lg border border-slate-200 bg-slate-50 p-12 text-center">
         <CheckCircle className="mx-auto h-12 w-12 text-slate-400" />
         <h3 className="mt-2 text-sm font-medium text-slate-900">
-          No completed challenges
+          No tienes desafíos completados
         </h3>
         <p className="mt-1 text-sm text-slate-500">
-          Challenges you complete will appear here.
+          Los desafíos que completes aparecerán aquí.
         </p>
       </div>
     );
