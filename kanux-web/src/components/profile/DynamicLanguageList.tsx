@@ -233,7 +233,7 @@ export function DynamicLanguageList({languages,availableLanguages,onChange,onAdd
       {pendingChanges && (
         <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
           <p className="text-sm text-yellow-800">
-            ⚠️ Tienes cambios sin guardar. Haz clic en "Guardar Cambios" para aplicarlos.
+            You have unsaved changes. Click "Save Changes" to apply them.
           </p>
         </div>
       )}
