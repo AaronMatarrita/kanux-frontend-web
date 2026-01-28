@@ -98,14 +98,54 @@ export interface Catalogs {
   opportunity_statuses: Array<{ id: string; name: string }>;
 }
 
+export interface DashboardChallenge {
+  id: string;
+  title: string;
+  description: string | null;
+  challenge_type: string;
+  difficulty: string;
+  duration_minutes: number | null;
+  created_by_company: string | null;
+  created_at: string;
+}
+
+export interface FeedPost {
+  id: string;
+  content: string;
+  created_at: string;
+  author: {
+    id: string;
+    name?: string;
+    avatar?: string;
+  } | null;
+  commentsCount: number;
+  reactionsCount: number;
+  comments: unknown[];
+  reactions: unknown[];
+  isOwner: boolean;
+  isLikedByMe: boolean;
+}
+
+export interface DashboardStats {
+  skillsCount: number;
+  completedChallengesCount: number;
+  unreadMessagesCount: number;
+  postsCount: number;
+}
+
 // ============================================================================
 // Service
 // ============================================================================
 
 export const profilesService = {
-
-  preRegisterProfile: async (id_user: string, data: TalentProfile): Promise<TalentPreregisterResponse> => {
-    const res = await httpClient.post<TalentPreregisterResponse>(`/profiles/${id_user}`, data);
+  preRegisterProfile: async (
+    id_user: string,
+    data: TalentProfile,
+  ): Promise<TalentPreregisterResponse> => {
+    const res = await httpClient.post<TalentPreregisterResponse>(
+      `/profiles/${id_user}`,
+      data,
+    );
     return res.data;
   },
   /**
@@ -205,6 +245,27 @@ export const profilesService = {
    */
   getCatalogs: async (): Promise<Catalogs> => {
     const res = await httpClient.get<Catalogs>("/profiles/catalogs");
+    return res.data;
+  },
+
+  getFirstChallenges: async (): Promise<DashboardChallenge[]> => {
+    const res = await httpClient.get<DashboardChallenge[]>(
+      "/profiles/dashboard/challenges",
+    );
+    return res.data;
+  },
+
+  getDashboardFeed: async (): Promise<FeedPost[]> => {
+    const res = await httpClient.get<FeedPost[]>("/profiles/dashboard/feed");
+
+    return res.data;
+  },
+
+  getDashboardStats: async (): Promise<DashboardStats> => {
+    const res = await httpClient.get<DashboardStats>(
+      "/profiles/dashboard/stats",
+    );
+
     return res.data;
   },
 };
