@@ -4,6 +4,7 @@ import { ConversationsList } from "@/modules/messages/components/ConversationsLi
 import { ConversationDetail } from "@/modules/messages/components/ConversationDetail";
 import { MessagesPanel } from "@/modules/messages/components/MessagesPanel";
 import { useMessagesState } from "@/modules/messages/hooks/useMessagesState";
+import { useConversationMessages } from "@/modules/messages/hooks/useConversationMessages";
 
 interface MessagesContainerProps {
   conversations: Conversation[];
@@ -22,12 +23,25 @@ export function MessagesContainer({
 }: MessagesContainerProps) {
   const {
     selectedConversation,
+    conversationMessages,
     searchQuery,
     sending,
     setSelectedConversation,
     setSearchQuery,
+    setConversationMessages,
+    addMessage,
     handleSendMessage,
   } = useMessagesState();
+
+  const {
+    messages: loadedMessages,
+    loading: messagesLoading,
+    error: messagesError,
+  } = useConversationMessages(selectedConversation?.id);
+
+  React.useEffect(() => {
+    setConversationMessages(loadedMessages);
+  }, [loadedMessages, setConversationMessages]);
 
   const onSend = async (content: string) => {
     if (!selectedConversation) return;
@@ -56,11 +70,9 @@ export function MessagesContainer({
       <MessagesPanel isVisible={!!selectedConversation} className="flex-1">
         <ConversationDetail
           conversation={selectedConversation}
-          messages={
-            selectedConversation?.last_message
-              ? [selectedConversation.last_message]
-              : []
-          }
+          messages={conversationMessages}
+          loading={messagesLoading}
+          error={messagesError}
           userRole={userRole}
           onClose={() => setSelectedConversation(undefined)}
           onSendMessage={onSend}

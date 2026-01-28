@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Conversation, Message } from "@/services/messages.service";
 import Image from "next/image";
 import { Send, X, Search } from "lucide-react";
@@ -28,6 +28,15 @@ export function ConversationDetail({
 }: ConversationDetailProps) {
   const [messageInput, setMessageInput] = useState("");
   const [messageSearch, setMessageSearch] = useState("");
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   const handleSendMessage = () => {
     if (messageInput.trim()) {
@@ -196,6 +205,9 @@ export function ConversationDetail({
             </div>
           );
         })}
+
+        {/* Elemento de referencia para scroll automático */}
+        <div ref={messagesEndRef} />
       </div>
 
       <div className="p-4 border-t border-gray-200 bg-white">
