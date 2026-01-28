@@ -281,8 +281,7 @@ export const CompanyChallengesList: React.FC<CompanyChallengesListProps> = ({
             {filteredChallenges.map((challenge) => (
               <div
                 key={challenge.id}
-                onClick={() => onViewDetails?.(challenge.id)}
-                className="bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer group"
+                className="bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all duration-200 group"
               >
                 <div className="p-6 space-y-4">
                   {/* Header */}
@@ -290,7 +289,6 @@ export const CompanyChallengesList: React.FC<CompanyChallengesListProps> = ({
                     <h3 className="text-xl font-semibold text-slate-900 group-hover:text-emerald-600 transition-colors">
                       {challenge.title}
                     </h3>
-                    <ChevronRight className="w-5 h-5 text-slate-400 group-hover:text-emerald-600 transition-colors" />
                   </div>
 
                   {/* Difficulty */}
@@ -317,9 +315,19 @@ export const CompanyChallengesList: React.FC<CompanyChallengesListProps> = ({
                   </div>
 
                   {/* Footer */}
-                  <div className="flex items-center justify-end pt-2">
+                  <div className="flex items-center justify-end pt-2 gap-2">
                     <button
-                      className="flex items-center gap-1 text-sm font-medium text-emerald-600 hover:text-emerald-700 group-hover:gap-2 transition-all"
+                      className="cursor-pointer flex items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-700 group-hover:gap-2 transition-all border border-blue-100 rounded px-2 py-1"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        window.location.href = `/company/challenges/${challenge.id}/metrics`;
+                      }}
+                    >
+                      Ver métricas
+                    </button>
+
+                    <button
+                      className="cursor-pointer flex items-center gap-1 text-sm font-medium text-emerald-600 hover:text-emerald-700 group-hover:gap-2 transition-all"
                       onClick={(e) => {
                         e.stopPropagation();
                         onViewDetails?.(challenge.id);
