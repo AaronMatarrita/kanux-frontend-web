@@ -70,7 +70,7 @@ export function ConversationsList({
           <div className="p-4 text-center text-gray-500">
             <div className="animate-pulse space-y-3">
               {[...Array(5)].map((_, i) => (
-                <div key={i} className="h-14 bg-red-200 rounded-lg" />
+                <div key={i} className="h-14 bg-gray-200 rounded-lg" />
               ))}
             </div>
           </div>

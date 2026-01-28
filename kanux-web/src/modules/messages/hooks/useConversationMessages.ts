@@ -82,6 +82,8 @@ export function useConversationMessages(
 
         return newMessages;
       }
+
+      return [...prev, message];
     });
   }, []);
 
@@ -126,16 +128,11 @@ export function useConversationMessages(
         setSending(true);
         setError(null);
 
-        // Track pending message
         setPendingMessageIds((prev) => new Set(prev).add(optimisticId));
-
-        // Add optimistic message to UI immediately
         addOptimisticMessage(optimisticMessage);
 
-        // Send via WebSocket
         await sendMessageViaSocket(content);
       } catch (err) {
-        // Remove optimistic message on error
         setMessages((prev) =>
           prev.filter((m) => m.id !== optimisticMessage.id),
         );

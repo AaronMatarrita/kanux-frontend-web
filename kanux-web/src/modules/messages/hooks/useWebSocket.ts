@@ -55,6 +55,29 @@ export function useWebSocket({
       socketService.connect(token);
     }
 
+    // Handle reconnection - rejoin conversation
+    const socket = socketService.getSocket();
+    if (socket) {
+      const handleReconnect = () => {
+        console.log("WebSocket reconnected, rejoining conversation...");
+        hasJoinedRef.current = false;
+
+        if (currentConversationRef.current) {
+          socketService.joinConversation(currentConversationRef.current);
+          hasJoinedRef.current = true;
+          console.log(
+            `Rejoined conversation: ${currentConversationRef.current}`,
+          );
+        }
+      };
+
+      socket.on("connect", handleReconnect);
+
+      return () => {
+        socket.off("connect", handleReconnect);
+      };
+    }
+
     return () => {};
   }, [enabled, session?.token]);
 
@@ -117,8 +140,6 @@ export function useWebSocket({
       }
     };
   }, [conversationId, enabled]);
-
-
 
   /**
    * Listen for message errors

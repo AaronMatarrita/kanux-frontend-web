@@ -11,9 +11,11 @@ import {
   MessagesHeader,
 } from "@/modules/messages/components";
 import { useAuth } from "@/context/AuthContext";
+import { useMessagesGuard } from "@/guards/useMessagesGuard";
 
 export default function Page() {
   const { session } = useAuth();
+  const isAuthorized = useMessagesGuard();
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -25,7 +27,6 @@ export default function Page() {
         setError(null);
 
         const data = await messagesService.getUserConversations();
-
         setConversations(data);
       } catch (err) {
         console.error(err);
@@ -35,12 +36,14 @@ export default function Page() {
       }
     };
 
-    if (session?.token) {
+    if (isAuthorized && session?.token) {
       loadConversations();
-    } else {
-      setLoading(false);
     }
-  }, [session?.token]);
+  }, [session?.token, isAuthorized]);
+
+  if (!isAuthorized) {
+    return null;
+  }
 
   const userPhoto =
     session?.user.userType === "talent"

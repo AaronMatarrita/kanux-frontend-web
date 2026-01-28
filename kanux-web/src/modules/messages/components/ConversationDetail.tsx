@@ -5,6 +5,7 @@ import { Conversation, Message } from "@/services/messages.service";
 import Image from "next/image";
 import { Send, X, Search } from "lucide-react";
 import { formatMessageTime, groupMessagesByDate } from "@/lib/dateUtils";
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 
 interface ConversationDetailProps {
   conversation?: Conversation | null;
@@ -152,7 +153,7 @@ export function ConversationDetail({
       <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50">
         {loading && (
           <div className="flex justify-center py-8">
-            <div className="animate-spin w-8 h-8 border-4 border-gray-200 border-t-blue-500 rounded-full" />
+            <LoadingSpinner size="lg" message="Cargando mensajes..." />
           </div>
         )}
 
