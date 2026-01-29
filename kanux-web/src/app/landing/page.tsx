@@ -84,15 +84,15 @@ export default function HomePage() {
             </div>
 
             <nav className={styles.nav}>
-              <a href="#about">About</a>
-              <a href="#professionals">Professionals</a>
-              <a href="#companies">Companies</a>
-              <a href="#pricing">Pricing</a>
-              <a href="/login" className={styles.loginLink}>
-                Login
+              <a href="#about">Acerca de</a>
+              <a href="#professionals">Profesional</a>
+              <a href="#companies">Empresarial</a>
+              <a href="#pricing">Precios</a>
+              <a href="/auth/login" className={styles.loginLink}>
+                Inicia sesión
               </a>
-              <a href="/register" className={styles.ctaButton}>
-                Try Kanux free →
+              <a href="/onboarding/account-selection" className={styles.ctaButton}>
+                Prueba Kanux Gratis →
               </a>
             </nav>
           </div>
@@ -100,19 +100,21 @@ export default function HomePage() {
 
         <div className={styles.heroInner}>
           <div className={styles.heroContent}>
-            <h1 className={styles.heroTitle}>Build Skills · Discover Talent</h1>
-            <h2 className={styles.heroSubtitle}>Grow together</h2>
+            <h1 className={styles.heroTitle}>
+              Desarrolla habilidades · Descubre el talento
+            </h1>
+            <h2 className={styles.heroSubtitle}>Te ayudamos a crecer.</h2>
             <p className={styles.heroDescription}>
-              Kánux connects professionals and companies through real challenges
-              and verified skills.
+              Kánux conecta a profesionales y empresas a través de retos reales
+              y habilidades verificadas.
             </p>
 
             <div className={styles.heroButtons}>
               <a href="/register" className={styles.primaryButton}>
-                Get Started
+                Comienza ahora
               </a>
               <a href="#what-is" className={styles.secondaryButton}>
-                Learn More
+                Mas información
               </a>
             </div>
           </div>
@@ -124,30 +126,28 @@ export default function HomePage() {
 
       {/* ================= FEATURE: PROFESSIONAL ================= */}
       <FeatureSection
-        title="Prove what you can do"
-        description="Your profile grows through practice, not assumptions."
+        title="Demuestra lo que puedes hacer."
+        description="Tu perfil crece con la práctica, no con suposiciones."
         features={[
-          "Skill-based profile",
-          "AI-assisted feedback",
-          "Progress tracking",
+          "Perfil basado en habilidades",
+          "Comentarios asistidos por IA",
+          "Seguimiento del progreso",
         ]}
-        cta="Start as Professional"
+        cta="Comienza como Profesional"
       />
 
-      {/* ================= FEATURE: COMPANY ================= */}
       <FeatureSection
-        title="Hire based on real skills"
-        description="Evaluate talent using real challenges, not guesses."
+        title="Contrata basado en habilidades reales"
+        description="Evalúa talento usando retos reales, no suposiciones."
         features={[
-          "Challenge creation",
-          "Skill analytics",
-          "Talent comparison",
+          "Creación de retos",
+          "Análisis de habilidades",
+          "Comparación de talento",
         ]}
-        cta="Start as Company"
+        cta="Comienza como Empresa"
         reverse
       />
 
-      {/* ================= FOOTER ================= */}
       <FooterCTA />
     </div>
   );
