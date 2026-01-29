@@ -110,7 +110,7 @@ export default function HomePage() {
             </p>
 
             <div className={styles.heroButtons}>
-              <a href="/register" className={styles.primaryButton}>
+              <a href="/onboarding/account-selection" className={styles.primaryButton}>
                 Comienza ahora
               </a>
               <a href="#what-is" className={styles.secondaryButton}>
@@ -134,6 +134,10 @@ export default function HomePage() {
           "Seguimiento del progreso",
         ]}
         cta="Comienza como Profesional"
+        imageUrl="computer.jpg"
+        imageAlt="Ilustración de profesional usando Kánux"
+        variant="talent"
+        ctaHref="/onboarding/register-talent"
       />
 
       <FeatureSection
@@ -145,6 +149,10 @@ export default function HomePage() {
           "Comparación de talento",
         ]}
         cta="Comienza como Empresa"
+        imageUrl="empresa.jpg"
+        imageAlt="Ilustración de empresa usando Kánux"
+        variant="company"
+        ctaHref="/onboarding/register-company"
         reverse
       />
 
