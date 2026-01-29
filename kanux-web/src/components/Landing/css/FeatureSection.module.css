@@ -91,9 +91,41 @@
 }
 
 .imageBlock {
-    display: flex;
-    justify-content: center;
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+
+  border-radius: 16px;
+  padding: 12px;
+
+  background: #0f172a;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
+
+.talent {
+  border: 2px solid #22c55e;
+  box-shadow:
+    0 10px 25px rgba(0, 0, 0, 0.15),
+    0 0 0 1px rgba(34, 197, 94, 0.25);
+}
+
+.company {
+  border: 2px solid #3b82f6;
+  box-shadow:
+    0 10px 25px rgba(0, 0, 0, 0.15),
+    0 0 0 1px rgba(59, 130, 246, 0.25);
+}
+
+.image {
+  object-fit: contain;
+  border-radius: 12px;
+}
+
+.imageBlock:hover {
+  transform: translateY(-4px);
+}
+
+
 
 .placeholderImage {
     width: 100%;
