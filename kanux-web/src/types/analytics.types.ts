@@ -1,5 +1,3 @@
-// src/types/analytics.types.ts
-
 export interface AnalyticsSummary {
   totalCandidates: number;
   activeChallenges: number;
@@ -24,7 +22,11 @@ export interface ChallengePerformance {
 
 export type ScoreRange = "90-100" | "80-89" | "70-79" | "60-69" | "below-60";
 
-export type ScoreDistribution = Record<ScoreRange, number>;
+export type ScoreDistributionItem = {
+  range: string;
+  candidates: number;
+  fill: string;
+};
 
 export interface TopCandidate {
   id: string;
@@ -45,7 +47,7 @@ export interface AnalyticsDashboard {
     activeChallenges: StatChange;
   };
   challengePerformance: ChallengePerformance[];
-  scoreDistribution: ScoreDistribution;
+  scoreDistribution: Record<ScoreRange, number>;
   topCandidates: TopCandidate[];
   candidateQuality: CandidateQuality;
 }

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { analyticsService } from "@/services/analytics.service";
-import { AnalyticsDashboard } from "@/types/analytics.types";
+import type { AnalyticsDashboard } from "@/types/analytics.types";
 import { useAuth } from "@/context/AuthContext";
 
 export function useAnalyticsDashboard() {
@@ -13,27 +13,16 @@ export function useAnalyticsDashboard() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!session?.token) {
-      setLoading(false);
-      return;
-    }
+    if (!session?.isAuthenticated) return;
 
     setLoading(true);
-    setError(null);
 
     analyticsService
-      .getDashboard(session.token)
+      .getDashboard()
       .then(setData)
-      .catch((err) => {
-        console.error("Analytics dashboard error:", err);
-        setError("Failed to load analytics");
-      })
+      .catch(() => setError("Failed to load analytics"))
       .finally(() => setLoading(false));
-  }, [session?.token]);
+  }, [session?.isAuthenticated]);
 
-  return {
-    data,
-    loading,
-    error,
-  };
+  return { data, loading, error };
 }

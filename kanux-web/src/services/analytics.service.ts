@@ -1,5 +1,3 @@
-// src/services/analytics/analytics.service.ts
-
 import { httpClient } from "@/services/http";
 import { AnalyticsDashboard } from "@/types/analytics.types";
 
@@ -8,16 +6,11 @@ export interface AnalyticsDashboardApiResponse {
 }
 
 class AnalyticsService {
-  async getDashboard(token: string): Promise<AnalyticsDashboard> {
+  async getDashboard(): Promise<AnalyticsDashboard> {
     const res = await httpClient.get<AnalyticsDashboardApiResponse>(
       "/analytics/dashboard",
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      },
     );
-
+    console.log("Analytics Dashboard Response:", res);
     return res.data.data;
   }
 }

@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { analyticsData } from "@/modules/company/analytics/lib/analytics-data";
+import { useAnalyticsDashboardContext } from "@/modules/company/analytics/context/AnalyticsDashboardContext";
 import { Crown } from "lucide-react";
 
 function getScoreColor(score: number): string {
@@ -13,9 +13,59 @@ function getScoreColor(score: number): string {
 }
 
 export function TopCandidates() {
-  const candidates = analyticsData.topCandidates
-    .slice()
-    .sort((a, b) => b.score - a.score);
+  const { data, loading, error } = useAnalyticsDashboardContext();
+  const candidates = data?.topCandidates
+    ? data.topCandidates.slice().sort((a, b) => b.score - a.score)
+    : [];
+
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader className="pb-4">
+          <CardTitle className="text-base font-semibold">
+            Top Performing Candidates
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div
+                key={i}
+                className="flex items-center justify-between rounded-lg p-3 animate-pulse bg-muted/40"
+              >
+                <div className="space-y-2 w-2/3">
+                  <div className="h-4 w-32 rounded bg-muted" />
+                  <div className="flex gap-1">
+                    {Array.from({ length: 3 }).map((_, j) => (
+                      <div key={j} className="h-4 w-12 rounded bg-muted" />
+                    ))}
+                  </div>
+                </div>
+                <div className="h-10 w-14 rounded-full bg-muted" />
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (error || !data) {
+    return (
+      <Card>
+        <CardHeader className="pb-4">
+          <CardTitle className="text-base font-semibold">
+            Top Performing Candidates
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-sm text-muted-foreground">
+            No se pudieron cargar los datos.
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>
