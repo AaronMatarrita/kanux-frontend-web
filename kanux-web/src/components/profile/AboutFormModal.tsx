@@ -72,7 +72,7 @@ export function AboutFormModal({initialData,onSubmit,onCancel}: {
           variant="outline"
           onClick={onCancel}
         >
-          Cancelar
+          Cancel
         </Button>
         <Button
           type="submit"

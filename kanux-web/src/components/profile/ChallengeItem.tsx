@@ -4,12 +4,12 @@ export function ChallengeItem({
   title, 
   timeAgo, 
   difficulty, 
-  percentage 
+  score 
 }: { 
   title: string; 
   timeAgo: string; 
   difficulty: string; 
-  percentage: number 
+  score: number 
 }) {
   return (
     <div className="flex flex-wrap items-center gap-4 py-5 border-b border-gray-200 last:border-b-0 pl-2 pr-2">
@@ -32,7 +32,7 @@ export function ChallengeItem({
           {difficulty}
         </span>
         <span className="px-4 py-1.5 rounded-full text-sm font-medium bg-slate-800 text-white min-w-[60px] text-center">
-          {percentage}%
+          {score} pt
         </span>
       </div>
     </div>

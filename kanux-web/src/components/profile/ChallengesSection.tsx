@@ -1,13 +1,10 @@
+import { ChallengeSubmissionsResponse } from "@/services/challenges.service";
 import { ChallengeItem } from "./ChallengeItem";
 import { ChallengeItemSkeleton } from "./ChallengeItemSkeleton";
+import { formatTimeAgo } from "../../helper/formats"
 
 export function ChallengesSection({ challenges, isLoading}: {
-  challenges: Array<{
-    title: string;
-    timeAgo: string;
-    difficulty: string;
-    percentage: number;
-  }>, 
+  challenges: Array<ChallengeSubmissionsResponse[number]>, 
   isLoading: boolean
 }) {
   return (
@@ -20,13 +17,13 @@ export function ChallengesSection({ challenges, isLoading}: {
         </div>
       ) : (
         <div className="bg-white rounded-lg border border-gray-200 p-2">
-          {challenges.map((challenge, index) => (
+          {challenges.map((submission) => (
             <ChallengeItem
-              key={index}
-              title={challenge.title}
-              timeAgo={challenge.timeAgo}
-              difficulty={challenge.difficulty}
-              percentage={challenge.percentage}
+              key={submission.submission_id}
+              title={submission.challenge.title}
+              difficulty={submission.challenge.difficulty}
+              score={submission.score}
+              timeAgo={formatTimeAgo(submission.submitted_at)}
             />
           ))}
         </div>

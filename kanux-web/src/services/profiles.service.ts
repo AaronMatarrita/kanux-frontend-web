@@ -36,6 +36,10 @@ export interface CreateLanguageRequest {
   level: "Básico" | "Intermedio" | "Avanzado";
 }
 
+export interface UpdateLenguageRequest{
+  language_id: string;
+  level: "Básico" | "Intermedio" | "Avanzado";
+}
 // ============================================================================
 // Response DTOs
 // ============================================================================
@@ -140,6 +144,10 @@ export interface DashboardStats {
 // ============================================================================
 
 export const profilesService = {
+   /**
+   * POST /profiles/me
+   * POST user's profile (requires auth)
+   */
   preRegisterProfile: async (
     id_user: string,
     data: TalentProfile,
@@ -245,6 +253,14 @@ export const profilesService = {
    */
   addLanguage: async (data: CreateLanguageRequest): Promise<Language> => {
     const res = await httpClient.post<Language>("/profiles/languages/me", data);
+    return res.data;
+  },
+   /**
+   * PUT /profiles/languages/me/id
+   * Update a language to current user's profile (requires auth)
+   */
+  updateLanguage:async(id:string,data:UpdateLenguageRequest):Promise<Language>=>{
+    const res = await httpClient.post<Language>(`/profiles/languages/me/${id}`, data);
     return res.data;
   },
 

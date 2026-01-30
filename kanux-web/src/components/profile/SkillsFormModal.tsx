@@ -1,57 +1,68 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { DynamicSkillList} from "./DynamicSkillList";
+import { DynamicSkillList } from "./DynamicSkillList";
 import { Button } from "./Button";
-import { Catalogs, profilesService, Skill } from "@/services/profiles.service";
+import { Catalogs, Skill } from "@/services/profiles.service";
 
 
-export function SkillsFormModal({initialData,onSubmit,onCancel}: {
-  initialData?: Skill;
-  onSubmit: (data: Skill) => void;
+type SkillsForm = {
+  skills: Skill[];
+};
+
+export function SkillsFormModal({ initialData, catalogs, onSubmit, onCancel }: {
+  initialData?: Skill[];
+  catalogs: Catalogs | null;
+  onSubmit: (data: Skill[]) => void;
   onCancel: () => void;
 }) {
 
-  const [formData, setFormData] = useState<Skill>(initialData);
-
+  const [localSkills, setLocalSkills] = useState<Skill[]>(initialData || []);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [catalogs, setCatalogs] = useState<Catalogs | null>(null);
-  const [isLoadingCatalogs, setIsLoadingCatalogs] = useState(true);
-
 
   useEffect(() => {
-    async function getCatalogs() {
-      try {
-        setIsLoadingCatalogs(true);
-        const response = await profilesService.getCatalogs();
-        setCatalogs(response);
-      } catch (error) {
-        console.error("Error al obtener catálogos:", error);
-      } finally {
-        setIsLoadingCatalogs(false);
-      }
-    }
-    getCatalogs();
-  }, []);
-
+    setLocalSkills(initialData??[]);
+  }, [initialData])
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
-    if (formData.skills.length === 0) {
-      newErrors.skills = "Debes agregar al menos una skill";
+    if (localSkills.length === 0) {
+      newErrors.skills = "You must add at least one skill";
     }
-
-    const invalidSkills = formData.skills.some(
-      skill => !skill.category || !skill.name.trim()
+    const invalidSkills = localSkills.some(
+      skill => !skill.id_category || !skill.name.trim() || !skill.level
     );
     if (invalidSkills) {
-      newErrors.skills = "Todas las skills deben tener categoría y nombre";
+      newErrors.skills = "All skills must have a category, name and a level.";
     }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
+  };
+
+  // add lenguage to local
+  const addSkillLocal = () => {
+    const tempLanguage: Skill = {
+      id: `temp-${Date.now()}`,
+      id_category: catalogs?.categories[0]?.id || "",
+      name: "",
+      level: "beginner",
+      _isNew: true
+    } as any;
+    setLocalSkills([...localSkills, tempLanguage]);
+  };
+  //remove to local
+  const removeSkillLocal = (id: string) => {
+    setLocalSkills(localSkills.filter(lang => lang.id !== id));
+  };
+  // update to local
+  const updateSkillLocal = (id: string, field: "id_category" | "name" | "level", value: string) => {
+    setLocalSkills(
+      localSkills.map(sk =>
+        sk.id === id ? { ...sk, [field]: value } : sk
+      )
+    );
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -64,10 +75,7 @@ export function SkillsFormModal({initialData,onSubmit,onCancel}: {
     setIsSubmitting(true);
 
     try {
-      // aqui guardar o eliminar los skills que han sido seleccionados o quitados.
-
-
-      await onSubmit(formData);
+      await onSubmit(localSkills);
     } catch (error) {
       console.error("Error submitting form:", error);
     } finally {
@@ -78,16 +86,21 @@ export function SkillsFormModal({initialData,onSubmit,onCancel}: {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="text-sm text-gray-600">
-        Agrega tus habilidades técnicas organizadas por categoría.
+        Add your technical skills organized by category.
       </div>
 
       <DynamicSkillList
-        skills={initialData}
-        onChange={(skills) => setFormData({ ...formData, skills })}
+        skills={initialData || []}
+        availableCategories={catalogs?.categories || []}
+        localSkills={localSkills}
+        addSkillLocal={addSkillLocal}
+        removeSkillLocal={removeSkillLocal}
+        updateSkillLocal={updateSkillLocal}
       />
       {errors.skills && (
         <p className="text-sm text-red-600 -mt-2">{errors.skills}</p>
       )}
+
 
       {/* buttons*/}
       <div className="flex gap-3 justify-end pt-4 border-t border-gray-200">
