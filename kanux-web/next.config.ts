@@ -10,6 +10,11 @@ const nextConfig: NextConfig = {
         hostname: "ui-avatars.com",
         pathname: "/api/**",
       },
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+        pathname: "/dhu43bl6x/**", // ajusta según tu carpeta/bucket si quieres restringirlo más
+      },
     ],
   },
 };

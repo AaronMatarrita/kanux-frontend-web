@@ -7,6 +7,9 @@ import { candidatesService } from "@/services/candidates.service";
 import { Select } from "@/components/ui/select";
 import { useAuth } from "@/context/AuthContext";
 import { CandidateProfileDetails } from "@/components/candidates/CandidateProfileDetails";
+import { Pagination } from "@/components/ui/pagination";
+
+/* ---------------- MOCK ---------------- */
 
 export const MOCK_CANDIDATES: CandidateListItem[] = [
   {
@@ -15,25 +18,10 @@ export const MOCK_CANDIDATES: CandidateListItem[] = [
     last_name: "Martinez",
     title: "Frontend Developer",
     education: "Self-taught",
+    avg_score: 92,
     skills: [
-      {
-        id: "skill-react",
-        name: "React",
-        level: "Advanced",
-        category_id: "frontend",
-      },
-      {
-        id: "skill-ts",
-        name: "TypeScript",
-        level: "Intermediate",
-        category_id: "frontend",
-      },
-      {
-        id: "skill-node",
-        name: "Node.js",
-        level: "Intermediate",
-        category_id: "backend",
-      },
+      { id: "skill-react", name: "React", level: "Advanced", category_id: "frontend" },
+      { id: "skill-ts", name: "TypeScript", level: "Intermediate", category_id: "frontend" },
     ],
     profile: {
       id: "1",
@@ -44,268 +32,80 @@ export const MOCK_CANDIDATES: CandidateListItem[] = [
       education: "Self-taught",
       location: "San José, Costa Rica",
       experience_level: "3 años",
-      email: "alex.johnson@email.com",
-      contact: {
-        phone: "8888-1111",
-      },
+      email: "sarah@email.com",
+      contact: { phone: "8888-1111" },
       profile_completeness: 85,
       opportunity_status_id: null,
       learning_background_id: null,
+      image_url: null,
       user_id: "user-1",
-      created_at: new Date().toISOString(),
-    },
-  },
-  {
-    talent_id: "2",
-    first_name: "James",
-    last_name: "Chen",
-    title: "Backend Developer",
-    education: "Bootcamp",
-    skills: [
-      {
-        id: "skill-python",
-        name: "Python",
-        level: "Advanced",
-        category_id: "backend",
-      },
-      {
-        id: "skill-django",
-        name: "Django",
-        level: "Intermediate",
-        category_id: "backend",
-      },
-      {
-        id: "skill-postgresql",
-        name: "PostgreSQL",
-        level: "Intermediate",
-        category_id: "database",
-      },
-    ],
-    profile: {
-      id: "2",
-      first_name: "James",
-      last_name: "Chen",
-      title: "Backend Developer",
-      about: "Backend engineer enfocado en APIs escalables.",
-      education: "Bootcamp",
-      location: "Heredia, Costa Rica",
-      experience_level: "4 años",
-      email: "alex.johnson@email.com",
-      contact: {
-        phone: "8888-2222",
-      },
-      profile_completeness: 90,
-      opportunity_status_id: null,
-      learning_background_id: null,
-      user_id: "user-2",
-      created_at: new Date().toISOString(),
-    },
-  },
-  {
-    talent_id: "3",
-    first_name: "Emily",
-    last_name: "Rodriguez",
-    title: "Cloud Engineer",
-    education: "University",
-    skills: [
-      {
-        id: "skill-vue",
-        name: "Vue.js",
-        level: "Advanced",
-        category_id: "frontend",
-      },
-      {
-        id: "skill-aws",
-        name: "AWS",
-        level: "Intermediate",
-        category_id: "cloud",
-      },
-      {
-        id: "skill-docker",
-        name: "Docker",
-        level: "Intermediate",
-        category_id: "devops",
-      },
-    ],
-    profile: {
-      id: "3",
-      first_name: "Emily",
-      last_name: "Rodriguez",
-      title: "Cloud Engineer",
-      about: "Ingeniera cloud con experiencia en AWS y contenedores.",
-      education: "University",
-      location: "Alajuela, Costa Rica",
-      experience_level: "5 años",
-      email: "alex.johnson@email.com",
-      contact: {
-        phone: "8888-3333",
-      },
-      profile_completeness: 95,
-      opportunity_status_id: null,
-      learning_background_id: null,
-      user_id: "user-3",
-      created_at: new Date().toISOString(),
-    },
-  },
-  {
-    talent_id: "4",
-    first_name: "Michael",
-    last_name: "Kim",
-    title: "Fullstack Developer",
-    education: "Self-taught",
-    skills: [
-      {
-        id: "skill-angular",
-        name: "Angular",
-        level: "Advanced",
-        category_id: "frontend",
-      },
-      {
-        id: "skill-csharp",
-        name: "C#",
-        level: "Intermediate",
-        category_id: "backend",
-      },
-      {
-        id: "skill-dotnet",
-        name: ".NET",
-        level: "Intermediate",
-        category_id: "backend",
-      },
-    ],
-    profile: {
-      id: "4",
-      first_name: "Michael",
-      last_name: "Kim",
-      title: "Fullstack Developer",
-      about: "Fullstack dev con enfoque en aplicaciones empresariales.",
-      education: "Self-taught",
-      location: "Cartago, Costa Rica",
-      experience_level: "6 años",
-      email: "alex.johnson@email.com",
-      contact: {
-        phone: "8888-4444",
-      },
-      profile_completeness: 88,
-      opportunity_status_id: null,
-      learning_background_id: null,
-      user_id: "user-4",
-      created_at: new Date().toISOString(),
-    },
-  },
-  {
-    talent_id: "5",
-    first_name: "Alex",
-    last_name: "Johnson",
-    title: "Java Engineer",
-    education: "University",
-    skills: [
-      {
-        id: "skill-java",
-        name: "Java",
-        level: "Advanced",
-        category_id: "backend",
-      },
-      {
-        id: "skill-spring",
-        name: "Spring Boot",
-        level: "Intermediate",
-        category_id: "backend",
-      },
-      {
-        id: "skill-kubernetes",
-        name: "Kubernetes",
-        level: "Intermediate",
-        category_id: "cloud",
-      },
-    ],
-    profile: {
-      id: "5",
-      first_name: "Alex",
-      last_name: "Johnson",
-      title: "Java Engineer",
-      about: "Ingeniero Java especializado en microservicios.",
-      education: "University",
-      location: "Puntarenas, Costa Rica",
-      email: "alex.johnson@email.com",
-      experience_level: "7 años",
-      contact: {
-        phone: "8888-5555",
-      },
-      profile_completeness: 92,
-      opportunity_status_id: null,
-      learning_background_id: null,
-      user_id: "user-5",
       created_at: new Date().toISOString(),
     },
   },
 ];
 
-interface CandidatesProps {
-  onViewProfile?: (candidateId: string) => void;
-  onContact?: (candidateId: string) => void;
-}
+/* ---------------- COMPONENT ---------------- */
 
-export const CandidatesList: React.FC<CandidatesProps> = ({ onContact }) => {
+interface CandidatesProps {  onContact?: (candidateId: string) => void; }
+
+export const CandidatesList: React.FC<CandidatesProps> = ({onContact }) => {
   const { session } = useAuth();
 
   const [isLoading, setIsLoading] = useState(true);
-  const [candidates, setCandidates] =
-    useState<CandidateListItem[]>(MOCK_CANDIDATES);
+  const [candidates, setCandidates] = useState<CandidateListItem[]>([]);
 
+  /* PAGINATION */
+  const [page, setPage] = useState(1);
+  const [pageSize] = useState(10);
+  const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+
+  /* FILTERS */
   const [searchTerm, setSearchTerm] = useState("");
   const [skillFilter, setSkillFilter] = useState<string>("All Skills");
   const [backgroundFilter, setBackgroundFilter] = useState<string>("");
+
+  const [skillsOptions, setSkillsOptions] = useState<string[]>([]);
   const [selectedCandidate, setSelectedCandidate] =
     useState<CandidateListItem | null>(null);
 
-  const [skillsOptions, setSkillsOptions] = useState<string[]>([]);
+  /* ---------------- DATA LOAD ---------------- */
 
   useEffect(() => {
     const loadCandidates = async () => {
+      setIsLoading(true);
+
       try {
         if (!session?.token) {
           setCandidates(MOCK_CANDIDATES);
+          setTotalItems(MOCK_CANDIDATES.length);
+          setTotalPages(1);
           return;
         }
 
-        const data = await candidatesService.getCandidates(session.token);
+        const result = await candidatesService.getCandidates(
+          session.token,
+          page,
+          pageSize
+        );
 
-        setCandidates(data);
+        setCandidates(result.candidates);
+        setTotalItems(result.pagination.total);
+        setTotalPages(result.pagination.totalPages);
       } catch (error) {
         console.error("API failed, using mock candidates", error);
         setCandidates(MOCK_CANDIDATES);
+        setTotalItems(MOCK_CANDIDATES.length);
+        setTotalPages(1);
       } finally {
         setIsLoading(false);
       }
     };
 
     loadCandidates();
-  }, [session?.token]);
+  }, [session?.token, page, pageSize]);
 
-  useEffect(() => {
-    const loadFilters = async () => {
-      try {
-        const skills = await candidatesService.getSkillFilters();
-        setSkillsOptions(Array.from(new Set(skills)));
-      } catch {
-        setSkillsOptions(
-          Array.from(
-            new Set(
-              MOCK_CANDIDATES.flatMap((c) => c.skills.map((s) => s.name)),
-            ),
-          ),
-        );
-      }
-    };
-
-    loadFilters();
-  }, []);
-
-  const uniqueBackgrounds = useMemo(
-    () => Array.from(new Set(candidates.map((c) => c.education))),
-    [candidates],
-  );
+  /* ---------------- FILTERS (FRONT ONLY) ---------------- */
 
   const filteredCandidates = useMemo(() => {
     let filtered = candidates;
@@ -317,14 +117,14 @@ export const CandidatesList: React.FC<CandidatesProps> = ({ onContact }) => {
             .toLowerCase()
             .includes(searchTerm.toLowerCase()) ||
           c.skills.some((s) =>
-            s.name.toLowerCase().includes(searchTerm.toLowerCase()),
-          ),
+            s.name.toLowerCase().includes(searchTerm.toLowerCase())
+          )
       );
     }
 
     if (skillFilter !== "All Skills") {
       filtered = filtered.filter((c) =>
-        c.skills.some((s) => s.name === skillFilter),
+        c.skills.some((s) => s.name === skillFilter)
       );
     }
 
@@ -335,13 +135,20 @@ export const CandidatesList: React.FC<CandidatesProps> = ({ onContact }) => {
     return filtered;
   }, [candidates, searchTerm, skillFilter, backgroundFilter]);
 
+  /* ---------------- UI HELPERS ---------------- */
+
+  const uniqueBackgrounds = useMemo(
+    () => Array.from(new Set(candidates.map((c) => c.education))).filter(Boolean),
+    [candidates]
+  );
+
   const handleViewProfile = useCallback((candidate: CandidateListItem) => {
     setSelectedCandidate(candidate);
   }, []);
 
   const handleContact = useCallback(
     (id: string) => onContact?.(id),
-    [onContact],
+    [onContact]
   );
 
   const skillSelectOptions = useMemo(
@@ -349,19 +156,19 @@ export const CandidatesList: React.FC<CandidatesProps> = ({ onContact }) => {
       { label: "All Skills", value: "All Skills" },
       ...skillsOptions.map((s) => ({ label: s, value: s })),
     ],
-    [skillsOptions],
+    [skillsOptions]
   );
 
   const backgroundSelectOptions = useMemo(
     () =>
-      uniqueBackgrounds
-        .filter((b): b is string => b !== null)
-        .map((b) => ({
-          label: b,
-          value: b,
-        })),
-    [uniqueBackgrounds],
+      uniqueBackgrounds.map((b) => ({
+        label: b!,
+        value: b!,
+      })),
+    [uniqueBackgrounds]
   );
+
+  /* ---------------- RENDER ---------------- */
 
   if (isLoading) {
     return (
@@ -378,6 +185,7 @@ export const CandidatesList: React.FC<CandidatesProps> = ({ onContact }) => {
         <p className="text-slate-600">Explore and evaluate talent.</p>
       </div>
 
+      {/* FILTERS */}
       <div className="bg-white rounded-lg border p-4 space-y-4">
         <div className="relative">
           <Search className="absolute left-3 top-3 text-slate-400" size={20} />
@@ -404,13 +212,14 @@ export const CandidatesList: React.FC<CandidatesProps> = ({ onContact }) => {
         </div>
       </div>
 
+      {/* TABLE */}
       <div className="bg-white border rounded-lg overflow-hidden">
         <table className="w-full">
           <thead className="bg-slate-50 border-b">
             <tr>
               <th className="px-6 py-3 text-left">Candidato</th>
               <th className="px-6 py-3 text-left">Habilidades</th>
-              <th className="px-6 py-3 text-left">Educacion</th>
+              <th className="px-6 py-3 text-left">Educación</th>
               <th className="px-6 py-3 text-left">Título</th>
               <th className="px-6 py-3 text-left">Acciones</th>
             </tr>
@@ -436,7 +245,6 @@ export const CandidatesList: React.FC<CandidatesProps> = ({ onContact }) => {
                   </td>
 
                   <td className="px-6 py-4 text-slate-600">{c.education}</td>
-
                   <td className="px-6 py-4">{c.title}</td>
 
                   <td className="px-6 py-4 flex gap-2">
@@ -460,9 +268,24 @@ export const CandidatesList: React.FC<CandidatesProps> = ({ onContact }) => {
         </table>
       </div>
 
-      <div className="text-sm text-slate-600">
-        Showing {filteredCandidates.length} of {candidates.length} candidates
+      {/* FOOTER */}
+      <div className="flex items-center justify-between">
+        <div className="text-sm text-slate-600">
+          Showing {candidates.length} of {totalItems} candidates
+        </div>
+
+        <Pagination
+          currentPage={page}
+          totalPages={totalPages}
+          onPageChange={(newPage) => {
+            if (newPage !== page) {
+              setPage(newPage);
+            }
+          }}
+        />
+        
       </div>
+
       {selectedCandidate && (
         <CandidateProfileDetails
           candidate={selectedCandidate}
