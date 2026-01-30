@@ -23,7 +23,7 @@ export function TopCandidates() {
       <Card>
         <CardHeader className="pb-4">
           <CardTitle className="text-base font-semibold">
-            Top Performing Candidates
+            Mejores Candidatos
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -78,7 +78,7 @@ export function TopCandidates() {
       <CardContent>
         {candidates.length === 0 ? (
           <p className="text-sm text-muted-foreground">
-            No candidate results available yet.
+            No hay resultados de candidatos aún.
           </p>
         ) : (
           <div className="space-y-3">
@@ -107,7 +107,7 @@ export function TopCandidates() {
                       {isTop && (
                         <Badge className="flex items-center gap-1 bg-emerald-500 text-white">
                           <Crown size={12} />
-                          Best Match
+                          Mejor Puntaje
                         </Badge>
                       )}
                     </div>
@@ -128,7 +128,7 @@ export function TopCandidates() {
                           ))
                       ) : (
                         <span className="text-xs text-muted-foreground">
-                          No skills listed
+                          Sin habilidades listadas
                         </span>
                       )}
                     </div>
