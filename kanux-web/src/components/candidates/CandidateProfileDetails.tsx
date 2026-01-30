@@ -187,13 +187,13 @@ const InfoItem = ({
 interface ContactItemProps {
   label: string;
   value?: string | null;
-  icon: LucideIcon; // recibimos el componente del icono
+  icon: LucideIcon; 
 }
 
 export const ContactItem: React.FC<ContactItemProps> = ({
   label,
   value,
-  icon: Icon, // renombramos para usarlo como componente
+  icon: Icon, 
 }) => (
   <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
     <div className="p-2 bg-white rounded-lg shadow-sm">

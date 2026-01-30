@@ -54,13 +54,11 @@ export const CandidatesList: React.FC<CandidatesProps> = ({onContact }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [candidates, setCandidates] = useState<CandidateListItem[]>([]);
 
-  /* PAGINATION */
   const [page, setPage] = useState(1);
   const [pageSize] = useState(10);
   const [totalItems, setTotalItems] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
 
-  /* FILTERS */
   const [searchTerm, setSearchTerm] = useState("");
   const [skillFilter, setSkillFilter] = useState<string>("All Skills");
   const [backgroundFilter, setBackgroundFilter] = useState<string>("");
@@ -69,7 +67,7 @@ export const CandidatesList: React.FC<CandidatesProps> = ({onContact }) => {
   const [selectedCandidate, setSelectedCandidate] =
     useState<CandidateListItem | null>(null);
 
-  /* ---------------- DATA LOAD ---------------- */
+
 
   useEffect(() => {
     const loadCandidates = async () => {
@@ -105,7 +103,6 @@ export const CandidatesList: React.FC<CandidatesProps> = ({onContact }) => {
     loadCandidates();
   }, [session?.token, page, pageSize]);
 
-  /* ---------------- FILTERS (FRONT ONLY) ---------------- */
 
   const filteredCandidates = useMemo(() => {
     let filtered = candidates;
@@ -135,7 +132,6 @@ export const CandidatesList: React.FC<CandidatesProps> = ({onContact }) => {
     return filtered;
   }, [candidates, searchTerm, skillFilter, backgroundFilter]);
 
-  /* ---------------- UI HELPERS ---------------- */
 
   const uniqueBackgrounds = useMemo(
     () => Array.from(new Set(candidates.map((c) => c.education))).filter(Boolean),
@@ -168,7 +164,6 @@ export const CandidatesList: React.FC<CandidatesProps> = ({onContact }) => {
     [uniqueBackgrounds]
   );
 
-  /* ---------------- RENDER ---------------- */
 
   if (isLoading) {
     return (
@@ -185,7 +180,6 @@ export const CandidatesList: React.FC<CandidatesProps> = ({onContact }) => {
         <p className="text-slate-600">Explore and evaluate talent.</p>
       </div>
 
-      {/* FILTERS */}
       <div className="bg-white rounded-lg border p-4 space-y-4">
         <div className="relative">
           <Search className="absolute left-3 top-3 text-slate-400" size={20} />
@@ -212,7 +206,6 @@ export const CandidatesList: React.FC<CandidatesProps> = ({onContact }) => {
         </div>
       </div>
 
-      {/* TABLE */}
       <div className="bg-white border rounded-lg overflow-hidden">
         <table className="w-full">
           <thead className="bg-slate-50 border-b">
@@ -268,7 +261,6 @@ export const CandidatesList: React.FC<CandidatesProps> = ({onContact }) => {
         </table>
       </div>
 
-      {/* FOOTER */}
       <div className="flex items-center justify-between">
         <div className="text-sm text-slate-600">
           Showing {candidates.length} of {totalItems} candidates

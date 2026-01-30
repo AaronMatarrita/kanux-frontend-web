@@ -13,7 +13,7 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "res.cloudinary.com",
-        pathname: "/dhu43bl6x/**", // ajusta según tu carpeta/bucket si quieres restringirlo más
+        pathname: "/dhu43bl6x/**", 
       },
     ],
   },
