@@ -11,7 +11,7 @@ type BasicInfoFormData = {
   experienceLevel: string;
   learningBackground: string;
   openToOpportunities: string;
-  
+
 };
 
 const EXPERIENCE_LEVELS = [
@@ -21,60 +21,53 @@ const EXPERIENCE_LEVELS = [
   { id: "expert", label: "Expert" }
 ];
 
-export function BasicInfoFormModal({initialData,initialLanguages,onSubmit,onCancel}: {
-  initialData:BasicInfoFormData,
+export function BasicInfoFormModal({ initialData, initialLanguages, catalogs, onSubmit, onCancel }: {
+  initialData: BasicInfoFormData,
   initialLanguages?: Language[];
+  catalogs: Catalogs | null;
   onSubmit: (data: BasicInfoFormData) => void;
   onCancel: () => void;
 }) {
   const [formData, setFormData] = useState<BasicInfoFormData>({
-      experienceLevel: initialData.experienceLevel || "",
-      learningBackground: initialData.learningBackground||"",
-      openToOpportunities: initialData.openToOpportunities|| ""
+    experienceLevel: initialData.experienceLevel || "",
+    learningBackground: initialData.learningBackground || "",
+    openToOpportunities: initialData.openToOpportunities || ""
   });
 
   const [languages, setLanguages] = useState<Language[]>(initialLanguages || []);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [catalogs, setCatalogs] = useState<Catalogs | null>(null);
-  const [isLoadingCatalogs, setIsLoadingCatalogs] = useState(true);
+  const [localLanguages, setLocalLanguages] = useState<Language[]>(languages);
 
-  //get catalogs
   useEffect(() => {
-    async function getCatalogs() {
-      try {
-        setIsLoadingCatalogs(true);
+    setLocalLanguages(languages);
+  }, [languages]);
 
-        const response = await profilesService.getCatalogs();
-        setCatalogs(response);
-      } catch (error) {
-        console.error("Error al obtener catálogos:", error);
-      } finally {
-        setIsLoadingCatalogs(false);
-      }
-    }
-    getCatalogs();
-  }, []);
-
-  // create lenguages
-  const handleAddLanguage = async (languageData: CreateLanguageRequest): Promise<Language> => {
-    try {
-      console.log(languageData)
-      const newLanguage = await profilesService.addLanguage(languageData);
-      return newLanguage;
-    } catch (error) {
-      console.error("Error creating language:", error);
-      throw error;
-    }
+  // add lenguage to local
+  const addLanguageLocal = () => {
+    const tempLanguage: Language = {
+      id: `temp-${Date.now()}`,
+      id_languages: catalogs?.languages[0]?.id || "",
+      level: "Básico",
+      _isNew: true
+    } as any;
+    setLocalLanguages([...localLanguages, tempLanguage]);
   };
-  //delete lenguages
-  const handleDeleteLanguage = async (id: string): Promise<void> => {
-    try {
-      await profilesService.deleteLanguage(id);
-    } catch (error) {
-      console.error("Error deleting language:", error);
-      throw error;
-    }
+  //remove to local
+  const removeLanguageLocal = (id: string) => {
+    setLocalLanguages(localLanguages.filter(lang => lang.id !== id));
+  };
+  // update to local
+  const updateLanguageLocal = (id: string, field: "id_languages" | "level", value: string) => {
+    setLocalLanguages(
+      localLanguages.map(lang =>
+        lang.id === id ? { ...lang, [field]: value } : lang
+      )
+    );
+  };
+
+  const handleCancelChanges = () => {
+    setLocalLanguages(languages);
   };
 
   const validateForm = () => {
@@ -84,12 +77,12 @@ export function BasicInfoFormModal({initialData,initialLanguages,onSubmit,onCanc
       newErrors.experienceLevel = "Experience level is required";
     }
 
-    if (languages.length === 0) {
+    if (localLanguages.length === 0) {
       newErrors.languages = "You must add at least one language";
     }
 
     // validate languages
-    const invalidLanguages = languages.some(
+    const invalidLanguages = localLanguages.some(
       lang => !lang.id_languages || !lang.level
     );
     if (invalidLanguages) {
@@ -118,22 +111,21 @@ export function BasicInfoFormModal({initialData,initialLanguages,onSubmit,onCanc
     setIsSubmitting(true);
 
     try {
+      const data = {
+        experienceLevel: formData.experienceLevel,
+        learningBackground: formData.learningBackground,
+        openToOpportunities: formData.openToOpportunities,
+        localLanguages: localLanguages
+      }
+
       //sent data to profile page
-      await onSubmit(formData);
+      await onSubmit(data);
     } catch (error) {
       console.error("Error submitting form:", error);
     } finally {
       setIsSubmitting(false);
     }
   };
-
-  if (isLoadingCatalogs) {
-    return (
-      <div className="flex items-center justify-center py-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500"></div>
-      </div>
-    );
-  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -154,9 +146,10 @@ export function BasicInfoFormModal({initialData,initialLanguages,onSubmit,onCanc
         <DynamicLanguageList
           languages={languages}
           availableLanguages={catalogs?.languages || []}
-          onChange={setLanguages}
-          onAdd={handleAddLanguage}
-          onDelete={handleDeleteLanguage}
+          localLanguages={localLanguages}
+          addLanguageLocal={addLanguageLocal}
+          removeLanguageLocal={removeLanguageLocal}
+          updateLanguageLocal={updateLanguageLocal}
         />
         {errors.languages && (
           <p className="text-sm text-red-600 -mt-2">{errors.languages}</p>
@@ -193,7 +186,7 @@ export function BasicInfoFormModal({initialData,initialLanguages,onSubmit,onCanc
         />
       </div>
 
-      {/* Botones */}
+      {/* Buttons */}
       <div className="flex gap-3 justify-end pt-4 border-t border-gray-200">
         <Button
           type="button"

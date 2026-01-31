@@ -11,8 +11,8 @@ type UserInfoFormData = {
   last_name: string;
   title: string;
   location: string;
-  avatar?: File | null;           // ← Ahora acepta null
-  removeAvatar?: boolean;         // ← Nuevo
+  avatar?: File | null;          
+  removeAvatar?: boolean;         
   currentAvatarUrl?: string;
   contacts: Contact[];
 };
@@ -59,18 +59,18 @@ export function UserInfoFormModal({ initialData, onSubmit, onCancel }: { initial
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
     if (!formData.first_name.trim()) {
-      newErrors.name = "El nombre es requerido";
+      newErrors.name = "Name is required";
     }
     if (!formData.last_name.trim()) {
-      newErrors.name = "El apellido es requerido";
+      newErrors.name = "Last name is required";
     }
 
     if (!formData.title.trim()) {
-      newErrors.title = "El título es requerido";
+      newErrors.title = "Title is required";
     }
 
     if (!formData.location.trim()) {
-      newErrors.location = "La ubicación es requerida";
+      newErrors.location = "Location is required";
     }
 
     const invalidContacts = formData.contacts.some(
@@ -78,7 +78,7 @@ export function UserInfoFormModal({ initialData, onSubmit, onCancel }: { initial
     )
 
     if (invalidContacts) {
-      newErrors.contacts = "Todos los contactos deben tener tipo y valor";
+      newErrors.contacts = "All contacts must have a type and value";
     }
 
     setErrors(newErrors);
@@ -121,17 +121,17 @@ export function UserInfoFormModal({ initialData, onSubmit, onCancel }: { initial
 
       {/* name */}
       <Input
-        label="Nombre Completo"
+        label="Name"
         name="name"
         value={formData.first_name}
         onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
-        placeholder="Ej: Alex Smith"
+        placeholder="Ej: Alex"
         error={errors.name}
         required
       />
       {/* last name */}
       <Input
-        label="Apellido"
+        label="Last name"
         name="last_name"
         value={formData.last_name}
         onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
@@ -141,7 +141,7 @@ export function UserInfoFormModal({ initialData, onSubmit, onCancel }: { initial
       />
       {/* title */}
       <Input
-        label="Título Profesional"
+        label="Professional Title"
         name="title"
         value={formData.title}
         onChange={(e) => setFormData({ ...formData, title: e.target.value })}
@@ -152,7 +152,7 @@ export function UserInfoFormModal({ initialData, onSubmit, onCancel }: { initial
 
       {/* location */}
       <Input
-        label="Ubicación"
+        label="Location"
         name="location"
         value={formData.location}
         onChange={(e) => setFormData({ ...formData, location: e.target.value })}
@@ -177,7 +177,7 @@ export function UserInfoFormModal({ initialData, onSubmit, onCancel }: { initial
           variant="outline"
           onClick={onCancel}
         >
-          Cancelar
+          Cancel
         </Button>
         <Button
           type="submit"

@@ -1,135 +1,28 @@
 import { Plus, Trash2, Save } from "lucide-react";
 import { Select } from "./Select";
-import { Language, CreateLanguageRequest } from "@/services/profiles.service";
-import React from "react";
+import { Language } from "@/services/profiles.service";
 
 const LANGUAGE_LEVELS = [
-  { id: "Basic", label: "Básico" },
-  { id: "Intermediate", label: "Intermedio" },
-  { id: "Advanced", label: "Avanzado" }
+  { id: "Básico", label: "Básico" },
+  { id: "Intermedio", label: "Intermedio" },
+  { id: "Avanzado", label: "Avanzado" }
 ];
 
-export function DynamicLanguageList({languages,availableLanguages,onChange,onAdd,onDelete,label = "Languages"}: {
+export function DynamicLanguageList({ languages, availableLanguages, localLanguages, addLanguageLocal, removeLanguageLocal,updateLanguageLocal, label = "Languages" }: {
   languages: Language[];
+  localLanguages: Language[];
   availableLanguages: Array<{ id: string; name: string }>;
-  onChange: (languages: Language[]) => void;
-  onAdd: (language: CreateLanguageRequest) => Promise<Language>;
-  onDelete: (id: string) => Promise<void>;
+  addLanguageLocal: () => void;
+  removeLanguageLocal: (id: string) => void;
+  updateLanguageLocal:(id: string, field: "id_languages" | "level", value: string)=>void;
   label?: string;
 }) {
-  const [isLoading, setIsLoading] = React.useState<string | null>(null);
-  const [localLanguages, setLocalLanguages] = React.useState<Language[]>(languages);
-  const [pendingChanges, setPendingChanges] = React.useState(false);
-
-  // update local languages
-  React.useEffect(() => {
-    setLocalLanguages(languages);
-    setPendingChanges(false);
-  }, [languages]);
-
-  const addLanguageLocal = () => {
-    // create language local
-    const tempLanguage: Language = {
-      id: `temp-${Date.now()}`,
-      id_languages: availableLanguages[0]?.id || "",
-      level: "Básico",
-      _isNew: true
-    } as any;
-
-    setLocalLanguages([...localLanguages, tempLanguage]);
-    setPendingChanges(true);
-  };
-
-  const removeLanguageLocal = (id: string) => {
-    setLocalLanguages(localLanguages.filter(lang => lang.id !== id));
-    setPendingChanges(true);
-  };
-
-  const updateLanguageLocal = (id: string, field: "id_languages" | "level", value: string) => {
-    setLocalLanguages(
-      localLanguages.map(lang =>
-        lang.id === id ? { ...lang, [field]: value } : lang
-      )
-    );
-    setPendingChanges(true);
-  };
-
-  const handleSaveChanges = async () => {
-    try {
-      setIsLoading("saving");
-
-      // indentify language to delete
-      const languagesToDelete = languages.filter(
-        original => !localLanguages.find(local => local.id === original.id)
-      );
-
-      // identify new languages.
-      const newLanguages = localLanguages.filter(lang => 
-        (lang as any)._isNew || lang.id.startsWith('temp-')
-      );
-
-      //delete new languages
-      for (const lang of languagesToDelete) {
-        await onDelete(lang.id);
-      }
-
-      //create new languages
-      const createdLanguages: Language[] = [];
-      for (const lang of newLanguages) {
-        const data: CreateLanguageRequest = {
-          language_id: lang.id_languages || "",
-          level: lang.level
-        };
-        const created = await onAdd(data);
-        createdLanguages.push(created);
-      }
-
-      //update local
-      let updatedLanguages = localLanguages.filter(lang => 
-        !(lang as any)._isNew && !lang.id.startsWith('temp-')
-      );
-      updatedLanguages = [...updatedLanguages, ...createdLanguages];
-      onChange(updatedLanguages);
-      setPendingChanges(false);
-    } catch (error) {
-      console.error("Error saving changes:", error);
-    } finally {
-      setIsLoading(null);
-    }
-  };
-
-  const handleCancelChanges = () => {
-    setLocalLanguages(languages);
-    setPendingChanges(false);
-  };
-
   const selectedLanguageIds = localLanguages.map(l => l.id_languages).filter(Boolean);
-
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between">
         <label className="text-sm font-medium text-gray-700">{label}</label>
         <div className="flex gap-2">
-          {pendingChanges && (
-            <>
-              <button
-                type="button"
-                onClick={handleCancelChanges}
-                className="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-700 border border-gray-300 hover:bg-gray-50 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={handleSaveChanges}
-                disabled={isLoading === "saving"}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-blue-500 text-white hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <Save className="w-4 h-4" />
-                {isLoading === "saving" ? "Saving..." : "Save"}
-              </button>
-            </>
-          )}
           <button
             type="button"
             onClick={addLanguageLocal}
@@ -212,13 +105,12 @@ export function DynamicLanguageList({languages,availableLanguages,onChange,onAdd
                 const langName = availableLanguages.find(l => l.id === language.id_languages)?.name;
                 const isTemp = (language as any)._isNew || language.id.startsWith('temp-');
                 return (
-                  <span 
+                  <span
                     key={language.id}
-                    className={`px-3 py-1.5 rounded-lg text-sm border ${
-                      isTemp 
-                        ? 'bg-orange-50 border-orange-300' 
+                    className={`px-3 py-1.5 rounded-lg text-sm border ${isTemp
+                        ? 'bg-orange-50 border-orange-300'
                         : 'bg-white border-gray-300'
-                    }`}
+                      }`}
                   >
                     <span className="font-medium">{langName}</span>
                     <span className="text-gray-500 ml-2">({language.level})</span>
@@ -226,15 +118,6 @@ export function DynamicLanguageList({languages,availableLanguages,onChange,onAdd
                 );
               })}
           </div>
-        </div>
-      )}
-
-      {/* pendents*/}
-      {pendingChanges && (
-        <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-          <p className="text-sm text-yellow-800">
-            You have unsaved changes. Click "Save Changes" to apply them.
-          </p>
         </div>
       )}
     </div>

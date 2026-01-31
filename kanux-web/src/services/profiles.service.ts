@@ -30,12 +30,20 @@ export interface CreateSkillRequest {
   name: string;
   level?: "beginner" | "intermediate" | "advanced" | "expert";
 }
-
+export interface UpdateSkillRequest {
+  category_id?: string;
+  name?: string;
+  level?: "beginner" | "intermediate" | "advanced" | "expert";
+}
 export interface CreateLanguageRequest {
   language_id: string;
   level: "Básico" | "Intermedio" | "Avanzado";
 }
 
+export interface UpdateLenguageRequest{
+  language_id: string;
+  level: "Básico" | "Intermedio" | "Avanzado";
+}
 // ============================================================================
 // Response DTOs
 // ============================================================================
@@ -81,6 +89,7 @@ export interface Skill {
     name: string;
   };
 }
+
 
 export interface Language {
   id: string;
@@ -140,6 +149,10 @@ export interface DashboardStats {
 // ============================================================================
 
 export const profilesService = {
+   /**
+   * POST /profiles/me
+   * POST user's profile (requires auth)
+   */
   preRegisterProfile: async (
     id_user: string,
     data: TalentProfile,
@@ -216,6 +229,14 @@ export const profilesService = {
     const res = await httpClient.post<Skill>("/profiles/skills/me", data);
     return res.data;
   },
+  /**
+   * PATCH /profiles/skills/me/:id
+   */
+  updateSkill: async (id: string | number, data: UpdateSkillRequest): Promise<Skill> => {
+    // Usamos patch o put según tu backend
+    const res = await httpClient.put<Skill>(`/profiles/skills/me/${id}`, data);
+    return res.data;
+  },
 
   /**
    * DELETE /profiles/skills/me/:id
@@ -245,6 +266,14 @@ export const profilesService = {
    */
   addLanguage: async (data: CreateLanguageRequest): Promise<Language> => {
     const res = await httpClient.post<Language>("/profiles/languages/me", data);
+    return res.data;
+  },
+   /**
+   * PUT /profiles/languages/me/id
+   * Update a language to current user's profile (requires auth)
+   */
+  updateLanguage:async(id:string,data:UpdateLenguageRequest):Promise<Language>=>{
+    const res = await httpClient.post<Language>(`/profiles/languages/me/${id}`, data);
     return res.data;
   },
 
