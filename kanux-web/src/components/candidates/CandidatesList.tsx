@@ -3,7 +3,10 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { Search, Eye, MessageSquare } from "lucide-react";
 import type { CandidateListItem } from "@/services/candidates.service";
-import { candidatesService } from "@/services/candidates.service";
+import {
+  candidatesService,
+  LearningBackground,
+} from "@/services/candidates.service";
 import { Select } from "@/components/ui/select";
 import { useAuth } from "@/context/AuthContext";
 import { CandidateProfileDetails } from "@/components/candidates/CandidateProfileDetails";
@@ -20,8 +23,18 @@ export const MOCK_CANDIDATES: CandidateListItem[] = [
     education: "Self-taught",
     avg_score: 92,
     skills: [
-      { id: "skill-react", name: "React", level: "Advanced", category_id: "frontend" },
-      { id: "skill-ts", name: "TypeScript", level: "Intermediate", category_id: "frontend" },
+      {
+        id: "skill-react",
+        name: "React",
+        level: "Advanced",
+        category_id: "frontend",
+      },
+      {
+        id: "skill-ts",
+        name: "TypeScript",
+        level: "Intermediate",
+        category_id: "frontend",
+      },
     ],
     profile: {
       id: "1",
@@ -46,9 +59,11 @@ export const MOCK_CANDIDATES: CandidateListItem[] = [
 
 /* ---------------- COMPONENT ---------------- */
 
-interface CandidatesProps {  onContact?: (candidateId: string) => void; }
+interface CandidatesProps {
+  onContact?: (candidateId: string) => void;
+}
 
-export const CandidatesList: React.FC<CandidatesProps> = ({onContact }) => {
+export const CandidatesList: React.FC<CandidatesProps> = ({ onContact }) => {
   const { session } = useAuth();
 
   const [isLoading, setIsLoading] = useState(true);
@@ -59,15 +74,20 @@ export const CandidatesList: React.FC<CandidatesProps> = ({onContact }) => {
   const [totalItems, setTotalItems] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
 
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchInput, setSearchInput] = useState("");
+  const [searchTerm, setSearchTerm] = useState<string | undefined>(undefined);
+  const [learningBackgrounds, setLearningBackgrounds] = useState<
+    LearningBackground[]
+  >([]);
+
   const [skillFilter, setSkillFilter] = useState<string>("All Skills");
-  const [backgroundFilter, setBackgroundFilter] = useState<string>("");
+  const [backgroundFilter, setBackgroundFilter] = useState<string | undefined>(
+    undefined,
+  );
 
   const [skillsOptions, setSkillsOptions] = useState<string[]>([]);
   const [selectedCandidate, setSelectedCandidate] =
     useState<CandidateListItem | null>(null);
-
-
 
   useEffect(() => {
     const loadCandidates = async () => {
@@ -84,7 +104,7 @@ export const CandidatesList: React.FC<CandidatesProps> = ({onContact }) => {
         const result = await candidatesService.getCandidates(
           session.token,
           page,
-          pageSize
+          pageSize,
         );
 
         setCandidates(result.candidates);
@@ -103,40 +123,96 @@ export const CandidatesList: React.FC<CandidatesProps> = ({onContact }) => {
     loadCandidates();
   }, [session?.token, page, pageSize]);
 
+  useEffect(() => {
+    const loadSkills = async () => {
+      try {
+        if (!session?.token) {
+          const mockSkills = Array.from(
+            new Set(
+              MOCK_CANDIDATES.flatMap((c) => c.skills.map((s) => s.name)),
+            ),
+          );
+          setSkillsOptions(mockSkills);
+          return;
+        }
 
-  const filteredCandidates = useMemo(() => {
-    let filtered = candidates;
+        const skills = await candidatesService.getSkillFilters();
+        setSkillsOptions(skills);
+      } catch (error) {
+        console.error("Failed to load skill filters", error);
+        setSkillsOptions([]);
+      }
+    };
 
-    if (searchTerm) {
-      filtered = filtered.filter(
-        (c) =>
-          `${c.first_name} ${c.last_name}`
-            .toLowerCase()
-            .includes(searchTerm.toLowerCase()) ||
-          c.skills.some((s) =>
-            s.name.toLowerCase().includes(searchTerm.toLowerCase())
-          )
-      );
-    }
+    loadSkills();
+  }, [session?.token]);
 
-    if (skillFilter !== "All Skills") {
-      filtered = filtered.filter((c) =>
-        c.skills.some((s) => s.name === skillFilter)
-      );
-    }
+  useEffect(() => {
+    const loadCandidates = async () => {
+      setIsLoading(true);
 
-    if (backgroundFilter) {
-      filtered = filtered.filter((c) => c.education === backgroundFilter);
-    }
+      try {
+        if (!session?.token) {
+          setCandidates(MOCK_CANDIDATES);
+          setTotalItems(MOCK_CANDIDATES.length);
+          setTotalPages(1);
+          return;
+        }
 
-    return filtered;
-  }, [candidates, searchTerm, skillFilter, backgroundFilter]);
+        console.log("que envio",backgroundFilter)
+        const result = await candidatesService.getCandidatesFiltered(
+          session.token,
+          {
+            searchText: searchTerm || undefined,
+            skill: skillFilter !== "All Skills" ? skillFilter : undefined,
+            learningBackgroundId: backgroundFilter || undefined,
+          },
+          page,
+          pageSize,
+        );
 
+        setCandidates(result.candidates);
+        setTotalItems(result.pagination.total);
+        setTotalPages(result.pagination.totalPages);
+      } catch (error) {
+        console.error("API failed, using mock candidates", error);
+        setCandidates(MOCK_CANDIDATES);
+        setTotalItems(MOCK_CANDIDATES.length);
+        setTotalPages(1);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  const uniqueBackgrounds = useMemo(
-    () => Array.from(new Set(candidates.map((c) => c.education))).filter(Boolean),
-    [candidates]
-  );
+    loadCandidates();
+  }, [
+    session?.token,
+    page,
+    pageSize,
+    searchTerm,
+    skillFilter,
+    backgroundFilter,
+  ]);
+
+  useEffect(() => {
+    const loadLearningBackgrounds = async () => {
+      try {
+        if (!session?.token) {
+          return;
+        }
+
+        const data = await candidatesService.getLearningBackgrounds(
+          session.token,
+        );
+        setLearningBackgrounds(data);
+      } catch (error) {
+        console.error("Failed to load learning backgrounds", error);
+        setLearningBackgrounds([]);
+      }
+    };
+
+    loadLearningBackgrounds();
+  }, [session?.token]);
 
   const handleViewProfile = useCallback((candidate: CandidateListItem) => {
     setSelectedCandidate(candidate);
@@ -144,7 +220,7 @@ export const CandidatesList: React.FC<CandidatesProps> = ({onContact }) => {
 
   const handleContact = useCallback(
     (id: string) => onContact?.(id),
-    [onContact]
+    [onContact],
   );
 
   const skillSelectOptions = useMemo(
@@ -152,17 +228,19 @@ export const CandidatesList: React.FC<CandidatesProps> = ({onContact }) => {
       { label: "All Skills", value: "All Skills" },
       ...skillsOptions.map((s) => ({ label: s, value: s })),
     ],
-    [skillsOptions]
+    [skillsOptions],
   );
 
   const backgroundSelectOptions = useMemo(
-    () =>
-      uniqueBackgrounds.map((b) => ({
-        label: b!,
-        value: b!,
-      })),
-    [uniqueBackgrounds]
-  );
+  () => [
+    { label: "All", value: "" }, 
+    ...learningBackgrounds.map((b) => ({
+      label: b.name,
+      value: b.id,
+    })),
+  ],
+  [learningBackgrounds],
+);
 
 
   if (isLoading) {
@@ -184,8 +262,14 @@ export const CandidatesList: React.FC<CandidatesProps> = ({onContact }) => {
         <div className="relative">
           <Search className="absolute left-3 top-3 text-slate-400" size={20} />
           <input
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                setSearchTerm(searchInput || undefined);
+                setPage(1);
+              }
+            }}
             placeholder="Search candidates..."
             className="w-full pl-10 pr-4 py-2 border rounded-lg"
           />
@@ -198,8 +282,8 @@ export const CandidatesList: React.FC<CandidatesProps> = ({onContact }) => {
             options={skillSelectOptions}
           />
           <Select
-            value={backgroundFilter}
-            onChange={setBackgroundFilter}
+            value={backgroundFilter ?? ""}
+            onChange={(value) => setBackgroundFilter(value || undefined)}
             options={backgroundSelectOptions}
             placeholder="Education"
           />
@@ -219,8 +303,8 @@ export const CandidatesList: React.FC<CandidatesProps> = ({onContact }) => {
           </thead>
 
           <tbody className="divide-y">
-            {filteredCandidates.length ? (
-              filteredCandidates.map((c) => (
+            {candidates.length ? (
+              candidates.map((c) => (
                 <tr key={c.talent_id} className="hover:bg-slate-50">
                   <td className="px-6 py-4 font-medium">
                     {c.first_name} {c.last_name}
@@ -275,7 +359,6 @@ export const CandidatesList: React.FC<CandidatesProps> = ({onContact }) => {
             }
           }}
         />
-        
       </div>
 
       {selectedCandidate && (
