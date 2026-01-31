@@ -22,6 +22,7 @@ export interface UpdateTalentProfileRequest {
   contact?: Record<string, unknown>;
   learning_background_id?: string;
   opportunity_status_id?: string;
+  image_profile?: File;
 }
 
 export interface CreateSkillRequest {
@@ -29,12 +30,20 @@ export interface CreateSkillRequest {
   name: string;
   level?: "beginner" | "intermediate" | "advanced" | "expert";
 }
-
+export interface UpdateSkillRequest {
+  category_id?: string;
+  name?: string;
+  level?: "beginner" | "intermediate" | "advanced" | "expert";
+}
 export interface CreateLanguageRequest {
   language_id: string;
   level: "Básico" | "Intermedio" | "Avanzado";
 }
 
+export interface UpdateLenguageRequest{
+  language_id: string;
+  level: "Básico" | "Intermedio" | "Avanzado";
+}
 // ============================================================================
 // Response DTOs
 // ============================================================================
@@ -51,6 +60,7 @@ export interface TalentPreregisterResponse {
 export interface TalentProfile {
   id: string;
   user_id: string;
+  image_url?: string;
   first_name?: string;
   last_name?: string;
   title?: string;
@@ -79,6 +89,7 @@ export interface Skill {
     name: string;
   };
 }
+
 
 export interface Language {
   id: string;
@@ -138,6 +149,10 @@ export interface DashboardStats {
 // ============================================================================
 
 export const profilesService = {
+   /**
+   * POST /profiles/me
+   * POST user's profile (requires auth)
+   */
   preRegisterProfile: async (
     id_user: string,
     data: TalentProfile,
@@ -173,7 +188,27 @@ export const profilesService = {
   updateMyProfile: async (
     data: UpdateTalentProfileRequest,
   ): Promise<TalentProfile> => {
-    const res = await httpClient.put<TalentProfile>("/profiles/me", data);
+    const formData = new FormData();
+
+    if (data.first_name) formData.append("first_name", data.first_name);
+    if (data.last_name) formData.append("last_name", data.last_name);
+    if (data.title) formData.append("title", data.title);
+    if (data.location) formData.append("location", data.location);
+    if (data.experience_level) formData.append("experience_level", data.experience_level);
+    if (data.education) formData.append("education", data.education);
+    if (data.about) formData.append("about", data.about);
+    if (data.learning_background_id) {formData.append("learning_background_id", data.learning_background_id);}
+    if (data.opportunity_status_id) {formData.append("opportunity_status_id", data.opportunity_status_id);}
+    if (data.contact) {formData.append("contact", JSON.stringify(data.contact)); }
+    if (data.image_profile) { formData.append("image_profile", data.image_profile);}
+
+    const res = await httpClient.put<TalentProfile>("/profiles/me", data,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      },
+    );
     return res.data;
   },
 
@@ -192,6 +227,14 @@ export const profilesService = {
    */
   addSkill: async (data: CreateSkillRequest): Promise<Skill> => {
     const res = await httpClient.post<Skill>("/profiles/skills/me", data);
+    return res.data;
+  },
+  /**
+   * PATCH /profiles/skills/me/:id
+   */
+  updateSkill: async (id: string | number, data: UpdateSkillRequest): Promise<Skill> => {
+    // Usamos patch o put según tu backend
+    const res = await httpClient.put<Skill>(`/profiles/skills/me/${id}`, data);
     return res.data;
   },
 
@@ -223,6 +266,14 @@ export const profilesService = {
    */
   addLanguage: async (data: CreateLanguageRequest): Promise<Language> => {
     const res = await httpClient.post<Language>("/profiles/languages/me", data);
+    return res.data;
+  },
+   /**
+   * PUT /profiles/languages/me/id
+   * Update a language to current user's profile (requires auth)
+   */
+  updateLanguage:async(id:string,data:UpdateLenguageRequest):Promise<Language>=>{
+    const res = await httpClient.post<Language>(`/profiles/languages/me/${id}`, data);
     return res.data;
   },
 

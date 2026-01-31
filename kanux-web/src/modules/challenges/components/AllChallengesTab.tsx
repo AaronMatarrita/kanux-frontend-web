@@ -37,7 +37,7 @@ export function AllChallengesTab({
   if (loading) {
     return (
       <div className="flex justify-center py-12">
-        <LoadingSpinner size="lg" message="Cargando challenges..." />
+        <LoadingSpinner size="lg" message="Cargando desafíos..." />
       </div>
     );
   }
@@ -51,10 +51,10 @@ export function AllChallengesTab({
       <div className="rounded-lg border border-slate-200 bg-slate-50 p-12 text-center">
         <FileText className="mx-auto h-12 w-12 text-slate-400" />
         <h3 className="mt-2 text-sm font-medium text-slate-900">
-          There are no challenges available.
+          No hay desafíos disponibles.
         </h3>
         <p className="mt-1 text-sm text-slate-500">
-          Come back later to see new challenges.
+          Vuelve más tarde para ver nuevos desafíos.
         </p>
       </div>
     );

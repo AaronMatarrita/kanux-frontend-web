@@ -110,7 +110,7 @@ export function CreateAboutTalent() {
 
     // confirmation modal
     if (success) {
-        return <SuccessModal redirectPath="/talent/dashboard" />;
+        return <SuccessModal redirectPath="/auth/login" />;
     }
 
     return (

@@ -1,0 +1,18 @@
+import { Skill } from "@/services/profiles.service";
+import { SkillBadge } from "./SkillBadge";
+
+export function SkillsSection({ title, skills }: { 
+  title: string; 
+  skills: Skill[] 
+}) {
+  return (
+    <div className="space-y-3">
+      <h3 className="text-base font-semibold text-gray-900">{title}</h3>
+      <div className="flex flex-wrap gap-2">
+        {skills.map((skill) => (
+          <SkillBadge key={skill.id} skill={`${skill.name} (${skill.level})`} />
+        ))}
+      </div>
+    </div>
+  );
+}

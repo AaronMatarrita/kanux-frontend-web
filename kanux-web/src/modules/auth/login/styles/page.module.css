@@ -1,0 +1,190 @@
+.landingContainer {
+    font-family: system-ui, sans-serif;
+}
+
+.logoContainer {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logoIcon {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+
+    background: white;
+    border-radius: 8px;
+    padding: 6px;
+}
+
+.logoText {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: white;
+    letter-spacing: 0.5px;
+}
+
+.heroSection {
+    min-height: 85vh;
+    padding: 0 24px;
+    display: flex;
+    flex-direction: column;
+    color: white;
+}
+
+.header {
+    width: 100%;
+}
+
+.headerInner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 32px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.nav a {
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.ctaButton {
+    background: #2eaa50;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+.heroInner {
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+
+.heroContent {
+    max-width: 720px;
+}
+
+.heroTitle {
+    font-size: 3.2rem;
+    font-weight: 800;
+}
+
+.heroSubtitle {
+    font-size: 2.2rem;
+    color: #2eaa50;
+}
+
+.heroDescription {
+    font-size: 1.3rem;
+    max-width: 600px;
+    opacity: 0.9;
+}
+
+.heroButtons {
+    margin-top: 32px;
+    display: flex;
+    gap: 16px;
+}
+
+.primaryButton {
+    background: #2eaa50;
+    padding: 14px 28px;
+    border-radius: 8px;
+    color: white;
+    font-weight: 600;
+}
+
+.secondaryButton {
+    border: 2px solid white;
+    padding: 14px 28px;
+    border-radius: 8px;
+    color: white;
+}
+
+.section {
+    padding: 96px 24px;
+}
+
+.sectionContent {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.darkSection {
+    background: #f8f9fa;
+}
+
+.workflowContainer {
+    display: grid;
+    grid-template-columns: 1fr 1px 1fr;
+    gap: 48px;
+    align-items: start;
+}
+
+.workflowDivider {
+    background: linear-gradient(to bottom, transparent, #2eaa50, transparent);
+}
+
+.workflowColumn {
+    background: white;
+    padding: 48px;
+    border-radius: 16px;
+}
+
+.workflowButton {
+    display: block;
+    margin-top: 24px;
+    background: #2eaa50;
+    color: white;
+    text-align: center;
+    padding: 14px;
+    border-radius: 8px;
+}
+
+.footer {
+    background: #284b8c;
+    color: white;
+    padding: 64px 24px;
+}
+
+.footerContent {
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.footerActions {
+    margin-top: 24px;
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+}
+@media (max-width: 768px) {
+    .nav {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .heroTitle {
+        font-size: 2.4rem;
+    }
+
+    .workflowContainer {
+        grid-template-columns: 1fr;
+    }
+
+    .workflowDivider {
+        display: none;
+    }
+}

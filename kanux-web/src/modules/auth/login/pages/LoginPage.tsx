@@ -130,15 +130,14 @@ export const LoginPage: React.FC = () => {
 
         <div className={styles.brandingContent}>
           <h1 className={styles.brandingTitle}>
-            Build skills.
+            Desarrolla habilidades.
             <br />
-            Discover talent. Grow
+            Descubre talento. Crecemos
             <br />
-            together.
+            juntos.
           </h1>
           <p className={styles.brandingDescription}>
-            Kánux connects professionals and companies through real challenges
-            and verified skills.
+            Kánux conecta a profesionales y empresas a través de retos reales y habilidades verificadas.
           </p>
         </div>
 
