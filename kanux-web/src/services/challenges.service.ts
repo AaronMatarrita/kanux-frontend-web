@@ -6,6 +6,7 @@
  */
 
 import { httpClient } from "@/services/http";
+import { CreateSoftChallengeDto } from "@/modules/challenges/types/challenge";
 
 // ============================================================================
 // Request DTOs
@@ -405,6 +406,117 @@ export const challengesService = {
     const res = await httpClient.get<PublicTechnicalChallengeDetailResponse>(
       `/challenges/technical-challenges/public/${challengeId}`,
     );
+    return res.data;
+  },
+
+  /**
+   * POST /challenges/company/:id_company
+   * Create non-technical (soft) challenge
+   */
+  createSoftChallenge: async (
+    companyId: string,
+    payload: CreateSoftChallengeDto,
+  ) => {
+    const res = await httpClient.post(
+      `/challenges/company/${companyId}`,
+      payload,
+    );
+    return res.data;
+  },
+
+  /**
+   * PATCH /challenges/:challengeId
+   */
+  updateChallengeBase: async (
+    challengeId: string,
+    data: Partial<{
+      title: string;
+      description: string;
+      difficulty: string;
+      duration_minutes: number;
+    }>,
+    companyId?: string,
+  ) => {
+    const url = companyId
+      ? `/challenges/${challengeId}/company/${companyId}`
+      : `/challenges/${challengeId}`;
+    const res = await httpClient.patch(url, data);
+    return res.data;
+  },
+
+  /**
+   * PATCH /challenges/:nonTechnicalChallengeId/non-technical/details
+   */
+  updateNonTechnicalDetails: async (
+    nonTechnicalChallengeId: string,
+    data: { instructions: string },
+    companyId?: string,
+  ) => {
+    const url = companyId
+      ? `/challenges/${nonTechnicalChallengeId}/company/${companyId}/non-technical/details`
+      : `/challenges/${nonTechnicalChallengeId}/non-technical/details`;
+    const res = await httpClient.patch(url, data);
+    return res.data;
+  },
+
+  /**
+   * PATCH /challenges/questions/:questionId
+   */
+  updateNonTechnicalQuestion: async (
+    questionId: string,
+    data: { question: string; question_type: string },
+    companyId?: string,
+  ) => {
+    const url = companyId
+      ? `/challenges/questions/${questionId}/company/${companyId}`
+      : `/challenges/questions/${questionId}`;
+    const res = await httpClient.patch(url, data);
+    return res.data;
+  },
+
+  /**
+   * POST /challenges/:challengeId/non-technical/:nonTechnicalChallengeId/questions
+   */
+  createNonTechnicalQuestion: async (
+    challengeId: string,
+    nonTechnicalChallengeId: string,
+    data: { question: string; question_type: string },
+    companyId?: string,
+  ) => {
+    const url = companyId
+      ? `/challenges/${challengeId}/company/${companyId}/non-technical/${nonTechnicalChallengeId}/questions`
+      : `/challenges/${challengeId}/non-technical/${nonTechnicalChallengeId}/questions`;
+    const res = await httpClient.post(url, data);
+    return res.data;
+  },
+
+  /**
+   * PATCH /challenges/options/:optionId
+   */
+  updateNonTechnicalOption: async (
+    optionId: string,
+    data: { option_text: string; is_correct: boolean },
+    companyId?: string,
+  ) => {
+    const url = companyId
+      ? `/challenges/options/${optionId}/company/${companyId}`
+      : `/challenges/options/${optionId}`;
+    const res = await httpClient.patch(url, data);
+    return res.data;
+  },
+
+  /**
+   * POST /challenges/questions/:questionId/options
+   */
+  createNonTechnicalOption: async (
+    questionId: string,
+    data: { option_text: string; is_correct: boolean },
+    companyId?: string,
+  ) => {
+    const url = companyId
+      ? `/challenges/questions/${questionId}/company/${companyId}/options`
+      : `/challenges/questions/${questionId}/options`;
+    const res = await httpClient.post(url, data);
     return res.data;
   },
 };

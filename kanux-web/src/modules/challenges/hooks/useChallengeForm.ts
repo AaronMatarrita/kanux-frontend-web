@@ -1,0 +1,343 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import type { CreateSoftChallengeDto } from "../types/challenge";
+import { challengesService } from "@/services/challenges.service";
+
+const VALIDATION_MESSAGES = {
+  TITLE_REQUIRED: "El título es obligatorio",
+  DESCRIPTION_REQUIRED: "La descripción es obligatoria",
+  INSTRUCTIONS_REQUIRED: "Las instrucciones son obligatorias",
+  DURATION_INVALID: "La duración debe ser mayor a 0",
+  QUESTION_EMPTY: (n: number) => `La pregunta ${n} no puede estar vacía`,
+  QUESTION_OPTION_EMPTY: (n: number) =>
+    `La pregunta ${n} tiene opciones vacías`,
+  QUESTION_NO_CORRECT: (n: number) =>
+    `La pregunta ${n} debe tener al menos una opción correcta`,
+};
+
+export type QuestionFormData = {
+  id: string;
+  question: string;
+  question_type: "Unica" | "Multiple";
+  options: {
+    id: string;
+    option_text: string;
+    is_correct: boolean;
+  }[];
+};
+
+const createInitialQuestion = (): QuestionFormData => ({
+  id: crypto.randomUUID(),
+  question: "",
+  question_type: "Unica",
+  options: [
+    { id: crypto.randomUUID(), option_text: "", is_correct: false },
+    { id: crypto.randomUUID(), option_text: "", is_correct: false },
+  ],
+});
+
+export function useCreateSoftChallenge(companyId: string, initialData?: any) {
+  const router = useRouter();
+
+  const [title, setTitle] = useState(initialData?.title || "");
+  const [description, setDescription] = useState(
+    initialData?.description || "",
+  );
+  const [difficulty, setDifficulty] = useState<
+    "Básico" | "Intermedio" | "Avanzado"
+  >(initialData?.difficulty || "Básico");
+  const [durationMinutes, setDurationMinutes] = useState(
+    initialData?.duration_minutes || 30,
+  );
+  const [instructions, setInstructions] = useState(
+    initialData?.details?.instructions || "",
+  );
+  // Mapeo para mantener IDs reales del backend y distinguir entre nuevas y existentes
+  const [questions, setQuestions] = useState<QuestionFormData[]>(
+    initialData?.details?.questions
+      ? initialData.details.questions.map((q: any) => ({
+          id: q.id || crypto.randomUUID(),
+          question: q.question,
+          question_type: q.question_type,
+          options: q.options.map((o: any) => ({
+            id: o.id || crypto.randomUUID(),
+            option_text: o.option_text,
+            is_correct: o.is_correct,
+          })),
+        }))
+      : [createInitialQuestion()],
+  );
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  /* -------------------- helpers -------------------- */
+
+  const addQuestion = () =>
+    setQuestions((q) => [...q, createInitialQuestion()]);
+
+  const removeQuestion = (questionId: string) =>
+    setQuestions((q) =>
+      q.length > 1 ? q.filter((x) => x.id !== questionId) : q,
+    );
+
+  const updateQuestion = (
+    questionId: string,
+    field: keyof QuestionFormData,
+    value: string,
+  ) =>
+    setQuestions((q) =>
+      q.map((x) => (x.id === questionId ? { ...x, [field]: value } : x)),
+    );
+
+  const addOption = (questionId: string) =>
+    setQuestions((q) =>
+      q.map((x) =>
+        x.id === questionId
+          ? {
+              ...x,
+              options: [
+                ...x.options,
+                {
+                  id: crypto.randomUUID(),
+                  option_text: "",
+                  is_correct: false,
+                },
+              ],
+            }
+          : x,
+      ),
+    );
+
+  const removeOption = (questionId: string, optionId: string) =>
+    setQuestions((q) =>
+      q.map((x) =>
+        x.id === questionId && x.options.length > 2
+          ? {
+              ...x,
+              options: x.options.filter((o) => o.id !== optionId),
+            }
+          : x,
+      ),
+    );
+
+  const updateOption = (
+    questionId: string,
+    optionId: string,
+    field: "option_text" | "is_correct",
+    value: string | boolean,
+  ) =>
+    setQuestions((q) =>
+      q.map((x) =>
+        x.id === questionId
+          ? {
+              ...x,
+              options: x.options.map((o) =>
+                o.id === optionId ? { ...o, [field]: value } : o,
+              ),
+            }
+          : x,
+      ),
+    );
+
+  /* -------------------- validation -------------------- */
+
+  const validate = (): string | null => {
+    if (!title.trim()) return VALIDATION_MESSAGES.TITLE_REQUIRED;
+    if (!description.trim()) return VALIDATION_MESSAGES.DESCRIPTION_REQUIRED;
+    if (!instructions.trim()) return VALIDATION_MESSAGES.INSTRUCTIONS_REQUIRED;
+    if (durationMinutes < 1) return VALIDATION_MESSAGES.DURATION_INVALID;
+
+    for (let i = 0; i < questions.length; i++) {
+      const q = questions[i];
+
+      if (!q.question.trim()) return VALIDATION_MESSAGES.QUESTION_EMPTY(i + 1);
+
+      if (q.options.some((o) => !o.option_text.trim()))
+        return VALIDATION_MESSAGES.QUESTION_OPTION_EMPTY(i + 1);
+
+      if (!q.options.some((o) => o.is_correct))
+        return VALIDATION_MESSAGES.QUESTION_NO_CORRECT(i + 1);
+    }
+
+    return null;
+  };
+
+  /* -------------------- submit -------------------- */
+
+  const submit = async (isEdit = false, onSuccess?: () => void) => {
+    if (isSubmitting) return;
+
+    const validationError = validate();
+    if (validationError) {
+      toast.error(validationError);
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    const payload: CreateSoftChallengeDto = {
+      title,
+      description,
+      challenge_type: "No Técnico",
+      difficulty,
+      duration_minutes: durationMinutes,
+      details: {
+        instructions,
+        questions: questions.map((q) => ({
+          question: q.question,
+          question_type: q.question_type,
+          options: q.options.map((o) => ({
+            option_text: o.option_text,
+            is_correct: o.is_correct,
+          })),
+        })),
+      },
+    };
+
+    try {
+      if (isEdit && initialData?.id) {
+        await challengesService.updateChallengeBase(
+          initialData.id,
+          {
+            title,
+            description,
+            difficulty,
+            duration_minutes: durationMinutes,
+          },
+          companyId,
+        );
+
+        await challengesService.updateNonTechnicalDetails(
+          initialData.id,
+          { instructions },
+          companyId,
+        );
+
+        const originalQuestions = (initialData.details?.questions || []).map(
+          (q: any) => ({
+            ...q,
+            options: q.options || [],
+          }),
+        );
+
+        const originalQuestionsMap = new Map(
+          originalQuestions.map((q: any) => [q.id, q]),
+        );
+        const currentQuestionsMap = new Map(questions.map((q) => [q.id, q]));
+
+        for (const q of questions) {
+          if (originalQuestionsMap.has(q.id)) {
+            const orig = originalQuestionsMap.get(q.id) as any;
+            if (
+              orig &&
+              (q.question !== orig.question ||
+                q.question_type !== orig.question_type)
+            ) {
+              await challengesService.updateNonTechnicalQuestion(
+                q.id,
+                {
+                  question: q.question,
+                  question_type: q.question_type,
+                },
+                companyId,
+              );
+            }
+          } else {
+            const created = await challengesService.createNonTechnicalQuestion(
+              initialData.id,
+              initialData.nonTechnicalChallengeId,
+              {
+                question: q.question,
+                question_type: q.question_type,
+              },
+              companyId,
+            );
+            q.id = created.id;
+          }
+
+          const origQ = (originalQuestionsMap.get(q.id) as any) || {
+            options: [],
+          };
+          const origOptionsMap = new Map(
+            (origQ && origQ.options ? origQ.options : []).map((o: any) => [
+              o.id,
+              o,
+            ]),
+          );
+          for (const o of q.options) {
+            if (origOptionsMap.has(o.id)) {
+              const origO = origOptionsMap.get(o.id) as any;
+              if (
+                origO &&
+                (o.option_text !== origO.option_text ||
+                  o.is_correct !== origO.is_correct)
+              ) {
+                await challengesService.updateNonTechnicalOption(
+                  o.id,
+                  {
+                    option_text: o.option_text,
+                    is_correct: o.is_correct,
+                  },
+                  companyId,
+                );
+              }
+            } else {
+              await challengesService.createNonTechnicalOption(
+                q.id,
+                {
+                  option_text: o.option_text,
+                  is_correct: o.is_correct,
+                },
+                companyId,
+              );
+            }
+          }
+        }
+
+        toast.success("Challenge actualizado correctamente");
+        if (onSuccess) onSuccess();
+      } else {
+        await challengesService.createSoftChallenge(companyId, payload);
+        toast.success("Soft challenge creado correctamente");
+        router.push("/company/challenges");
+      }
+    } catch (err: any) {
+      console.error(err);
+      const message =
+        err?.response?.data?.message ??
+        (isEdit ? "Error al actualizar challenge" : "Error al crear challenge");
+      toast.error(message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return {
+    /* state */
+    title,
+    description,
+    difficulty,
+    durationMinutes,
+    instructions,
+    questions,
+    isSubmitting,
+
+    /* setters */
+    setTitle,
+    setDescription,
+    setDifficulty,
+    setDurationMinutes,
+    setInstructions,
+
+    /* actions */
+    addQuestion,
+    removeQuestion,
+    updateQuestion,
+    addOption,
+    removeOption,
+    updateOption,
+    submit,
+  };
+}

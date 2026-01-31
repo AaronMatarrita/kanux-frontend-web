@@ -11,7 +11,7 @@ export default function Page() {
   };
 
   const handleCreateChallenge = () => {
-    router.push("/company/challenges/create");
+    router.push("/company/challenges/create-soft");
   };
 
   return (
