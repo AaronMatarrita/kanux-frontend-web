@@ -43,14 +43,15 @@ export function useCreateSoftChallenge(companyId: string, initialData?: any) {
   const [instructions, setInstructions] = useState(
     initialData?.details?.instructions || "",
   );
+  // Mapeo para mantener IDs reales del backend y distinguir entre nuevas y existentes
   const [questions, setQuestions] = useState<QuestionFormData[]>(
     initialData?.details?.questions
       ? initialData.details.questions.map((q: any) => ({
-          id: crypto.randomUUID(),
+          id: q.id || crypto.randomUUID(),
           question: q.question,
           question_type: q.question_type,
           options: q.options.map((o: any) => ({
-            id: crypto.randomUUID(),
+            id: o.id || crypto.randomUUID(),
             option_text: o.option_text,
             is_correct: o.is_correct,
           })),
@@ -190,6 +191,94 @@ export function useCreateSoftChallenge(companyId: string, initialData?: any) {
           },
           companyId,
         );
+
+        await challengesService.updateNonTechnicalDetails(
+          initialData.id,
+          { instructions },
+          companyId,
+        );
+
+        const originalQuestions = (initialData.details?.questions || []).map(
+          (q: any) => ({
+            ...q,
+            options: q.options || [],
+          }),
+        );
+
+        const originalQuestionsMap = new Map(
+          originalQuestions.map((q: any) => [q.id, q]),
+        );
+        const currentQuestionsMap = new Map(questions.map((q) => [q.id, q]));
+
+        for (const q of questions) {
+          if (originalQuestionsMap.has(q.id)) {
+            const orig = originalQuestionsMap.get(q.id) as any;
+            if (
+              orig &&
+              (q.question !== orig.question ||
+                q.question_type !== orig.question_type)
+            ) {
+              await challengesService.updateNonTechnicalQuestion(
+                q.id,
+                {
+                  question: q.question,
+                  question_type: q.question_type,
+                },
+                companyId,
+              );
+            }
+          } else {
+            const created = await challengesService.createNonTechnicalQuestion(
+              initialData.id,
+              initialData.nonTechnicalChallengeId,
+              {
+                question: q.question,
+                question_type: q.question_type,
+              },
+              companyId,
+            );
+            q.id = created.id;
+          }
+
+          const origQ = (originalQuestionsMap.get(q.id) as any) || {
+            options: [],
+          };
+          const origOptionsMap = new Map(
+            (origQ && origQ.options ? origQ.options : []).map((o: any) => [
+              o.id,
+              o,
+            ]),
+          );
+          for (const o of q.options) {
+            if (origOptionsMap.has(o.id)) {
+              const origO = origOptionsMap.get(o.id) as any;
+              if (
+                origO &&
+                (o.option_text !== origO.option_text ||
+                  o.is_correct !== origO.is_correct)
+              ) {
+                await challengesService.updateNonTechnicalOption(
+                  o.id,
+                  {
+                    option_text: o.option_text,
+                    is_correct: o.is_correct,
+                  },
+                  companyId,
+                );
+              }
+            } else {
+              await challengesService.createNonTechnicalOption(
+                q.id,
+                {
+                  option_text: o.option_text,
+                  is_correct: o.is_correct,
+                },
+                companyId,
+              );
+            }
+          }
+        }
+
         toast.success("Challenge actualizado correctamente");
         if (onSuccess) onSuccess();
       } else {
