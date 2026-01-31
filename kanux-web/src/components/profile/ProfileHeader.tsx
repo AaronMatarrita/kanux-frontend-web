@@ -1,9 +1,8 @@
 import { Avatar } from "./Avatar";
-import { ContactInfo } from "./ContactInfo";
-import { Button } from "./Button";
 import { Contact } from "lucide-react";
+import { ProfileProgressBar } from "./ProfileProgressCompletness";
 
-export function ProfileHeader({ name, title, email, location, contact, avatar, children }: {
+export function ProfileHeader({ name, title, email, location, contact, avatar, children,progress }: {
   name: string;
   title: string;
   email: string;
@@ -11,6 +10,7 @@ export function ProfileHeader({ name, title, email, location, contact, avatar, c
   contact: Record<string, unknown>|undefined;
   avatar: string;
   children?: React.ReactNode;
+  progress:number;
 }) {
   return (
     <div className="flex flex-wrap items-start gap-4">
@@ -31,6 +31,7 @@ export function ProfileHeader({ name, title, email, location, contact, avatar, c
         ))}
 
       </div>
+      <ProfileProgressBar percentage={progress}/>
       {children}
     </div>
   );

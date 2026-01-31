@@ -30,7 +30,11 @@ export interface CreateSkillRequest {
   name: string;
   level?: "beginner" | "intermediate" | "advanced" | "expert";
 }
-
+export interface UpdateSkillRequest {
+  category_id?: string;
+  name?: string;
+  level?: "beginner" | "intermediate" | "advanced" | "expert";
+}
 export interface CreateLanguageRequest {
   language_id: string;
   level: "Básico" | "Intermedio" | "Avanzado";
@@ -85,6 +89,7 @@ export interface Skill {
     name: string;
   };
 }
+
 
 export interface Language {
   id: string;
@@ -222,6 +227,14 @@ export const profilesService = {
    */
   addSkill: async (data: CreateSkillRequest): Promise<Skill> => {
     const res = await httpClient.post<Skill>("/profiles/skills/me", data);
+    return res.data;
+  },
+  /**
+   * PATCH /profiles/skills/me/:id
+   */
+  updateSkill: async (id: string | number, data: UpdateSkillRequest): Promise<Skill> => {
+    // Usamos patch o put según tu backend
+    const res = await httpClient.put<Skill>(`/profiles/skills/me/${id}`, data);
     return res.data;
   },
 

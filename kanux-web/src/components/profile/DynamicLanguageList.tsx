@@ -1,7 +1,6 @@
 import { Plus, Trash2, Save } from "lucide-react";
 import { Select } from "./Select";
-import { Language, CreateLanguageRequest } from "@/services/profiles.service";
-import React, { useEffect, useState } from "react";
+import { Language } from "@/services/profiles.service";
 
 const LANGUAGE_LEVELS = [
   { id: "Básico", label: "Básico" },

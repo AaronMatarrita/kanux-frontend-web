@@ -147,7 +147,7 @@ export function ProfilePage() {
       setOpenModal("none");
       toast.success("The basic information has been updated")
     } catch (error) {
-      toast.error("The profile could not be updated.")
+      toast.error("The basic information could not be updated.")
     }
   };
 
@@ -175,6 +175,16 @@ export function ProfilePage() {
             level: sk.level
           })
         ),
+        ...toUpdate.map((sk:Skill)=>
+          profilesService.updateSkill(
+            sk.id,
+            {
+              category_id:sk.id_category,
+              name: sk.name,
+              level:sk.level
+            }
+          )
+        ),
         ...toDelete.map((sk: Skill) =>
           profilesService.deleteSkill(sk.id)
         )
@@ -182,7 +192,7 @@ export function ProfilePage() {
       const resprofile: TalentProfile = await profilesService.getMyProfile();
       setProfile(resprofile);
       setOpenModal("none");
-      toast.success("The skills section been updated");
+      toast.success("The skills has been updated");
     } catch (error) {
       toast.error("The Skills could not be updated.")
     }
@@ -328,6 +338,7 @@ export function ProfilePage() {
                     location={`${profile?.location}`}
                     contact={profile?.contact}
                     avatar={`${profile?.image_url}`}
+                    progress={profile?.profile_completeness??0}
                   />
                 </CardContent>
               </Card>
