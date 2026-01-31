@@ -1,15 +1,9 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import {
-  Plus,
-  Filter,
-  Search,
-  Users,
-  Calendar,
-  ChevronRight,
-} from "lucide-react";
+import { Plus, Search, Eye, Pencil, BarChart } from "lucide-react";
+
 import { challengesService } from "@/services/challenges.service";
 import { useAuth } from "@/context/AuthContext";
 import { Pagination } from "@/components/ui/pagination";
@@ -18,6 +12,12 @@ import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ErrorAlert } from "@/components/ui/error-alert";
 import { Select } from "@/components/ui/select";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 type Difficulty = "beginner" | "intermediate" | "advanced";
 type DifficultyFilter = Difficulty | "all";
@@ -44,20 +44,20 @@ const DIFFICULTY_LABELS: Record<Difficulty, string> = {
   advanced: "Avanzado",
 };
 
+const DIFFICULTY_COLORS: Record<Difficulty, string> = {
+  beginner: "bg-emerald-100 text-emerald-700",
+  intermediate: "bg-blue-100 text-blue-700",
+  advanced: "bg-purple-100 text-purple-700",
+};
+
 const DIFFICULTY_OPTIONS = [
   { label: "Todas las dificultades", value: "all" },
   { label: "Principiante", value: "beginner" },
   { label: "Intermedio", value: "intermediate" },
   { label: "Avanzado", value: "advanced" },
-] as const;
+];
 
-const DIFFICULTY_COLORS: Record<Difficulty, string> = {
-  beginner: "bg-emerald-100 text-emerald-700 border-emerald-200",
-  intermediate: "bg-blue-100 text-blue-700 border-blue-200",
-  advanced: "bg-purple-100 text-purple-700 border-purple-200",
-};
-
-const normalizeDifficulty = (difficulty: string) => {
+const normalizeDifficulty = (difficulty: string): Difficulty => {
   const d = difficulty?.toLowerCase();
   if (["beginner", "principiante", "básico", "basico"].includes(d))
     return "beginner";
@@ -66,7 +66,7 @@ const normalizeDifficulty = (difficulty: string) => {
   return "beginner";
 };
 
-const mapApiChallengeToCompanyChallenge = (ch: any): CompanyChallenge => ({
+const mapApiChallenge = (ch: any): CompanyChallenge => ({
   id: ch.id,
   title: ch.title,
   type: ch.challenge_type?.toLowerCase().includes("técnico")
@@ -74,7 +74,7 @@ const mapApiChallengeToCompanyChallenge = (ch: any): CompanyChallenge => ({
     : "soft_skill",
   difficulty: normalizeDifficulty(ch.difficulty),
   status: "active",
-  created_at: typeof ch.created_at === "string" ? ch.created_at : "",
+  created_at: ch.created_at ?? "",
   submissions_count:
     ch.metrics?.total_submissions ??
     (Array.isArray(ch.challenge_submissions)
@@ -82,37 +82,12 @@ const mapApiChallengeToCompanyChallenge = (ch: any): CompanyChallenge => ({
       : 0),
 });
 
-const fetchChallengesByCompany = async (
-  companyId: string,
-  page: number,
-  limit: number,
-): Promise<{
-  challenges: CompanyChallenge[];
-  total: number;
-  lastPage: number;
-}> => {
-  const res = await challengesService.getChallengesByCompany(
-    companyId,
-    page,
-    limit,
-  );
-  return {
-    challenges: Array.isArray(res.data)
-      ? res.data.map(mapApiChallengeToCompanyChallenge)
-      : [],
-    total: res.meta?.total ?? 0,
-    lastPage: res.meta?.lastPage ?? 1,
-  };
-};
-
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString);
-  return date.toLocaleDateString("es-ES", {
+const formatDate = (date: string) =>
+  new Date(date).toLocaleDateString("es-ES", {
     year: "numeric",
     month: "short",
     day: "numeric",
   });
-};
 
 export const CompanyChallengesList: React.FC<CompanyChallengesListProps> = ({
   onViewDetails,
@@ -120,248 +95,248 @@ export const CompanyChallengesList: React.FC<CompanyChallengesListProps> = ({
 }) => {
   const router = useRouter();
   const { session } = useAuth();
+
   const companyId =
     session?.user.userType === "company" ? session.user.profile.id : undefined;
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [difficultyFilter, setDifficultyFilter] =
-    useState<DifficultyFilter>("all");
-  const [challenges, setChallenges] = useState<CompanyChallenge[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalChallenges, setTotalChallenges] = useState(0);
+
   const PAGE_SIZE = 10;
 
-  const loadChallenges = async (page = 1) => {
-    if (!companyId) return;
-    try {
-      setIsLoading(true);
-      setError(null);
-      const { challenges, total, lastPage } = await fetchChallengesByCompany(
-        companyId,
-        page,
-        PAGE_SIZE,
-      );
-      setChallenges(challenges);
-      setTotalChallenges(total);
-      setTotalPages(lastPage);
-    } catch (e) {
-      console.error(e);
-      setError(
-        "Error al cargar los challenges. Por favor, intenta nuevamente.",
-      );
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const [challenges, setChallenges] = useState<CompanyChallenge[]>([]);
+  const [searchInput, setSearchInput] = useState("");
+  const [searchTerm, setSearchTerm] = useState<string | undefined>(undefined);
+  const [difficultyFilter, setDifficultyFilter] =
+    useState<DifficultyFilter>("all");
+
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+
+  const loadChallenges = useCallback(
+    async (pageNumber = 1) => {
+      if (!companyId) return;
+
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        const res = await challengesService.getChallengesByCompany(
+          companyId,
+          pageNumber,
+          PAGE_SIZE,
+        );
+
+        const data = Array.isArray(res.data)
+          ? res.data.map(mapApiChallenge)
+          : [];
+
+        setChallenges(data);
+        setTotalItems(data.length ? (res.meta?.total ?? data.length) : 0);
+        setTotalPages(res.meta?.lastPage ?? 1);
+      } catch (err) {
+        console.error(err);
+        setError("Error al cargar los challenges.");
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [companyId],
+  );
 
   useEffect(() => {
-    setCurrentPage(1);
+    setPage(1);
     loadChallenges(1);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [companyId]);
+  }, [companyId, loadChallenges]);
 
   useEffect(() => {
-    loadChallenges(currentPage);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage]);
+    loadChallenges(page);
+  }, [page, loadChallenges]);
 
   const filteredChallenges = useMemo(() => {
-    return challenges.filter((challenge) => {
-      const matchesSearch = challenge.title
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase());
+    return challenges.filter((ch) => {
+      const matchesSearch = searchTerm
+        ? ch.title.toLowerCase().includes(searchTerm.toLowerCase())
+        : true;
+
       const matchesDifficulty =
-        difficultyFilter === "all" || challenge.difficulty === difficultyFilter;
+        difficultyFilter === "all" || ch.difficulty === difficultyFilter;
+
       return matchesSearch && matchesDifficulty;
     });
   }, [challenges, searchTerm, difficultyFilter]);
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center py-24">
+      <div className="flex justify-center py-24">
         <LoadingSpinner size="lg" message="Cargando challenges..." />
       </div>
     );
   }
 
   if (error) {
-    return (
-      <div className="py-8">
-        <ErrorAlert message={error} onRetry={loadChallenges} />
-      </div>
-    );
+    return <ErrorAlert message={error} onRetry={() => loadChallenges(page)} />;
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-900">Challenges</h1>
-          <p className="text-slate-600 mt-1">
-            Gestiona y revisa los retos no técnicos que has creado.
-          </p>
-        </div>
-        <button
-          onClick={onCreateChallenge}
-          className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors font-medium"
-        >
-          <Plus className="w-5 h-5" />
-          Crear Challenge
-        </button>
-      </div>
+    <TooltipProvider delayDuration={200}>
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-slate-900">Challenges</h1>
+            <p className="text-slate-600">
+              Gestiona los desafíos creados por tu empresa.
+            </p>
+          </div>
 
-      {/* Filters */}
-      <div className="bg-white rounded-lg border border-slate-200 p-4">
-        <div className="flex flex-col gap-3">
+          <button
+            onClick={onCreateChallenge}
+            className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
+          >
+            <Plus size={18} />
+            Crear Challenge
+          </button>
+        </div>
+
+        {/* Filters */}
+        <div className="bg-white border rounded-lg p-4 space-y-4">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+            <Search
+              className="absolute left-3 top-3 text-slate-400"
+              size={20}
+            />
             <input
-              type="text"
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  setSearchTerm(searchInput || undefined);
+                  setPage(1);
+                }
+              }}
               placeholder="Buscar challenges..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              className="w-full pl-10 pr-4 py-2 border rounded-lg"
             />
           </div>
 
           <Select
             value={difficultyFilter}
-            onChange={(value) => setDifficultyFilter(value as DifficultyFilter)}
-            options={DIFFICULTY_OPTIONS as any}
-            placeholder="Dificultad"
-            className="w-full md:w-1/3"
+            onChange={(v) => setDifficultyFilter(v as DifficultyFilter)}
+            options={DIFFICULTY_OPTIONS}
+          />
+        </div>
+
+        {/* Table */}
+        {filteredChallenges.length === 0 ? (
+          <EmptyState
+            title="No se encontraron challenges"
+            description="Intenta ajustar los filtros o crea uno nuevo."
+            action={
+              <button
+                onClick={onCreateChallenge}
+                className="px-4 py-2 bg-emerald-600 text-white rounded-lg"
+              >
+                Crear Challenge
+              </button>
+            }
+          />
+        ) : (
+          <div className="bg-white border rounded-lg overflow-hidden">
+            <table className="w-full">
+              <thead className="bg-slate-50 border-b">
+                <tr>
+                  <th className="px-6 py-3 text-left">Challenge</th>
+                  <th className="px-6 py-3 text-left">Dificultad</th>
+                  <th className="px-6 py-3 text-left">Postulaciones</th>
+                  <th className="px-6 py-3 text-left">Creado</th>
+                  <th className="px-6 py-3 text-left">Acciones</th>
+                </tr>
+              </thead>
+
+              <tbody className="divide-y">
+                {filteredChallenges.map((ch) => (
+                  <tr key={ch.id} className="hover:bg-slate-50">
+                    <td className="px-6 py-4 font-medium">{ch.title}</td>
+
+                    <td className="px-6 py-4">
+                      <Badge className={DIFFICULTY_COLORS[ch.difficulty]}>
+                        {DIFFICULTY_LABELS[ch.difficulty]}
+                      </Badge>
+                    </td>
+
+                    <td className="px-6 py-4">{ch.submissions_count}</td>
+
+                    <td className="px-6 py-4 text-slate-600">
+                      {formatDate(ch.created_at)}
+                    </td>
+
+                    <td className="px-6 py-4 flex gap-3">
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button
+                            className="cursor-pointer"
+                            onClick={() => onViewDetails?.(ch.id)}
+                          >
+                            <Eye size={18} />
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent>Ver detalles</TooltipContent>
+                      </Tooltip>
+
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button
+                            className="cursor-pointer"
+                            onClick={() =>
+                              router.push(
+                                `/company/challenges/${ch.id}/metrics`,
+                              )
+                            }
+                          >
+                            <BarChart size={18} />
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent>Ver métricas</TooltipContent>
+                      </Tooltip>
+
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button
+                            className="cursor-pointer"
+                            onClick={() =>
+                              router.push(`/company/challenges/${ch.id}/edit`)
+                            }
+                          >
+                            <Pencil size={18} />
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent>Editar challenge</TooltipContent>
+                      </Tooltip>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {/* Pagination */}
+        <div className="flex justify-between items-center">
+          <span className="text-sm text-slate-600">
+            Mostrando {filteredChallenges.length} de {totalItems} challenges
+          </span>
+
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
           />
         </div>
       </div>
-
-      {/* Results count */}
-      <div className="text-sm text-slate-600">
-        {totalChallenges} challenge{totalChallenges !== 1 ? "s" : ""} encontrado
-        {totalChallenges !== 1 ? "s" : ""}
-      </div>
-
-      {/* Empty State */}
-      {filteredChallenges.length === 0 && (
-        <EmptyState
-          icon={<Filter className="w-12 h-12 text-slate-400 mx-auto" />}
-          title="No se encontraron challenges"
-          description={
-            searchTerm
-              ? "Intenta ajustar los filtros de búsqueda"
-              : "Aún no has creado ningún challenge."
-          }
-          action={
-            searchTerm ? (
-              <button
-                onClick={() => {
-                  setSearchTerm("");
-                  setDifficultyFilter("all");
-                }}
-                className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
-              >
-                Limpiar filtros
-              </button>
-            ) : (
-              <button
-                onClick={onCreateChallenge}
-                className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
-              >
-                Crear primer challenge
-              </button>
-            )
-          }
-        />
-      )}
-
-      {/* Grid */}
-      {filteredChallenges.length > 0 && (
-        <>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {filteredChallenges.map((challenge) => (
-              <div
-                key={challenge.id}
-                className="bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all duration-200 group"
-              >
-                <div className="p-6 space-y-4">
-                  {/* Header */}
-                  <div className="flex items-start justify-between">
-                    <h3 className="text-xl font-semibold text-slate-900 group-hover:text-emerald-600 transition-colors">
-                      {challenge.title}
-                    </h3>
-                  </div>
-
-                  {/* Difficulty */}
-                  <Badge
-                    variant="outline"
-                    className={DIFFICULTY_COLORS[challenge.difficulty]}
-                  >
-                    {DIFFICULTY_LABELS[challenge.difficulty]}
-                  </Badge>
-
-                  {/* Stats */}
-                  <div className="flex items-center gap-6 pt-4 border-t border-slate-100">
-                    <div className="flex items-center gap-2 text-sm text-slate-600">
-                      <Users className="w-4 h-4" />
-                      <span className="font-medium">
-                        {challenge.submissions_count} submissions
-                      </span>
-                    </div>
-
-                    <div className="flex items-center gap-2 text-sm text-slate-600">
-                      <Calendar className="w-4 h-4" />
-                      <span>{formatDate(challenge.created_at)}</span>
-                    </div>
-                  </div>
-
-                  {/* Footer */}
-                  <div className="flex items-center justify-end pt-2 gap-2">
-                    <button
-                      className="cursor-pointer flex items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-700 group-hover:gap-2 transition-all border border-blue-100 rounded px-2 py-1"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        window.location.href = `/company/challenges/${challenge.id}/metrics`;
-                      }}
-                    >
-                      Ver métricas
-                    </button>
-
-                    <button
-                      className="cursor-pointer flex items-center gap-1 text-sm font-medium text-yellow-600 hover:text-yellow-700 group-hover:gap-2 transition-all border border-yellow-100 rounded px-2 py-1"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        router.push(`/company/challenges/${challenge.id}/edit`);
-                      }}
-                    >
-                      Editar
-                    </button>
-
-                    <button
-                      className="cursor-pointer flex items-center gap-1 text-sm font-medium text-emerald-600 hover:text-emerald-700 group-hover:gap-2 transition-all"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onViewDetails?.(challenge.id);
-                      }}
-                    >
-                      Ver detalles
-                      <ChevronRight className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="flex justify-center mt-6">
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={setCurrentPage}
-            />
-          </div>
-        </>
-      )}
-    </div>
+    </TooltipProvider>
   );
 };
+
+export default CompanyChallengesList;
