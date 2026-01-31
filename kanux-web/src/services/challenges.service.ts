@@ -423,4 +423,24 @@ export const challengesService = {
     );
     return res.data;
   },
+
+  /**
+   * PATCH /challenges/:challengeId
+   */
+  updateChallengeBase: async (
+    challengeId: string,
+    data: Partial<{
+      title: string;
+      description: string;
+      difficulty: string;
+      duration_minutes: number;
+    }>,
+    companyId?: string,
+  ) => {
+    const url = companyId
+      ? `/challenges/${challengeId}/company/${companyId}`
+      : `/challenges/${challengeId}`;
+    const res = await httpClient.patch(url, data);
+    return res.data;
+  },
 };

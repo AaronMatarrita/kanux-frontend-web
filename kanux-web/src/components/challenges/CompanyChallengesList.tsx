@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Plus,
   Filter,
@@ -117,6 +118,7 @@ export const CompanyChallengesList: React.FC<CompanyChallengesListProps> = ({
   onViewDetails,
   onCreateChallenge,
 }) => {
+  const router = useRouter();
   const { session } = useAuth();
   const companyId =
     session?.user.userType === "company" ? session.user.profile.id : undefined;
@@ -324,6 +326,16 @@ export const CompanyChallengesList: React.FC<CompanyChallengesListProps> = ({
                       }}
                     >
                       Ver métricas
+                    </button>
+
+                    <button
+                      className="cursor-pointer flex items-center gap-1 text-sm font-medium text-yellow-600 hover:text-yellow-700 group-hover:gap-2 transition-all border border-yellow-100 rounded px-2 py-1"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        router.push(`/company/challenges/${challenge.id}/edit`);
+                      }}
+                    >
+                      Editar
                     </button>
 
                     <button

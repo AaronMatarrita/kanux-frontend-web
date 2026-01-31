@@ -24,9 +24,19 @@ const questionTypeOptions: SelectOption[] = [
   { label: "Respuesta múltiple", value: "Multiple" },
 ];
 
-export function CreateSoftChallengeForm({ companyId }: { companyId: string }) {
-  const form = useCreateSoftChallenge(companyId);
-  console.log("Rendering CreateSoftChallengeForm with form state:", companyId);
+export function CreateSoftChallengeForm({
+  companyId,
+  initialData,
+  mode = "create",
+  onSuccess,
+}: {
+  companyId: string;
+  initialData?: any;
+  mode?: "create" | "edit";
+  onSuccess?: () => void;
+}) {
+  const form = useCreateSoftChallenge(companyId, initialData);
+  const isEdit = mode === "edit";
   return (
     <div className="px-8 py-8">
       {/* Header */}
@@ -39,9 +49,13 @@ export function CreateSoftChallengeForm({ companyId }: { companyId: string }) {
           Volver al listado
         </Link>
 
-        <h1 className="text-2xl font-bold">Crear Soft Challenge</h1>
+        <h1 className="text-2xl font-bold">
+          {isEdit ? "Editar Soft Challenge" : "Crear Soft Challenge"}
+        </h1>
         <p className="text-muted-foreground mt-1">
-          Crea un nuevo reto no técnico para evaluar habilidades blandas.
+          {isEdit
+            ? "Edita los campos que desees y guarda los cambios."
+            : "Crea un nuevo reto no técnico para evaluar habilidades blandas."}
         </p>
       </div>
 
@@ -241,13 +255,13 @@ export function CreateSoftChallengeForm({ companyId }: { companyId: string }) {
 
           <Button
             className="bg-emerald-600"
-            onClick={form.submit}
+            onClick={() => form.submit(isEdit, onSuccess)}
             disabled={form.isSubmitting}
           >
             {form.isSubmitting && (
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
             )}
-            Crear Challenge
+            {isEdit ? "Guardar cambios" : "Crear Challenge"}
           </Button>
         </div>
       </div>

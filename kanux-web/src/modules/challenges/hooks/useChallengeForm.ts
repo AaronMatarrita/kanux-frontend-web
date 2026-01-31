@@ -27,20 +27,36 @@ const createInitialQuestion = (): QuestionFormData => ({
   ],
 });
 
-export function useCreateSoftChallenge(companyId: string) {
+export function useCreateSoftChallenge(companyId: string, initialData?: any) {
   const router = useRouter();
 
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
+  const [title, setTitle] = useState(initialData?.title || "");
+  const [description, setDescription] = useState(
+    initialData?.description || "",
+  );
   const [difficulty, setDifficulty] = useState<
     "Básico" | "Intermedio" | "Avanzado"
-  >("Básico");
-  const [durationMinutes, setDurationMinutes] = useState(30);
-  const [instructions, setInstructions] = useState("");
-  const [questions, setQuestions] = useState<QuestionFormData[]>([
-    createInitialQuestion(),
-  ]);
-
+  >(initialData?.difficulty || "Básico");
+  const [durationMinutes, setDurationMinutes] = useState(
+    initialData?.duration_minutes || 30,
+  );
+  const [instructions, setInstructions] = useState(
+    initialData?.details?.instructions || "",
+  );
+  const [questions, setQuestions] = useState<QuestionFormData[]>(
+    initialData?.details?.questions
+      ? initialData.details.questions.map((q: any) => ({
+          id: crypto.randomUUID(),
+          question: q.question,
+          question_type: q.question_type,
+          options: q.options.map((o: any) => ({
+            id: crypto.randomUUID(),
+            option_text: o.option_text,
+            is_correct: o.is_correct,
+          })),
+        }))
+      : [createInitialQuestion()],
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   /* -------------------- helpers -------------------- */
@@ -132,7 +148,7 @@ export function useCreateSoftChallenge(companyId: string) {
 
   /* -------------------- submit -------------------- */
 
-  const submit = async () => {
+  const submit = async (isEdit = false, onSuccess?: () => void) => {
     if (isSubmitting) return;
 
     const validationError = validate();
@@ -142,12 +158,6 @@ export function useCreateSoftChallenge(companyId: string) {
     }
 
     setIsSubmitting(true);
-
-    const difficultyMap = {
-      Básico: "BASICO",
-      Intermedio: "INTERMEDIO",
-      Avanzado: "AVANZADO",
-    } as const;
 
     const payload: CreateSoftChallengeDto = {
       title,
@@ -169,16 +179,29 @@ export function useCreateSoftChallenge(companyId: string) {
     };
 
     try {
-      await challengesService.createSoftChallenge(companyId, payload);
-
-      toast.success("Soft challenge created successfully");
-      router.push("/company/challenges");
+      if (isEdit && initialData?.id) {
+        await challengesService.updateChallengeBase(
+          initialData.id,
+          {
+            title,
+            description,
+            difficulty,
+            duration_minutes: durationMinutes,
+          },
+          companyId,
+        );
+        toast.success("Challenge actualizado correctamente");
+        if (onSuccess) onSuccess();
+      } else {
+        await challengesService.createSoftChallenge(companyId, payload);
+        toast.success("Soft challenge creado correctamente");
+        router.push("/company/challenges");
+      }
     } catch (err: any) {
       console.error(err);
-
       const message =
-        err?.response?.data?.message ?? "Failed to create soft challenge";
-
+        err?.response?.data?.message ??
+        (isEdit ? "Error al actualizar challenge" : "Error al crear challenge");
       toast.error(message);
     } finally {
       setIsSubmitting(false);
