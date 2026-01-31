@@ -1,3 +1,6 @@
+export type Difficulty = "Básico" | "Intermedio" | "Avanzado";
+export type QuestionType = "Unica" | "Multiple";
+
 export type CreateQuestionOption = {
   option_text: string;
   is_correct: boolean;
@@ -5,7 +8,7 @@ export type CreateQuestionOption = {
 
 export type CreateQuestion = {
   question: string;
-  question_type: "Unica" | "Multiple";
+  question_type: QuestionType;
   options: CreateQuestionOption[];
 };
 
@@ -13,7 +16,7 @@ export type CreateSoftChallengeDto = {
   title: string;
   description: string;
   challenge_type: "No Técnico";
-  difficulty: "BASICO" | "INTERMEDIO" | "AVANZADO";
+  difficulty: Difficulty;
   duration_minutes: number;
   details: {
     instructions: string;

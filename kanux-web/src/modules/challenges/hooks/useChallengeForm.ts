@@ -153,7 +153,7 @@ export function useCreateSoftChallenge(companyId: string) {
       title,
       description,
       challenge_type: "No Técnico",
-      difficulty: difficultyMap[difficulty],
+      difficulty,
       duration_minutes: durationMinutes,
       details: {
         instructions,
@@ -172,7 +172,7 @@ export function useCreateSoftChallenge(companyId: string) {
       await challengesService.createSoftChallenge(companyId, payload);
 
       toast.success("Soft challenge created successfully");
-      router.push("/challenges");
+      router.push("/company/challenges");
     } catch (err: any) {
       console.error(err);
 
