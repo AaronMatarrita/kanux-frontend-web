@@ -6,6 +6,18 @@ import { toast } from "sonner";
 import type { CreateSoftChallengeDto } from "../types/challenge";
 import { challengesService } from "@/services/challenges.service";
 
+const VALIDATION_MESSAGES = {
+  TITLE_REQUIRED: "El título es obligatorio",
+  DESCRIPTION_REQUIRED: "La descripción es obligatoria",
+  INSTRUCTIONS_REQUIRED: "Las instrucciones son obligatorias",
+  DURATION_INVALID: "La duración debe ser mayor a 0",
+  QUESTION_EMPTY: (n: number) => `La pregunta ${n} no puede estar vacía`,
+  QUESTION_OPTION_EMPTY: (n: number) =>
+    `La pregunta ${n} tiene opciones vacías`,
+  QUESTION_NO_CORRECT: (n: number) =>
+    `La pregunta ${n} debe tener al menos una opción correcta`,
+};
+
 export type QuestionFormData = {
   id: string;
   question: string;
@@ -132,16 +144,21 @@ export function useCreateSoftChallenge(companyId: string, initialData?: any) {
   /* -------------------- validation -------------------- */
 
   const validate = (): string | null => {
-    if (!title.trim()) return "Title is required";
-    if (!description.trim()) return "Description is required";
-    if (!instructions.trim()) return "Instructions are required";
-    if (durationMinutes < 1) return "Duration must be greater than 0";
+    if (!title.trim()) return VALIDATION_MESSAGES.TITLE_REQUIRED;
+    if (!description.trim()) return VALIDATION_MESSAGES.DESCRIPTION_REQUIRED;
+    if (!instructions.trim()) return VALIDATION_MESSAGES.INSTRUCTIONS_REQUIRED;
+    if (durationMinutes < 1) return VALIDATION_MESSAGES.DURATION_INVALID;
 
     for (let i = 0; i < questions.length; i++) {
       const q = questions[i];
-      if (!q.question.trim()) return `Question ${i + 1} is empty`;
+
+      if (!q.question.trim()) return VALIDATION_MESSAGES.QUESTION_EMPTY(i + 1);
+
       if (q.options.some((o) => !o.option_text.trim()))
-        return `Question ${i + 1} has empty options`;
+        return VALIDATION_MESSAGES.QUESTION_OPTION_EMPTY(i + 1);
+
+      if (!q.options.some((o) => o.is_correct))
+        return VALIDATION_MESSAGES.QUESTION_NO_CORRECT(i + 1);
     }
 
     return null;
