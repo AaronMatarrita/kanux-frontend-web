@@ -12,6 +12,7 @@ import {
   ProfileCompletion,
   RecommendedChallenges,
   Feed,
+  DashboardErrorState,
 } from "@/components/dashboard";
 
 import { useSyncExternalStore } from "react";
@@ -38,125 +39,59 @@ const MOCK_STATS = {
   profileCompletion: { value: 85, change: "" },
 };
 
-const MOCK_RECOMMENDED_CHALLENGES: DashboardChallenge[] = [
-  {
-    id: "1",
-    title: "Advanced React Patterns",
-    description: "Master advanced patterns and best practices in React.",
-    difficulty: "Avanzado",
-    created_at: new Date().toISOString(),
-  },
-  {
-    id: "2",
-    title: "API Integration Challenge",
-    description: "Build RESTful APIs using Node.js.",
-    difficulty: "Intermedio",
-    created_at: new Date().toISOString(),
-  },
-  {
-    id: "3",
-    title: "Database Design",
-    description: "Learn database design principles.",
-    difficulty: "Intermedio",
-    created_at: new Date().toISOString(),
-  },
-];
-
-const MOCK_FEED_POSTS: FeedPost[] = [
-  {
-    id: "1",
-    content:
-      "Just completed an amazing project! Learning so much every day about React and TypeScript.",
-    created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 horas atrás
-    author: {
-      id: "user1",
-      name: "Alex Johnson",
-    },
-    commentsCount: 5,
-    reactionsCount: 24,
-    comments: [],
-    reactions: [],
-    isOwner: false,
-    isLikedByMe: true,
-  },
-  {
-    id: "2",
-    content:
-      "Working on a new full-stack application with Next.js 14 and Prisma. The new features are amazing!",
-    created_at: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(), // 5 horas atrás
-    author: {
-      id: "user2",
-      name: "Maria Rodriguez",
-    },
-    commentsCount: 12,
-    reactionsCount: 42,
-    comments: [],
-    reactions: [],
-    isOwner: false,
-    isLikedByMe: false,
-  },
-  {
-    id: "3",
-    content:
-      "Just started a new challenge in the platform. The algorithm section looks challenging but exciting!",
-    created_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(), // 1 día atrás
-    author: {
-      id: "user3",
-      name: "David Chen",
-    },
-    commentsCount: 3,
-    reactionsCount: 18,
-    comments: [],
-    reactions: [],
-    isOwner: true,
-    isLikedByMe: true,
-  },
-  {
-    id: "4",
-    content:
-      "Completed the React performance optimization challenge with 95% score! The debugging section was particularly helpful.",
-    created_at: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(), // 3 días atrás
-    author: {
-      id: "user4",
-      name: "Sarah Williams",
-    },
-    commentsCount: 8,
-    reactionsCount: 31,
-    comments: [],
-    reactions: [],
-    isOwner: false,
-    isLikedByMe: false,
-  },
-];
-
 export default function TalentDashboardPage() {
   const { session } = useAuth();
   const isClient = useIsClient();
 
   const [recommendedChallenges, setRecommendedChallenges] = useState<
     DashboardChallenge[]
-  >(MOCK_RECOMMENDED_CHALLENGES);
+  >([]);
 
-  const [feedPosts, setFeedPosts] = useState<FeedPost[]>(MOCK_FEED_POSTS);
-  const [isLoadingFeed, setIsLoadingFeed] = useState(true);
-  const [feedError, setFeedError] = useState<string | null>(null);
+  const [challengesError, setChallengesError] = useState<string | null>(null);
+  const [isLoadingChallenges, setIsLoadingChallenges] = useState(true);
+
   const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [statsError, setStatsError] = useState<string | null>(null);
+
+  const [feedPosts, setFeedPosts] = useState<FeedPost[]>([]);
+  const [feedError, setFeedError] = useState<string | null>(null);
+  const [isLoadingFeed, setIsLoadingFeed] = useState(true);
+
   const [isLoadingStats, setIsLoadingStats] = useState(true);
+
+  const loadRecommendedChallenges = React.useCallback(async () => {
+    try {
+      setIsLoadingChallenges(true);
+
+      const data = await profilesService.getFirstChallenges();
+
+      if (!Array.isArray(data) || data.length === 0) {
+        throw new Error("No hay desafíos disponibles");
+      }
+
+      setRecommendedChallenges(data as DashboardChallenge[]);
+      setChallengesError(null);
+    } catch (error) {
+      console.error("Error cargando desafíos recomendados", error);
+      setChallengesError("No se pudieron cargar los desafíos recomendados");
+      setRecommendedChallenges([]);
+    } finally {
+      setIsLoadingChallenges(false);
+    }
+  }, []);
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
         setIsLoadingStats(true);
+        setStatsError(null);
+
         const data = await profilesService.getDashboardStats();
         setStats(data);
       } catch (error) {
-        console.error("Error loading dashboard stats, using mocks", error);
-        setStats({
-          skillsCount: MOCK_STATS.skillsVerified.value,
-          completedChallengesCount: MOCK_STATS.challengesCompleted.value,
-          unreadMessagesCount: 0,
-          postsCount: MOCK_STATS.activeChallenges.value,
-        });
+        console.error("Error loading dashboard stats", error);
+        setStatsError("No se pudieron cargar las estadísticas");
+        setStats(null);
       } finally {
         setIsLoadingStats(false);
       }
@@ -166,50 +101,33 @@ export default function TalentDashboardPage() {
   }, []);
 
   useEffect(() => {
-    const fetchChallenges = async () => {
-      try {
-        const data = await profilesService.getFirstChallenges();
+    loadRecommendedChallenges();
+  }, [loadRecommendedChallenges]);
 
-        if (Array.isArray(data) && data.length > 0) {
-          setRecommendedChallenges(data as DashboardChallenge[]);
-        }
-      } catch (error) {
-        console.error(
-          "Error loading recommended challenges, using mocks",
-          error,
-        );
-        setRecommendedChallenges(MOCK_RECOMMENDED_CHALLENGES);
+  const fetchFeedPosts = React.useCallback(async () => {
+    try {
+      setIsLoadingFeed(true);
+      setFeedError(null);
+
+      const posts = await profilesService.getDashboardFeed();
+
+      if (!Array.isArray(posts)) {
+        throw new Error("Respuesta inválida");
       }
-    };
 
-    fetchChallenges();
+      setFeedPosts(posts);
+    } catch (error) {
+      console.error("Error loading feed posts:", error);
+      setFeedError("No se pudo cargar el feed");
+      setFeedPosts([]);
+    } finally {
+      setIsLoadingFeed(false);
+    }
   }, []);
 
   useEffect(() => {
-    const fetchFeedPosts = async () => {
-      try {
-        setIsLoadingFeed(true);
-        setFeedError(null);
-
-        const posts = await profilesService.getDashboardFeed();
-
-        if (Array.isArray(posts) && posts.length > 0) {
-          setFeedPosts(posts);
-        } else {
-          console.log("No feed posts returned from API, using mock data");
-          setFeedPosts(MOCK_FEED_POSTS);
-        }
-      } catch (error) {
-        console.error("Error loading feed posts:", error);
-        setFeedError("Could not load feed posts");
-        setFeedPosts(MOCK_FEED_POSTS);
-      } finally {
-        setIsLoadingFeed(false);
-      }
-    };
-
     fetchFeedPosts();
-  }, []);
+  }, [fetchFeedPosts]);
 
   const getUserName = () => {
     if (!isClient) return "Alex";
@@ -263,7 +181,7 @@ export default function TalentDashboardPage() {
             </h3>
             <p className="text-gray-600 mb-4">{feedError}</p>
             <button
-              onClick={() => window.location.reload()}
+              onClick={fetchFeedPosts}
               className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
               Intenta de nuevo
@@ -290,25 +208,29 @@ export default function TalentDashboardPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard
           title="Habilidades Verificadas"
-          value={stats?.skillsCount ?? "—"}
+          value={statsError ? "—" : (stats?.skillsCount ?? "—")}
+          subtitle={statsError ?? undefined}
           icon={CheckCircle}
         />
 
         <StatCard
           title="Desafíos Completados"
-          value={stats?.completedChallengesCount ?? "—"}
+          value={statsError ? "—" : (stats?.completedChallengesCount ?? "—")}
+          subtitle={statsError ?? undefined}
           icon={Trophy}
         />
 
         <StatCard
           title="Publicaciones Realizadas"
-          value={stats?.postsCount ?? "—"}
+          value={statsError ? "—" : (stats?.postsCount ?? "—")}
+          subtitle={statsError ?? undefined}
           icon={MessageCircleHeart}
         />
 
         <StatCard
           title="Mensajes Sin Leer"
-          value={stats?.unreadMessagesCount ?? "—"}
+          value={statsError ? "—" : (stats?.unreadMessagesCount ?? "—")}
+          subtitle={statsError ?? undefined}
           icon={MessageSquareText}
         />
       </div>
@@ -319,7 +241,21 @@ export default function TalentDashboardPage() {
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <RecommendedChallenges challenges={recommendedChallenges} />
+        <div>
+          {challengesError ? (
+            <DashboardErrorState
+              title="Desafíos recomendados"
+              message={challengesError}
+              onRetry={loadRecommendedChallenges}
+              isRetrying={isLoadingChallenges}
+            />
+          ) : isLoadingChallenges ? (
+            <div className="bg-white border border-slate-200 rounded-lg p-6 h-[220px] animate-pulse" />
+          ) : (
+            <RecommendedChallenges challenges={recommendedChallenges} />
+          )}
+        </div>
+
         {renderFeedContent()}
       </div>
     </div>
