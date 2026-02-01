@@ -7,7 +7,7 @@ import { useEffect } from "react";
 
 export default function AccessDeniedPage() {
   const router = useRouter();
-  const { session } = useAuth();
+  const { session, logout } = useAuth();
 
   useEffect(() => {
     // Si no hay sesión, redirigir al login
@@ -17,7 +17,7 @@ export default function AccessDeniedPage() {
   }, [session, router]);
 
   const handleGoToDashboard = () => {
-    const userType = session?.user?.user_type;
+    const userType = session?.user?.userType;
     if (userType === "company") {
       router.push("/company/dashboard");
     } else if (userType === "talent") {
@@ -62,7 +62,10 @@ export default function AccessDeniedPage() {
           </Button>
 
           <Button
-            onClick={() => router.push("/auth/logout")}
+            onClick={async () => {
+              await logout();
+              router.push("/auth/login");
+            }}
             variant="outline"
             className="w-full"
           >
