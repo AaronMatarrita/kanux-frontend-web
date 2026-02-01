@@ -233,4 +233,55 @@ export const subscriptionsService = {
     );
     return res.data;
   },
+
+  /**
+   * GET /subscriptions/company/:id_company/my-subscription
+   */
+  getCompanySubscription: async (companyId: string): Promise<any> => {
+    const res = await httpClient.get(
+      `/subscriptions/company/${companyId}/my-subscription`
+    );
+    return res.data;
+  },
+
+  /**
+   * GET /subscriptions/talent/:id_profile/my-subscription
+   */
+  getTalentSubscription: async (profileId: string): Promise<any> => {
+    const res = await httpClient.get(
+      `/subscriptions/talent/${profileId}/my-subscription`
+    );
+    return res.data;
+  },
+
+  /**
+   * PUT /subscriptions/company/:id_company/upgrade/:id_plan
+   */
+  upgradeCompanyPlan: async (
+    companyId: string,
+    planId: string,
+    data: CreateCompanySubscriptionRequest = {}
+  ): Promise<CompanySubscription> => {
+    const res = await httpClient.put<CompanySubscription>(
+      `/subscriptions/company/${companyId}/upgrade/${planId}`,
+      data
+    );
+    return res.data;
+  },
+
+  /**
+   * PUT /subscriptions/talent/:id_profile/upgrade/:id_plan
+   */
+  upgradeTalentPlan: async (
+    profileId: string,
+    planId: string,
+    data: CreateTalentSubscriptionRequest = {}
+  ): Promise<TalentSubscription> => {
+    const res = await httpClient.put<TalentSubscription>(
+      `/subscriptions/talent/${profileId}/upgrade/${planId}`,
+      data
+    );
+    return res.data;
+  },
+  
 };
