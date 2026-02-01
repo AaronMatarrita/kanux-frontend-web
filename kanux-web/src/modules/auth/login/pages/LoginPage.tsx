@@ -21,7 +21,7 @@ export const LoginPage: React.FC = () => {
 
   useEffect(() => {
     if (!session || !session.isAuthenticated) {
-      setIsLoading(false); // no hay sesión → mostrar login
+      setIsLoading(false);
       return;
     }
 
@@ -68,7 +68,6 @@ export const LoginPage: React.FC = () => {
 
   return (
     <div className={styles.loginContainer}>
-      {/* Branding Side */}
       <div
         className={styles.brandingSide}
         style={{
