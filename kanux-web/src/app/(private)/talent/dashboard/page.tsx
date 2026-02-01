@@ -32,13 +32,6 @@ function useIsClient() {
   );
 }
 
-const MOCK_STATS = {
-  skillsVerified: { value: 4, change: "+1 this month" },
-  challengesCompleted: { value: 23, change: "92% average score" },
-  activeChallenges: { value: 2, change: "In progress" },
-  profileCompletion: { value: 85, change: "" },
-};
-
 export default function TalentDashboardPage() {
   const { session } = useAuth();
   const isClient = useIsClient();
@@ -46,6 +39,8 @@ export default function TalentDashboardPage() {
   const [recommendedChallenges, setRecommendedChallenges] = useState<
     DashboardChallenge[]
   >([]);
+
+  const [profileCompleteness, setProfileCompleteness] = useState<number>(0);
 
   const [challengesError, setChallengesError] = useState<string | null>(null);
   const [isLoadingChallenges, setIsLoadingChallenges] = useState(true);
@@ -79,6 +74,14 @@ export default function TalentDashboardPage() {
       setIsLoadingChallenges(false);
     }
   }, []);
+
+  useEffect(() => {
+    if (session?.user.userType === "talent") {
+      setProfileCompleteness(session.user.profile.profile_completeness);
+    } else {
+      setProfileCompleteness(0);
+    }
+  }, [session]);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -236,7 +239,7 @@ export default function TalentDashboardPage() {
       </div>
 
       <ProfileCompletion
-        completionPercentage={MOCK_STATS.profileCompletion.value}
+        completionPercentage={profileCompleteness}
         message="Mas información completa tu perfil, mejores oportunidades recibirás."
       />
 
