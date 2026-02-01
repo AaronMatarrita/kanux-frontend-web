@@ -12,51 +12,6 @@ import { useAuth } from "@/context/AuthContext";
 import { CandidateProfileDetails } from "@/components/candidates/CandidateProfileDetails";
 import { Pagination } from "@/components/ui/pagination";
 
-/* ---------------- MOCK ---------------- */
-
-export const MOCK_CANDIDATES: CandidateListItem[] = [
-  {
-    talent_id: "1",
-    first_name: "Sarah",
-    last_name: "Martinez",
-    title: "Frontend Developer",
-    education: "Self-taught",
-    avg_score: 92,
-    skills: [
-      {
-        id: "skill-react",
-        name: "React",
-        level: "Advanced",
-        category_id: "frontend",
-      },
-      {
-        id: "skill-ts",
-        name: "TypeScript",
-        level: "Intermediate",
-        category_id: "frontend",
-      },
-    ],
-    profile: {
-      id: "1",
-      first_name: "Sarah",
-      last_name: "Martinez",
-      title: "Frontend Developer",
-      about: "Frontend developer apasionada por la experiencia de usuario.",
-      education: "Self-taught",
-      location: "San José, Costa Rica",
-      experience_level: "3 años",
-      email: "sarah@email.com",
-      contact: { phone: "8888-1111" },
-      profile_completeness: 85,
-      opportunity_status_id: null,
-      learning_background_id: null,
-      image_url: null,
-      user_id: "user-1",
-      created_at: new Date().toISOString(),
-    },
-  },
-];
-
 /* ---------------- COMPONENT ---------------- */
 
 interface CandidatesProps {
@@ -89,17 +44,20 @@ export const CandidatesList: React.FC<CandidatesProps> = ({ onContact }) => {
   const [selectedCandidate, setSelectedCandidate] =
     useState<CandidateListItem | null>(null);
 
+  const [error, setError] = useState<string | null>(null);
+
   useEffect(() => {
     const loadCandidates = async () => {
       setIsLoading(true);
 
       try {
         if (!session?.token) {
-          setCandidates(MOCK_CANDIDATES);
-          setTotalItems(MOCK_CANDIDATES.length);
-          setTotalPages(1);
+          setError("No hay sesión activa");
           return;
         }
+
+        setIsLoading(true);
+        setError(null);
 
         const result = await candidatesService.getCandidates(
           session.token,
@@ -112,9 +70,7 @@ export const CandidatesList: React.FC<CandidatesProps> = ({ onContact }) => {
         setTotalPages(result.pagination.totalPages);
       } catch (error) {
         console.error("API failed, using mock candidates", error);
-        setCandidates(MOCK_CANDIDATES);
-        setTotalItems(MOCK_CANDIDATES.length);
-        setTotalPages(1);
+        setError("Error al cargar los candidatos");
       } finally {
         setIsLoading(false);
       }
@@ -127,12 +83,7 @@ export const CandidatesList: React.FC<CandidatesProps> = ({ onContact }) => {
     const loadSkills = async () => {
       try {
         if (!session?.token) {
-          const mockSkills = Array.from(
-            new Set(
-              MOCK_CANDIDATES.flatMap((c) => c.skills.map((s) => s.name)),
-            ),
-          );
-          setSkillsOptions(mockSkills);
+          setError("No hay sesión activa");
           return;
         }
 
@@ -147,44 +98,39 @@ export const CandidatesList: React.FC<CandidatesProps> = ({ onContact }) => {
     loadSkills();
   }, [session?.token]);
 
-  useEffect(() => {
-    const loadCandidates = async () => {
-      setIsLoading(true);
+  const loadCandidates = useCallback(async () => {
+    if (!session?.token) {
+      setError("No hay sesión activa");
+      return;
+    }
 
-      try {
-        if (!session?.token) {
-          setCandidates(MOCK_CANDIDATES);
-          setTotalItems(MOCK_CANDIDATES.length);
-          setTotalPages(1);
-          return;
-        }
+    setIsLoading(true);
+    setError(null);
 
-        console.log("que envio",backgroundFilter)
-        const result = await candidatesService.getCandidatesFiltered(
-          session.token,
-          {
-            searchText: searchTerm || undefined,
-            skill: skillFilter !== "All Skills" ? skillFilter : undefined,
-            learningBackgroundId: backgroundFilter || undefined,
-          },
-          page,
-          pageSize,
-        );
+    try {
+      const result = await candidatesService.getCandidatesFiltered(
+        session.token,
+        {
+          searchText: searchTerm || undefined,
+          skill: skillFilter !== "All Skills" ? skillFilter : undefined,
+          learningBackgroundId: backgroundFilter || undefined,
+        },
+        page,
+        pageSize,
+      );
 
-        setCandidates(result.candidates);
-        setTotalItems(result.pagination.total);
-        setTotalPages(result.pagination.totalPages);
-      } catch (error) {
-        console.error("API failed, using mock candidates", error);
-        setCandidates(MOCK_CANDIDATES);
-        setTotalItems(MOCK_CANDIDATES.length);
-        setTotalPages(1);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadCandidates();
+      setCandidates(result.candidates);
+      setTotalItems(result.pagination.total);
+      setTotalPages(result.pagination.totalPages);
+    } catch (err) {
+      console.error("Failed to load candidates", err);
+      setError("No se pudieron cargar los candidatos. Intenta nuevamente.");
+      setCandidates([]);
+      setTotalItems(0);
+      setTotalPages(1);
+    } finally {
+      setIsLoading(false);
+    }
   }, [
     session?.token,
     page,
@@ -193,6 +139,10 @@ export const CandidatesList: React.FC<CandidatesProps> = ({ onContact }) => {
     skillFilter,
     backgroundFilter,
   ]);
+
+  useEffect(() => {
+    loadCandidates();
+  }, [loadCandidates]);
 
   useEffect(() => {
     const loadLearningBackgrounds = async () => {
@@ -232,21 +182,34 @@ export const CandidatesList: React.FC<CandidatesProps> = ({ onContact }) => {
   );
 
   const backgroundSelectOptions = useMemo(
-  () => [
-    { label: "All", value: "" }, 
-    ...learningBackgrounds.map((b) => ({
-      label: b.name,
-      value: b.id,
-    })),
-  ],
-  [learningBackgrounds],
-);
-
+    () => [
+      { label: "All", value: "" },
+      ...learningBackgrounds.map((b) => ({
+        label: b.name,
+        value: b.id,
+      })),
+    ],
+    [learningBackgrounds],
+  );
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-slate-500">Loading candidates...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64 gap-4">
+        <p className="text-red-600 font-medium">{error}</p>
+        <button
+          onClick={loadCandidates}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+        >
+          Reintentar
+        </button>
       </div>
     );
   }

@@ -1,6 +1,6 @@
 "use client";
 import { AxiosError } from "axios";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { LoginForm } from "../components";
 import { authService } from "@/services";
@@ -11,30 +11,41 @@ import { getDeviceId } from "@/lib/device";
 import { mapLoginResponseToSession } from "@/helper/mapper";
 
 export const LoginPage: React.FC = () => {
-  const { login } = useAuth();
+  const { login, session } = useAuth();
   const deviceId = getDeviceId();
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const [submitError, setSubmitError] = useState<string>();
 
+  useEffect(() => {
+    if (!session || !session.isAuthenticated) {
+      setIsLoading(false);
+      return;
+    }
+
+    router.replace(
+      session.user.userType === "talent"
+        ? "/talent/dashboard"
+        : "/company/dashboard",
+    );
+  }, [session, router]);
+
   const handleLogin = async (data: LoginFormData) => {
-    setIsLoading(true);
+    setIsSubmitting(true);
     setSubmitError(undefined);
 
     try {
-      console.log("Attempting login with data:", data);
       const response = await authService.login({
         email: data.email,
         password: data.password,
-        deviceId: deviceId,
+        deviceId,
       });
 
-      console.log("Login successful:", response);
-      const session = mapLoginResponseToSession(response);
+      const newSession = mapLoginResponseToSession(response);
 
-      console.log("session successful:", session);
-
-      await login(session);
+      await login(newSession);
 
       router.push(
         response.user.userType === "talent"
@@ -51,13 +62,12 @@ export const LoginPage: React.FC = () => {
 
       setSubmitError(errorMessage);
     } finally {
-      setIsLoading(false);
+      setIsSubmitting(false);
     }
   };
 
   return (
     <div className={styles.loginContainer}>
-      {/* Branding Side */}
       <div
         className={styles.brandingSide}
         style={{
@@ -137,7 +147,8 @@ export const LoginPage: React.FC = () => {
             juntos.
           </h1>
           <p className={styles.brandingDescription}>
-            Kánux conecta a profesionales y empresas a través de retos reales y habilidades verificadas.
+            Kánux conecta a profesionales y empresas a través de retos reales y
+            habilidades verificadas.
           </p>
         </div>
 
@@ -151,6 +162,14 @@ export const LoginPage: React.FC = () => {
           submitError={submitError}
         />
       </div>
+      {isSubmitting && (
+        <div className={styles.loadingOverlay}>
+          <div className={styles.loadingBox}>
+            <span className={styles.spinner} />
+            <span>Iniciando sesión…</span>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
