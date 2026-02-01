@@ -6,6 +6,7 @@ import {
   StatCard,
   LatestSubmissions,
   RecentlyViewed,
+  DashboardErrorState,
 } from "@/components/dashboard";
 import { useAuth } from "@/context/AuthContext";
 import { useSyncExternalStore } from "react";
@@ -13,7 +14,6 @@ import { companiesService } from "@/services/companies.service";
 import {
   candidatesService,
   CandidateListItem,
-  CandidateProfile,
 } from "@/services/candidates.service";
 
 function useIsClient() {
@@ -24,72 +24,24 @@ function useIsClient() {
   );
 }
 
-// Mock data
-const MOCK_STATS = {
-  activeChallenges: { value: 12, change: "+2 this month" },
-  candidatesEvaluated: { value: 248, change: "+18% from last month" },
-  newApplications: { value: 34, change: "+7 this week" },
-  messages: { value: 8, change: "3 unread" },
-};
-
-const MOCK_CANDIDATES: CandidateListItem[] = [
-  {
-    talent_id: "1",
-    first_name: "Alex",
-    last_name: "Smith",
-    title: "Frontend Developer",
-    education: "Computer Science",
-    skills: [
-      { id: "1", name: "React", level: "Expert", category_id: "frontend" },
-      { id: "2", name: "TypeScript", level: "Expert", category_id: "frontend" },
-    ],
-    profile: null as unknown as CandidateProfile,
-  },
-  {
-    talent_id: "2",
-    first_name: "Sarah",
-    last_name: "Martinez",
-    title: "Full Stack Developer",
-    education: "Software Engineering",
-    skills: [
-      { id: "3", name: "Node.js", level: "Advanced", category_id: "backend" },
-      {
-        id: "4",
-        name: "PostgreSQL",
-        level: "Advanced",
-        category_id: "backend",
-      },
-    ],
-    profile: null as unknown as CandidateProfile,
-  },
-  {
-    talent_id: "3",
-    first_name: "Aaron",
-    last_name: "Matarrita",
-    title: "Backend Developer",
-    education: "Information Systems",
-    skills: [
-      { id: "5", name: "Java", level: "Expert", category_id: "backend" },
-      {
-        id: "6",
-        name: "Spring Boot",
-        level: "Advanced",
-        category_id: "backend",
-      },
-    ],
-    profile: null as unknown as CandidateProfile,
-  },
-];
-
 export default function DashboardPage() {
   const { session } = useAuth();
 
   const isClient = useIsClient();
 
-  const [stats, setStats] = React.useState(MOCK_STATS);
+  const [stats, setStats] = React.useState<{
+    activeChallenges: number;
+    candidatesEvaluated: number;
+    newApplications: number;
+    messages: number;
+  } | null>(null);
+  const [candidates, setCandidates] = React.useState<CandidateListItem[]>([]);
+
   const [loading, setLoading] = React.useState(false);
-  const [candidates, setCandidates] =
-    React.useState<CandidateListItem[]>(MOCK_CANDIDATES);
+  const [statsError, setStatsError] = React.useState<string | null>(null);
+  const [candidatesError, setCandidatesError] = React.useState<string | null>(
+    null,
+  );
 
   const greeting = React.useMemo(() => {
     if (!isClient || !session) return "Bienvenido de vuelta";
@@ -101,11 +53,36 @@ export default function DashboardPage() {
     return "Bienvenido de vuelta";
   }, [isClient, session]);
 
+  const loadRecentCandidates = React.useCallback(async () => {
+    if (!session?.token) {
+      setCandidatesError("No hay sesión activa");
+      return;
+    }
+
+    setCandidatesError(null);
+
+    try {
+      const candidatesRes = await candidatesService.getCandidatesDash(
+        session.token,
+      );
+      setCandidates(candidatesRes);
+    } catch (error) {
+      console.error("Error cargando candidatos recientes", error);
+      setCandidatesError("No se pudieron cargar los candidatos recientes");
+      setCandidates([]);
+    }
+  }, [session?.token]);
+
   React.useEffect(() => {
-    if (!session?.token) return;
+    if (!session?.token) {
+      setStatsError("No hay sesión activa");
+      setCandidatesError("No hay sesión activa");
+      return;
+    }
 
     const fetchDashboard = async () => {
       setLoading(true);
+      setStatsError(null);
 
       try {
         const response = await companiesService.getCompanyDashboard(
@@ -113,39 +90,25 @@ export default function DashboardPage() {
         );
 
         const dashboard = response.data;
-        setStats({
-          activeChallenges: {
-            value: dashboard.totalChallenges,
-            change: "",
-          },
-          candidatesEvaluated: {
-            value: dashboard.totalTalentsParticipated,
-            change: "",
-          },
-          newApplications: {
-            value: dashboard.totalUsersParticipated,
-            change: "",
-          },
-          messages: {
-            value: dashboard.unreadMessages,
-            change: "",
-          },
-        });
-        const candidatesRes = await candidatesService.getCandidatesDash(
-          session.token,
-        );
 
-        setCandidates(candidatesRes);
+        setStats({
+          activeChallenges: dashboard.totalChallenges,
+          candidatesEvaluated: dashboard.totalTalentsParticipated,
+          newApplications: dashboard.totalUsersParticipated,
+          messages: dashboard.unreadMessages,
+        });
       } catch (error) {
-        console.error("Dashboard error, usando MOCK_STATS", error);
-        setStats(MOCK_STATS);
+        console.error("Error cargando stats", error);
+        setStatsError("No se pudieron cargar las métricas");
+        setStats(null);
       } finally {
         setLoading(false);
       }
     };
 
     fetchDashboard();
-  }, [session?.token]);
+    loadRecentCandidates();
+  }, [session?.token, loadRecentCandidates]);
 
   return (
     <div className="space-y-8">
@@ -159,28 +122,43 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard
           title="Desafíos Activos"
-          value={stats.activeChallenges.value}
+          value={statsError ? "—" : (stats?.activeChallenges ?? "—")}
+          subtitle={statsError ?? undefined}
           icon={PaperclipIcon}
         />
+
         <StatCard
           title="Candidatos Evaluados"
-          value={stats.candidatesEvaluated.value}
+          value={statsError ? "—" : (stats?.candidatesEvaluated ?? "—")}
+          subtitle={statsError ?? undefined}
           icon={Users}
         />
+
         <StatCard
           title="Aplicaciones Nuevas"
-          value={stats.newApplications.value}
+          value={statsError ? "—" : (stats?.newApplications ?? "—")}
+          subtitle={statsError ?? undefined}
           icon={FileText}
         />
+
         <StatCard
           title="Mensajes no Leídos"
-          value={stats.messages.value}
+          value={statsError ? "—" : (stats?.messages ?? "—")}
+          subtitle={statsError ?? undefined}
           icon={MessageSquare}
         />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-[auto_380px] gap-12">
-        <LatestSubmissions candidates={candidates} />
+        {candidatesError ? (
+          <DashboardErrorState
+            title="Candidatos recientes"
+            message={candidatesError}
+            onRetry={loadRecentCandidates}
+          />
+        ) : (
+          <LatestSubmissions candidates={candidates} />
+        )}
         <RecentlyViewed />
       </div>
     </div>

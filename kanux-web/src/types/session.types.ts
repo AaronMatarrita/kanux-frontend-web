@@ -18,6 +18,7 @@ export type TalentProfile = {
   title: string | null;
   bio: string | null;
   location: string | null;
+  profile_completeness: number;
   skills: string[] | null;
   photo_url: string | null;
   created_at: string;

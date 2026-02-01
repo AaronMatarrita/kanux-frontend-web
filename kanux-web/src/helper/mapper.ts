@@ -24,6 +24,7 @@ const mapTalentProfile = (profile: BackendTalentProfile): TalentProfile => ({
   title: profile.title ?? null,
   bio: profile.about ?? null,
   location: profile.location ?? null,
+  profile_completeness: profile.profile_completeness ?? 100,
   skills: null,
   photo_url: null,
   created_at: profile.created_at,
