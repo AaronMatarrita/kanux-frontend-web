@@ -11,11 +11,6 @@ export const httpClient: AxiosInstance = axios.create({
   },
 });
 
-/**
- * Request Interceptor
- * Adds JWT token to headers if available.
- */
-
 httpClient.interceptors.request.use(
   (config) => {
     if (typeof window !== "undefined") {
@@ -26,9 +21,7 @@ httpClient.interceptors.request.use(
           if (session?.token) {
             config.headers.Authorization = `Bearer ${session.token}`;
           }
-        } catch (error) {
-          console.error("Error parsing session data:", error);
-        }
+        } catch {}
       }
     }
     return config;
@@ -36,13 +29,18 @@ httpClient.interceptors.request.use(
   (error) => Promise.reject(error),
 );
 
-/**
- * Response Interceptor
- * Centralized error handling.
- */
 httpClient.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem("session");
+      document.cookie = "token=; path=/; max-age=0";
+
+      if (typeof window !== "undefined") {
+        window.location.href = "/auth/login";
+      }
+    }
+
     handleHttpError(error);
     return Promise.reject(error);
   },

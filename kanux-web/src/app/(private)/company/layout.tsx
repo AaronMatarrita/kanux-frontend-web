@@ -1,14 +1,14 @@
 "use client";
 
-import { useTalentGuard } from "@/guards/useTalentGuard";
+import { useCompanyGuard } from "@/guards/useCompanyGuard";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 
-export default function TalentLayout({
+export default function CompanyLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const isAuthorized = useTalentGuard();
+  const isAuthorized = useCompanyGuard();
 
   if (!isAuthorized) {
     return (
