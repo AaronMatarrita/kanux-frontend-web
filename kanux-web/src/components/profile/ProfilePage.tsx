@@ -47,6 +47,7 @@ export function ProfilePage() {
       setProfile(responseProfile);
       setCatalogs(responseCatalogs);
       setChallenges(responseChallenges)
+      console.log(responseProfile)
     } catch (err) {
       toast.error("The profile could not be loaded.");
     } finally {

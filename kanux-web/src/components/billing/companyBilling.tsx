@@ -2,55 +2,125 @@
 import { useEffect, useState } from "react"
 import CompanyPlanCard from "./CompanyPlanCard";
 import CurrentPlanDetails from "./CurrentPlanDetails"
-import { CompanyPlan, subscriptionsService } from "@/services/subscriptions.service";
+import { CompanyPlan, subscriptionsService, CompanySubscriptionResponse } from "@/services/subscriptions.service";
 
-const CURRENT_PLAN_DETAILS = {
-  plan: "Professional",
-  billingCycle: "Monthly",
-  nextBillingDate: "February 1, 2026",
-  paymentMethod: "•••• •••• •••• 4242",
-}
+import { LoadingSpinner } from "../ui/LoadingSpinner";
+import { ErrorAlert } from "@/components/ui/error-alert";
+import { toast, Toaster } from "sonner";
+
+//static data
+const FALLBACK_DETAILS = {
+  plan: "Free",
+  billingCycle: "Unlimited",
+  nextBillingDate: "No expiration",
+  paymentMethod: "No payment method",
+};
 
 export default function CompanyBilling() {
+  const [companyPlans, setcompanyPlan] = useState<CompanyPlan[]>([]);
+  const [currentPlan, setCurrentPlan] = useState<CompanySubscriptionResponse | undefined>();
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>()
 
-  const [companyPlan,setcompanyPlan] = useState<CompanyPlan[]>([])
-  const [loading, setLoading] = useState<Boolean>(true);
+  const getData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
 
-  const getData = async ()=>{
-      try{
-        const responsePlans= await subscriptionsService.getAllCompanyPlans();
-        setcompanyPlan(responsePlans);
-      }catch(error){
-        console.log("erro get data")
-      }
+      const responsePlans = await subscriptionsService.getAllCompanyPlans();
+      setcompanyPlan(responsePlans);
+      const responseCurrent = await subscriptionsService.getCompanySubscription();
+      console.log(responseCurrent);
+      setCurrentPlan(responseCurrent);
+    } catch (error) {
+      const errorMessage = "Could not load billing information. Please check your connection.";
+      setError(errorMessage);
+      toast.error("Failed to sync subscription data");
+    } finally {
+      setLoading(false);
+    }
   }
 
-  useEffect(()=>{
+  useEffect(() => {
     getData()
-  },[])
+  }, [])
 
+  const isFreePlan = !currentPlan || Number(currentPlan?.company_plans?.price_monthly) === 0;
+
+  const formattedDate = currentPlan?.end_date
+    ? new Date(currentPlan.end_date).toLocaleDateString('en-US', {
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric'
+    })
+    : FALLBACK_DETAILS.nextBillingDate;
+
+  // data current plans
+  const planInfo = {
+    name: currentPlan?.company_plans?.name || FALLBACK_DETAILS.plan,
+    cycle: isFreePlan ? "One-time / Free" : "Monthly",
+    date: isFreePlan ? "No expiration" : formattedDate,
+    method: isFreePlan ? "No payment method" : "Card ending in •••• 4242"
+  };
+
+  // upgrade plan
   const handleUpgrade = (planId: string) => {
     console.log("Upgrade clicked →", planId)
   }
 
+  //load view
+  if (loading) {
+    return (
+      <div className="flex min-h-screen w-full items-center justify-center">
+        <LoadingSpinner size="md" message="Loading your billing details.." className="Billing" />
+      </div>
+    );
+  }
+  // show error load plans
+  if (!companyPlans) {
+    return (
+      <ErrorAlert message="Error loading billing. Please try again." onRetry={getData} />
+    );
+  }
+
   return (
-    <div className="min-h-full px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5">
-        {companyPlan.map((plan) => (
-          <CompanyPlanCard
-            key={plan.id}
-            plan={plan}
-            isCurrentPlan={false}
-            onUpgrade={handleUpgrade}
+    <>
+      <div className="min-h-full px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5">
+          {companyPlans
+            .slice()
+            .sort((a, b) => Number(a.price_monthly) - Number(b.price_monthly))
+            .map((plan) => (
+              <CompanyPlanCard
+                key={plan.id}
+                plan={plan}
+                isCurrentPlan={
+                  plan.id === currentPlan?.plan_id ||
+                  (Number(plan.price_monthly) === 0 && !currentPlan)
+                }
+                onUpgrade={handleUpgrade}
 
+              />
+            ))}
+        </div>
+
+        {/* details */}
+        <div className="mt-4">
+          <CurrentPlanDetails
+            planName={planInfo.name}
+            billingCycle={planInfo.cycle}
+            nextBillingDate={planInfo.date}
+            paymentMethod={planInfo.method}
           />
-        ))}
+        </div>
       </div>
-
-      {/* details */}
-      <div className="mt-4">
-        <CurrentPlanDetails planName={CURRENT_PLAN_DETAILS.plan} billingCycle={CURRENT_PLAN_DETAILS.billingCycle} nextBillingDate={CURRENT_PLAN_DETAILS.nextBillingDate} paymentMethod={CURRENT_PLAN_DETAILS.paymentMethod} />
-      </div>
-    </div>
+      <Toaster
+        position="top-right"
+        richColors
+        closeButton
+        expand={false}
+        duration={4000}
+      />
+    </>
   )
 }
