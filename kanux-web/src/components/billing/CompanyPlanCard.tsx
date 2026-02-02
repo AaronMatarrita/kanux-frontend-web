@@ -41,6 +41,10 @@ export default function CompanyPlanCard({ plan, isCurrentPlan, onUpgrade }: {
                 {plan.company_plan_features.map((feature) => (
                     <div key={feature.id}>
                         <FeatureItem
+                            label={`${feature.max_profile_views_per_month} max. de vista de perfiles por mes`}
+                            hasAccess={true}
+                        />
+                        <FeatureItem
                             label={feature.can_contact_talent ? "Contactar talento" : "Sin contactar talento"}
                             hasAccess={feature.can_contact_talent ?? false}
                         />

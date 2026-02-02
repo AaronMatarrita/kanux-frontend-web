@@ -7,6 +7,7 @@ import { CompanyPlan, subscriptionsService, CompanySubscriptionResponse } from "
 import { LoadingSpinner } from "../ui/LoadingSpinner";
 import { ErrorAlert } from "@/components/ui/error-alert";
 import { toast, Toaster } from "sonner";
+import { companiesService } from "@/services";
 
 //static data
 const FALLBACK_DETAILS = {
@@ -30,7 +31,6 @@ export default function CompanyBilling() {
       const responsePlans = await subscriptionsService.getAllCompanyPlans();
       setcompanyPlan(responsePlans);
       const responseCurrent = await subscriptionsService.getCompanySubscription();
-      console.log(responseCurrent);
       setCurrentPlan(responseCurrent);
     } catch (error) {
       const errorMessage = "Could not load billing information. Please check your connection.";
@@ -64,7 +64,14 @@ export default function CompanyBilling() {
   };
 
   // upgrade plan
-  const handleUpgrade = (planId: string) => {
+  const handleUpgrade = async (planId: string) => {
+    try{
+      const upgrade = await subscriptionsService.upgradeCompanyPlan(planId,{status:'active'});
+      const responseCurrent = await subscriptionsService.getCompanySubscription();
+      setCurrentPlan(responseCurrent);
+    }catch(error){
+      console.log(error);
+    }
     console.log("Upgrade clicked →", planId)
   }
 
