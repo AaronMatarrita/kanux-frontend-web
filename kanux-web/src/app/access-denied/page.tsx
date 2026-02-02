@@ -10,7 +10,6 @@ export default function AccessDeniedPage() {
   const { session, logout } = useAuth();
 
   useEffect(() => {
-    // Si no hay sesión, redirigir al login
     if (!session?.isAuthenticated) {
       router.push("/auth/login");
     }

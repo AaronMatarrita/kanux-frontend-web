@@ -1,5 +1,6 @@
 "use client";
-import { createContext, useContext, useState } from "react";
+
+import { createContext, useContext, useEffect, useState } from "react";
 import type { Session } from "@/types/session.types";
 
 type AuthContextType = {
@@ -12,20 +13,34 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [session, setSession] = useState<Session | null>(() => {
-    if (typeof window === "undefined") return null;
+  const [session, setSession] = useState<Session | null>(null);
+  const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
     const stored = localStorage.getItem("session");
-    return stored ? JSON.parse(stored) : null;
-  });
 
-  const [loading] = useState(false);
+    if (!stored) {
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const parsed: Session = JSON.parse(stored);
+
+      setSession((prev) =>
+        prev?.sessionId === parsed.sessionId ? prev : parsed
+      );
+    } catch (error) {
+      console.error("Invalid session in localStorage", error);
+      localStorage.removeItem("session");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   const login = async (sessionData: Session) => {
-    console.log("Storing session data:", sessionData);
     localStorage.setItem("session", JSON.stringify(sessionData));
     setSession(sessionData);
-    console.log("Session state updated:");
   };
 
   const logout = async () => {
