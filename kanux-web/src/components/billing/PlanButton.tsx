@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+
 
 export default function PlanButton({ id_plan, isCurrentPlan, onUpgrade }: {
   id_plan: string;
@@ -7,8 +9,11 @@ export default function PlanButton({ id_plan, isCurrentPlan, onUpgrade }: {
   onUpgrade: (id: string) => void;
 }) {
 
+  const [upgrade, setUpgrade] = useState<boolean>(false);
   const onHandleUpgrade = async () => {
-      onUpgrade(id_plan)
+    setUpgrade(true);
+    await onUpgrade(id_plan)
+    setUpgrade(false);
   }
 
   if (isCurrentPlan) {
@@ -25,9 +30,14 @@ export default function PlanButton({ id_plan, isCurrentPlan, onUpgrade }: {
   return (
     <button
       onClick={onHandleUpgrade}
-      className="w-full py-2.5 rounded-lg bg-[#1e2a5e] text-white text-sm font-semibold hover:bg-[#162044] transition-colors duration-200"
+      disabled={upgrade}
+      className={`w-full py-2.5 rounded-lg text-sm font-semibold transition-colors duration-200 
+    ${upgrade
+          ? "bg-gray-400 cursor-not-allowed opacity-70"
+          : "bg-[#1e2a5e] text-white hover:bg-[#162044]"
+        }`}
     >
-      Upgrade
+      {upgrade ? "Processing..." : "Upgrade"}
     </button>
   );
 }

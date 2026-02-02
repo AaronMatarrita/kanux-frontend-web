@@ -69,10 +69,10 @@ export default function CompanyBilling() {
       const upgrade = await subscriptionsService.upgradeCompanyPlan(planId,{status:'active'});
       const responseCurrent = await subscriptionsService.getCompanySubscription();
       setCurrentPlan(responseCurrent);
+      toast.success("Successfully subscribed to a new plan")
     }catch(error){
-      console.log(error);
+      toast.error("An error occurred while subscribing to another plan.");
     }
-    console.log("Upgrade clicked →", planId)
   }
 
   //load view

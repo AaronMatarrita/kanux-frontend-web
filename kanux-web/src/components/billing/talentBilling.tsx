@@ -70,8 +70,15 @@ export default function TalentBilling() {
   };
 
   const handleUpgrade = async (planId: string) => {
-    console.log("plan id -> ", planId)
-  };
+    try{
+      const upgrade = await subscriptionsService.upgradeTalentPlan(planId,{status:'active'});
+      const responseCurrent = await subscriptionsService.getTalentSubscription();
+      setCurrentPlan(responseCurrent);
+      toast.success("Successfully subscribed to a new plan")
+    }catch(error){
+      toast.error("An error occurred while subscribing to another plan.");
+    }
+  }
 
   if (loading) {
     return (
