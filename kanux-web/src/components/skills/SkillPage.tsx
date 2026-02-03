@@ -76,7 +76,7 @@ export default function SkillsPage() {
 
   return (
     <div className="min-h-screen p-4 md:p-6 lg:p-8">
-      <div className="max-w-screen-2xl mx-auto w-full">
+      <div className="mx-auto w-full">
         <div className="mb-6 md:mb-8">
           <Tabs tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
         </div>
