@@ -31,7 +31,7 @@ export function ActionGuard({ children, feature, actionName }: ActionGuardProps)
 
   const handleUpgrade = () => {
     setShowModal(false);
-    router.push("/billing"); 
+    router.push(`/${userType}/billing`); 
   };
 
   return (
