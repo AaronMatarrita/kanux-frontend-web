@@ -90,6 +90,7 @@ export interface CompanySubscription {
   plan_id: string;
   status: string;
   end_date?: string;
+
 }
 
 export interface TalentSubscription {
@@ -110,7 +111,77 @@ export interface UsageResponse {
   count?: number;
   [key: string]: unknown;
 }
+//talent current subscription response
+export interface TalentPlanDetail {
+  id: string;
+  name: string;
+  description: string | null;
+  price_monthly: string;
+  created_at: string;
+}
 
+export interface TalentSubscriptionResponse {
+  id: string;
+  id_profile: string;
+  plan_id: string;
+  status: "active" | "inactive" | "pending" | "expired";
+  end_date: string;
+  talent_plans: TalentPlanDetail;
+}
+
+// Wrapper
+export interface SubscriptionDataWrapper {
+  data: TalentSubscriptionResponse;
+  succes: boolean;
+}
+
+// ----------SUBSCRIPTION RESPONSE---------------
+// ---feature usage ---
+export interface CompanyPlanFeatures {
+  id?: string;
+  max_profile_views_per_month?: number;
+  can_contact_talent?: boolean;
+  can_use_advanced_filters?: boolean;
+  can_create_custom_challenges?: boolean;
+  can_access_metrics?: boolean;
+  can_access_reports?: boolean;
+}
+
+export interface CompanyPlanUsage {
+  id: string;
+  company_id: string;
+  profile_views_used: number;
+  challenges_created: number;
+  period_start: string;
+  period_end: string;
+}
+
+// --- detail plan---
+export interface CompanyPlanDetail {
+  id: string;
+  name: string;
+  description: string | null;
+  price_monthly: string; 
+  company_plan_features: CompanyPlanFeatures[];
+}
+
+// --- response ---
+export interface CompanySubscriptionResponse {
+  id: string;
+  company_id: string;
+  plan_id: string;
+  status: "active" | "inactive" | "pending" | "expired";
+  start_date: string;
+  end_date: string;
+  company_plans: CompanyPlanDetail;
+  usage: CompanyPlanUsage | null;
+}
+
+// wraper
+export interface CompanySubscriptionWrapper {
+  success: boolean;
+  data: CompanySubscriptionResponse;
+}
 // ============================================================================
 // Service
 // ============================================================================
@@ -167,30 +238,28 @@ export const subscriptionsService = {
   // ==================== SUBSCRIPTIONS ====================
 
   /**
-   * POST /subscriptions/talent/:id_profile/plan/:id_plan
+   * POST /subscriptions/talent/plan/:id_plan
    */
   subscribeTalent: async (
-    profileId: string,
     planId: string,
     data: CreateTalentSubscriptionRequest = {},
   ): Promise<TalentSubscription> => {
     const res = await httpClient.post<TalentSubscription>(
-      `/subscriptions/talent/${profileId}/plan/${planId}`,
+      `/subscriptions/talent/plan/${planId}`,
       data,
     );
     return res.data;
   },
 
   /**
-   * POST /subscriptions/company/:id_company/plan/:id_plan
+   * POST /subscriptions/company/plan/:id_plan
    */
   subscribeCompany: async (
-    companyId: string,
     planId: string,
     data: CreateCompanySubscriptionRequest = {},
   ): Promise<CompanySubscription> => {
     const res = await httpClient.post<CompanySubscription>(
-      `/subscriptions/company/${companyId}/plan/${planId}`,
+      `/subscriptions/company/plan/${planId}`,
       data,
     );
     return res.data;
@@ -233,4 +302,53 @@ export const subscriptionsService = {
     );
     return res.data;
   },
+
+  /**
+   * GET /subscriptions/company/my-subscription
+   */
+  getCompanySubscription: async (): Promise<CompanySubscriptionResponse> => {
+    const res = await httpClient.get<CompanySubscriptionWrapper>(
+      `/subscriptions/company/my-subscription`
+    );
+    return res.data.data;
+  },
+
+  /**
+   * GET /subscriptions/talent/my-subscription
+   */
+  getTalentSubscription: async (): Promise<TalentSubscriptionResponse> => {
+    const res = await httpClient.get<SubscriptionDataWrapper>(
+      `/subscriptions/talent/my-subscription`
+    );
+    return res.data.data;
+  },
+
+  /**
+   * PUT /subscriptions/company/upgrade/:id_plan
+   */
+  upgradeCompanyPlan: async (
+    planId: string,
+    data: CreateCompanySubscriptionRequest = {}
+  ): Promise<CompanySubscription> => {
+    const res = await httpClient.put<CompanySubscription>(
+      `/subscriptions/company/upgrade/${planId}`,
+      data
+    );
+    return res.data;
+  },
+
+  /**
+   * PUT /subscriptions/talent/upgrade/:id_plan
+   */
+  upgradeTalentPlan: async (
+    planId: string,
+    data: CreateTalentSubscriptionRequest = {}
+  ): Promise<TalentSubscription> => {
+    const res = await httpClient.put<TalentSubscription>(
+      `/subscriptions/talent/upgrade/${planId}`,
+      data
+    );
+    return res.data;
+  },
+
 };
