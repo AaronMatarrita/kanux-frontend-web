@@ -13,7 +13,7 @@ export function FeatureGuard({ children, feature, infoText }: FeatureGuardProps)
 
   if (loading) return (<div>Checking permissions...</div>);
 
-  // Acceso dinámico según las tablas de tu BD
+  // dinamyc get data
   const features = userType === "company" 
     ? planData?.company_plans?.company_plan_features?.[0]
     : planData?.talent_plans?.talent_plan_features?.[0];
