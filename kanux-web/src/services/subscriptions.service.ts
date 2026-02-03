@@ -118,6 +118,7 @@ export interface TalentPlanDetail {
   description: string | null;
   price_monthly: string;
   created_at: string;
+  talent_plan_features:TalentPlanFeatures
 }
 
 export interface TalentSubscriptionResponse {
