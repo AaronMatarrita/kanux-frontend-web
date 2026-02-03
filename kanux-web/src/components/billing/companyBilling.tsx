@@ -5,11 +5,10 @@ import CurrentPlanDetails from "./CurrentPlanDetails"
 import { CompanyPlan, subscriptionsService, CompanySubscriptionResponse } from "@/services/subscriptions.service";
 
 import { LoadingSpinner } from "../ui/LoadingSpinner";
-import { ErrorAlert } from "@/components/ui/error-alert";
 import { toast, Toaster } from "sonner";
-import { companiesService } from "@/services";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { ErrorAlert } from "../ui/error-alert";
 
-//static data
 const FALLBACK_DETAILS = {
   plan: "Free",
   billingCycle: "Unlimited",
@@ -21,69 +20,76 @@ export default function CompanyBilling() {
   const [companyPlans, setcompanyPlan] = useState<CompanyPlan[]>([]);
   const [currentPlan, setCurrentPlan] = useState<CompanySubscriptionResponse | undefined>();
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>()
+  const [error, setError] = useState<string | null>();
 
+  // state confirm
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
+  const [isUpgrading, setIsUpgrading] = useState(false);
+  // get data
   const getData = async () => {
     try {
       setLoading(true);
       setError(null);
-
       const responsePlans = await subscriptionsService.getAllCompanyPlans();
       setcompanyPlan(responsePlans);
       const responseCurrent = await subscriptionsService.getCompanySubscription();
       setCurrentPlan(responseCurrent);
     } catch (error) {
-      const errorMessage = "Could not load billing information. Please check your connection.";
-      setError(errorMessage);
+      setError("Could not load billing information.");
       toast.error("Failed to sync subscription data");
     } finally {
       setLoading(false);
     }
   }
 
-  useEffect(() => {
-    getData()
-  }, [])
+  useEffect(() => { getData() }, [])
 
+  // open modal confirm
+  const openConfirmDialog = (planId: string) => {
+    setSelectedPlanId(planId);
+    setIsConfirmOpen(true);
+  };
+
+  // confirm upgrade
+  const handleConfirmUpgrade = async () => {
+    if (!selectedPlanId) return;
+    try {
+      setIsUpgrading(true);
+      const response = await subscriptionsService.upgradeCompanyPlan(selectedPlanId, { status: 'active' });
+      // refresh data
+      const responseCurrent = await subscriptionsService.getCompanySubscription();
+      setCurrentPlan(responseCurrent);
+
+      toast.success("Successfully subscribed to a new plan");
+      setIsConfirmOpen(false); // close modal
+    } catch (error) {
+      toast.error("An error occurred while subscribing.");
+      throw error;
+    } finally {
+      setIsUpgrading(false);
+    }
+  };
+
+  // Render logic...
   const isFreePlan = !currentPlan || Number(currentPlan?.company_plans?.price_monthly) === 0;
-
   const formattedDate = currentPlan?.end_date
-    ? new Date(currentPlan.end_date).toLocaleDateString('en-US', {
-      month: 'long',
-      day: 'numeric',
-      year: 'numeric'
-    })
+    ? new Date(currentPlan.end_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
     : FALLBACK_DETAILS.nextBillingDate;
 
-  // data current plans
   const planInfo = {
     name: currentPlan?.company_plans?.name || FALLBACK_DETAILS.plan,
     cycle: isFreePlan ? "One-time / Free" : "Monthly",
     date: isFreePlan ? "No expiration" : formattedDate,
     method: isFreePlan ? "No payment method" : "Card ending in •••• 4242"
   };
-
-  // upgrade plan
-  const handleUpgrade = async (planId: string) => {
-    try{
-      const upgrade = await subscriptionsService.upgradeCompanyPlan(planId,{status:'active'});
-      const responseCurrent = await subscriptionsService.getCompanySubscription();
-      setCurrentPlan(responseCurrent);
-      toast.success("Successfully subscribed to a new plan")
-    }catch(error){
-      toast.error("An error occurred while subscribing to another plan.");
-    }
-  }
-
-  //load view
-  if (loading) {
-    return (
-      <div className="flex min-h-screen w-full items-center justify-center">
-        <LoadingSpinner size="md" message="Loading your billing details.." className="Billing" />
-      </div>
-    );
-  }
-  // show error load plans
+  //loading view
+  if (loading) return (
+    <div className="flex min-h-screen w-full items-center justify-center">
+      <LoadingSpinner size="md" message="Loading your billing details.." />
+    </div>
+  );
+  //loading view
   if (!companyPlans) {
     return (
       <ErrorAlert message="Error loading billing. Please try again." onRetry={getData} />
@@ -105,13 +111,12 @@ export default function CompanyBilling() {
                   plan.id === currentPlan?.plan_id ||
                   (Number(plan.price_monthly) === 0 && !currentPlan)
                 }
-                onUpgrade={handleUpgrade}
-
+                // set function to open confirm
+                onUpgrade={() => openConfirmDialog(plan.id)}
               />
             ))}
         </div>
 
-        {/* details */}
         <div className="mt-4">
           <CurrentPlanDetails
             planName={planInfo.name}
@@ -121,6 +126,19 @@ export default function CompanyBilling() {
           />
         </div>
       </div>
+
+      {/* modal confirmation */}
+      <ConfirmDialog
+        isOpen={isConfirmOpen}
+        title="Confirm Plan Change"
+        description="Are you sure you want to change your current subscription? The new plan will be applied immediately."
+        isLoading={isUpgrading}
+        confirmLabel="Confirm upgrade"
+        cancelLabel="Cancel"
+        onConfirm={handleConfirmUpgrade}
+        onCancel={() => setIsConfirmOpen(false)}
+      />
+
       <Toaster
         position="top-right"
         richColors
