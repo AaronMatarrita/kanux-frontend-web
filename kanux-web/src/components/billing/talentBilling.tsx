@@ -1,18 +1,15 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import PlanCard from "./TalentPlanCard";
 import CurrentPlanDetails from "./CurrentPlanDetails";
-import {
-  TalentPlan,
-  subscriptionsService,
-  TalentSubscriptionResponse
-} from "@/services/subscriptions.service";
+import { TalentPlan, subscriptionsService, TalentSubscriptionResponse } from "@/services/subscriptions.service";
 
 import { LoadingSpinner } from "../ui/LoadingSpinner";
 import { ErrorAlert } from "@/components/ui/error-alert";
 import { toast, Toaster } from "sonner";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
-//static data
+// Static fallback data
 const FALLBACK_DETAILS = {
   plan: "Free",
   billingCycle: "Unlimited",
@@ -26,16 +23,22 @@ export default function TalentBilling() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
+  // --- Confirmation Dialog States ---
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
+  const [isUpgrading, setIsUpgrading] = useState(false);
+
   const getData = async () => {
     try {
       setLoading(true);
       setError(null);
 
-      // get data
+      // Fetch plans and subscription data independently to avoid blocking
       const responsePlans = await subscriptionsService.getAllTalentPlans();
       setTalentPlans(responsePlans);
       const responseCurrent = await subscriptionsService.getTalentSubscription();
       setCurrentPlan(responseCurrent);
+
     } catch (err: any) {
       const errorMessage = "Could not load billing information. Please check your connection.";
       setError(errorMessage);
@@ -49,10 +52,10 @@ export default function TalentBilling() {
     getData();
   }, []);
 
-  // validation is free current plan
+  // check if current plan is free
   const isFreePlan = !currentPlan || Number(currentPlan?.talent_plans?.price_monthly) === 0;
 
-  // fdate format
+  // Date formatting
   const formattedDate = currentPlan?.end_date
     ? new Date(currentPlan.end_date).toLocaleDateString('en-US', {
       month: 'long',
@@ -61,7 +64,7 @@ export default function TalentBilling() {
     })
     : FALLBACK_DETAILS.nextBillingDate;
 
-  // data current plans
+  // Current plan display data
   const planInfo = {
     name: currentPlan?.talent_plans?.name || FALLBACK_DETAILS.plan,
     cycle: isFreePlan ? "One-time / Free" : "Monthly",
@@ -69,25 +72,41 @@ export default function TalentBilling() {
     method: isFreePlan ? "No payment method" : "Card ending in •••• 4242"
   };
 
-  const handleUpgrade = async (planId: string) => {
-    try{
-      const upgrade = await subscriptionsService.upgradeTalentPlan(planId,{status:'active'});
+  // Open the confirmation modal
+  const handleUpgradeClick = (planId: string) => {
+    setSelectedPlanId(planId);
+    setIsConfirmOpen(true);
+  };
+
+  // upgrade
+  const handleConfirmUpgrade = async () => {
+    if (!selectedPlanId) return;
+
+    try {
+      setIsUpgrading(true);
+      const response = await subscriptionsService.upgradeTalentPlan(selectedPlanId, { status: 'active' });
+      // Refresh current subscription data
       const responseCurrent = await subscriptionsService.getTalentSubscription();
       setCurrentPlan(responseCurrent);
-      toast.success("Successfully subscribed to a new plan")
-    }catch(error){
-      toast.error("An error occurred while subscribing to another plan.");
+      toast.success("Successfully subscribed to the new plan");
+      setIsConfirmOpen(false);
+    } catch (err) {
+      toast.error("An error occurred while upgrading your plan.");
+      throw err;
+    } finally {
+      setIsUpgrading(false);
     }
-  }
+  };
 
   if (loading) {
     return (
       <div className="flex min-h-screen w-full items-center justify-center">
-        <LoadingSpinner size="md" message="Loading your billing details.." className="Billing" />
+        <LoadingSpinner size="md" message="Loading your billing details..." className="Billing" />
       </div>
     );
   }
 
+  // Error alert remains as required
   if (!talentPlans) {
     return (
       <ErrorAlert message="Error loading billing. Please try again." onRetry={getData} />
@@ -97,7 +116,7 @@ export default function TalentBilling() {
   return (
     <>
       <div className="min-h-full px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
-        {/* planss */}
+        {/* Available Plans Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5">
           {talentPlans
             .slice()
@@ -110,12 +129,12 @@ export default function TalentBilling() {
                   plan.id === currentPlan?.plan_id ||
                   (Number(plan.price_monthly) === 0 && !currentPlan)
                 }
-                onUpgrade={handleUpgrade}
+                onUpgrade={() => handleUpgradeClick(plan.id)}
               />
             ))}
         </div>
 
-        {/* current plan details */}
+        {/* Subscription Detail Section */}
         <div className="mt-8">
           <h3 className="text-lg font-medium text-gray-900 mb-4">Subscription Details</h3>
           <CurrentPlanDetails
@@ -126,6 +145,19 @@ export default function TalentBilling() {
           />
         </div>
       </div>
+
+      {/* Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={isConfirmOpen}
+        title="Confirm Plan Upgrade"
+        description="Are you sure you want to change your current subscription? Your new benefits will be available immediately."
+        isLoading={isUpgrading}
+        confirmLabel="Confirm Upgrade"
+        cancelLabel="Cancel"
+        onConfirm={handleConfirmUpgrade}
+        onCancel={() => setIsConfirmOpen(false)}
+      />
+
       <Toaster
         position="top-right"
         richColors
@@ -133,7 +165,6 @@ export default function TalentBilling() {
         expand={false}
         duration={4000}
       />
-
     </>
   );
 }
