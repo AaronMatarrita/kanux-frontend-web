@@ -105,41 +105,7 @@ interface LearningBackgroundsApiResponse {
 }
 
 class CandidatesService {
-async getCandidates(
-    token: string,
-    page: number = 1,
-    pageSize: number = 10
-  ): Promise<{
-    candidates: CandidateListItem[];
-    pagination: PaginationMeta;
-  }> {
-    const res = await httpClient.get<CandidatesApiResponse>(
-      "/companies/company/candidates",
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        params: {
-          page,
-          pageSize,
-        },
-      }
-    );
 
-    return {
-      candidates: res.data.data.map((c) => ({
-        talent_id: c.talent_id,
-        first_name: c.talent_profile.first_name,
-        last_name: c.talent_profile.last_name,
-        title: c.talent_profile.title,
-        education: c.talent_profile.education,
-        skills: c.skills ?? [],
-        profile: c.talent_profile,
-        avg_score: c.avg_score,
-      })),
-      pagination: res.data.pagination,
-    };
-  }
 
   async getCandidatesFiltered(
   token: string,
@@ -184,6 +150,41 @@ async getCandidates(
     pagination: res.data.pagination,
   };
 }
+
+async getTalentProfileSummary(
+  token: string,
+  compId: string,
+  talentProfileId: string
+): Promise<{
+  candidates: CandidateListItem[];
+}> {
+  const res = await httpClient.get(
+    `/companies/company/${compId}/${talentProfileId}/summary`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  const c = res.data;
+
+  return {
+    candidates: [
+      {
+        talent_id: c.talent_id,
+        first_name: c.talent_profile.first_name,
+        last_name: c.talent_profile.last_name,
+        title: c.talent_profile.title,
+        education: c.talent_profile.education,
+        skills: c.skills ?? [],
+        profile: c.talent_profile,
+        avg_score: c.avg_score,
+      },
+    ],
+  };
+}
+
 
 async  getLearningBackgrounds(token: string): Promise<LearningBackground[]> {
   const res = await httpClient.get<LearningBackgroundsApiResponse>(

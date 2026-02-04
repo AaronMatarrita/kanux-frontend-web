@@ -1,30 +1,104 @@
 "use client";
 
 import { Mail, PhoneCall, X } from "lucide-react";
-import type { CandidateListItem } from "@/services/candidates.service";
-import { useEffect, ReactNode } from "react";
+import { candidatesService, Skill,CandidateListItem } from "@/services/candidates.service";
+import { useAuth } from "@/context/AuthContext";
+
+
+import { useEffect, ReactNode,useState } from "react";
 import { LucideIcon } from "lucide-react";
 import Image from "next/image";
+import { DashboardErrorState } from "../dashboard/DashboardErrorState";
 
 interface CandidateProfileDetailsProps {
-  candidate: CandidateListItem;
+  compId: string;
+  talentProfileId: string;
   onClose: () => void;
 }
 
 export const CandidateProfileDetails: React.FC<
   CandidateProfileDetailsProps
-> = ({ candidate, onClose }) => {
-  const { profile, skills, avg_score } = candidate;
+> = ({ compId, talentProfileId, onClose }) => {
+  const { session } = useAuth();
 
-  const initials = `${profile.first_name?.[0] ?? ""}${profile.last_name?.[0] ?? ""}`;
+  const [candidate, setCandidate] = useState<CandidateListItem | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const [retrying, setRetrying] = useState(false);
+
+  const loadCandidate = async (isRetry = false) => {
+  if (!session?.token) return;
+
+  setError(false);
+  setLoading(!isRetry);
+  setRetrying(isRetry);
+
+  try {
+    const res = await candidatesService.getTalentProfileSummary(
+      session.token,
+      compId,
+      talentProfileId
+    );
+
+    setCandidate(res.candidates[0] ?? null);
+  } catch (err) {
+    console.error(err);
+    setError(true);
+  } finally {
+    setLoading(false);
+    setRetrying(false);
+  }
+};
+
+  useEffect(() => {
+    loadCandidate();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session?.token, compId, talentProfileId]);
 
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === 'Escape') onClose();
     };
-    window.addEventListener("keydown", handleEsc);
-    return () => window.removeEventListener("keydown", handleEsc);
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
   }, [onClose]);
+
+  /* -------------------- STATES -------------------- */
+
+  if (loading) {
+    return (
+      <>
+        <div className="fixed inset-0 z-40 bg-black/60" />
+        <div className="fixed inset-y-0 right-0 z-50 w-full max-w-xl bg-white flex items-center justify-center">
+          <p className="text-slate-500">Cargando perfil…</p>
+        </div>
+      </>
+    );
+  }
+
+  if (error || !candidate) {
+    return (
+      <>
+        <div className="fixed inset-0 z-40 bg-black/60" onClick={onClose} />
+        <div className="fixed inset-y-0 right-0 z-50 w-full max-w-xl bg-white p-6 flex items-center justify-center">
+          <DashboardErrorState
+            title="No se pudo cargar el perfil"
+            message="Ocurrió un error al cargar la información del talento."
+            onRetry={() => loadCandidate(true)}
+            isRetrying={retrying}
+          />
+        </div>
+      </>
+    );
+  }
+
+  /* -------------------- DATA -------------------- */
+
+  const { profile, skills, avg_score } = candidate;
+
+  const initials = `${profile.first_name?.[0] ?? ''}${profile.last_name?.[0] ?? ''}`;
+
+  /* -------------------- RENDER -------------------- */
 
   return (
     <>
@@ -104,7 +178,7 @@ export const CandidateProfileDetails: React.FC<
               {/* SKILLS */}
               <Section title="Habilidades">
                 <div className="flex flex-wrap gap-2">
-                  {skills.map((skill) => (
+                  {skills.map((skill:Skill) => (
                     <span
                       key={skill.id}
                       className="px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg border"
@@ -149,7 +223,6 @@ export const CandidateProfileDetails: React.FC<
   );
 };
 
-/* -------------------- Helpers -------------------- */
 
 const Section = ({
   title,
