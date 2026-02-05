@@ -12,24 +12,19 @@ const NAV_ITEMS = [
 ] as const;
 
 function Logo({ isScrolled }: { isScrolled: boolean }) {
+  const logoSrc = isScrolled
+    ? "/brand/kanux-logo-sidebar.svg"
+    : "/brand/kanux-logo-variant-white.svg";
+
   return (
-    <div className="flex items-center gap-2.5 group cursor-pointer">
-      <div
-        className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold text-lg transition-all duration-300 group-hover:scale-105 ${
-          isScrolled
-            ? "bg-primary text-primary-foreground"
-            : "bg-white text-primary"
-        }`}
-      >
-        K
-      </div>
-      <span
-        className={`font-semibold text-lg transition-colors duration-300 ${
+    <div className="flex items-center group cursor-pointer">
+      <img
+        src={logoSrc}
+        alt="Kánux"
+        className={`h-9 w-auto transition-all duration-300 group-hover:scale-105 ${
           isScrolled ? "text-foreground" : "text-white"
         }`}
-      >
-        Kánux
-      </span>
+      />
     </div>
   );
 }

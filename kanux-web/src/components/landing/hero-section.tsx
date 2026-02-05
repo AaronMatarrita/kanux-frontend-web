@@ -47,29 +47,18 @@ export function HeroSection() {
   return (
     <section
       ref={heroRef}
-      className="relative min-h-screen flex items-center justify-center overflow-hidden bg-linear-to-b from-primary via-primary to-blue-700"
+      className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[#007ef8]"
     >
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-1/4 -left-20 w-96 h-96 bg-white/5 rounded-full blur-3xl" />
         <div className="absolute bottom-1/4 -right-20 w-80 h-80 bg-secondary/10 rounded-full blur-3xl" />
       </div>
 
-      <div
-        className="absolute inset-0 opacity-[0.02]"
-        style={{
-          backgroundImage:
-            "linear-gradient(white 1px, transparent 1px), linear-gradient(90deg, white 1px, transparent 1px)",
-          backgroundSize: "60px 60px",
-        }}
-      />
-
       <div className="relative z-10 max-w-5xl mx-auto px-6 text-center pt-20">
         <h1 className="hero-title text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-tight tracking-tight">
           Desarrolla habilidades.
           <br />
-          <span className="text-[#22c55e] drop-shadow-[0_2px_8px_rgba(34,197,94,0.5)]">
-            Descubre el talento.
-          </span>
+          <span className="text-[#22c55e]">Descubre el talento.</span>
         </h1>
 
         <p className="hero-subtitle mt-6 text-lg sm:text-xl md:text-2xl text-white/80 font-medium">

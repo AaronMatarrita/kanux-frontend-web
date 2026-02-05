@@ -11,13 +11,12 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
           <FadeInOnScroll>
             <div>
-              <div className="flex items-center gap-2.5 mb-4">
-                <div className="w-9 h-9 bg-primary rounded-xl flex items-center justify-center text-primary-foreground font-bold text-lg">
-                  K
-                </div>
-                <span className="font-semibold text-lg text-foreground">
-                  Kánux
-                </span>
+              <div className="flex items-center mb-4">
+                <img
+                  src="/brand/kanux-logo-sidebar.svg"
+                  alt="Kánux"
+                  className="h-9 w-auto"
+                />
               </div>
               <p className="text-muted-foreground text-sm leading-relaxed">
                 Conectamos profesionales y empresas a través de retos reales y
