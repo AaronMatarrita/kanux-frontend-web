@@ -23,6 +23,7 @@ import {
   DashboardStats,
 } from "@/services/profiles.service";
 import { DashboardChallenge } from "@/components/dashboard/RecommendedChallenges";
+import { Card, CardContent } from "@/components/ui/card";
 
 function useIsClient() {
   return useSyncExternalStore(
@@ -150,47 +151,51 @@ export default function TalentDashboardPage() {
   const renderFeedContent = () => {
     if (isLoadingFeed) {
       return (
-        <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-8">
-          <div className="flex flex-col items-center justify-center">
-            <div className="w-16 h-16 mb-4 rounded-full bg-gray-100 animate-pulse"></div>
-            <div className="h-4 w-32 bg-gray-200 rounded mb-2 animate-pulse"></div>
-            <div className="h-3 w-48 bg-gray-100 rounded animate-pulse"></div>
-          </div>
-        </div>
+        <Card>
+          <CardContent className="py-8">
+            <div className="flex flex-col items-center justify-center">
+              <div className="w-16 h-16 mb-4 rounded-full bg-muted animate-pulse"></div>
+              <div className="h-4 w-32 bg-muted rounded mb-2 animate-pulse"></div>
+              <div className="h-3 w-48 bg-muted rounded animate-pulse"></div>
+            </div>
+          </CardContent>
+        </Card>
       );
     }
 
     if (feedError) {
       return (
-        <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
-          <div className="text-center py-8">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-red-50 flex items-center justify-center">
-              <svg
-                className="w-8 h-8 text-red-500"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+        <Card>
+          <CardContent className="py-8">
+            <div className="text-center">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-red-50 flex items-center justify-center">
+                <svg
+                  className="w-8 h-8 text-red-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold text-foreground mb-2">
+                Las publicaciones no se pudieron cargar correctamente.
+              </h3>
+              <p className="text-muted-foreground mb-4">{feedError}</p>
+              <button
+                onClick={fetchFeedPosts}
+                className="px-4 py-2 rounded-lg border border-border bg-background text-sm font-medium text-foreground shadow-sm transition-all hover:border-primary/40 hover:bg-muted cursor-pointer"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
+                Intenta de nuevo
+              </button>
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              Las publicaciones no se pudieron cargar correctamente.
-            </h3>
-            <p className="text-gray-600 mb-4">{feedError}</p>
-            <button
-              onClick={fetchFeedPosts}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              Intenta de nuevo
-            </button>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       );
     }
 
@@ -198,68 +203,84 @@ export default function TalentDashboardPage() {
   };
 
   return (
-    <div className="space-y-8">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold text-slate-900">
+    <div className="flex flex-col flex-1 p-6">
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold tracking-tight text-foreground">
           Bienvenido de vuelta, {getUserName()}
         </h1>
-        <p className="text-slate-600">
+        <p className="mt-1 text-muted-foreground">
           Aquí está lo que ha estado pasando mientras estabas fuera.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatCard
-          title="Habilidades Verificadas"
-          value={statsError ? "—" : (stats?.skillsCount ?? "—")}
-          subtitle={statsError ?? undefined}
-          icon={CheckCircle}
-        />
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <StatCard
+            title="Habilidades Verificadas"
+            value={statsError ? "—" : (stats?.skillsCount ?? "—")}
+            subtitle={statsError ?? undefined}
+            icon={CheckCircle}
+            loading={isLoadingStats}
+          />
 
-        <StatCard
-          title="Desafíos Completados"
-          value={statsError ? "—" : (stats?.completedChallengesCount ?? "—")}
-          subtitle={statsError ?? undefined}
-          icon={Trophy}
-        />
+          <StatCard
+            title="Desafíos Completados"
+            value={statsError ? "—" : (stats?.completedChallengesCount ?? "—")}
+            subtitle={statsError ?? undefined}
+            icon={Trophy}
+            loading={isLoadingStats}
+          />
 
-        <StatCard
-          title="Publicaciones Realizadas"
-          value={statsError ? "—" : (stats?.postsCount ?? "—")}
-          subtitle={statsError ?? undefined}
-          icon={MessageCircleHeart}
-        />
+          <StatCard
+            title="Publicaciones Realizadas"
+            value={statsError ? "—" : (stats?.postsCount ?? "—")}
+            subtitle={statsError ?? undefined}
+            icon={MessageCircleHeart}
+            loading={isLoadingStats}
+          />
 
-        <StatCard
-          title="Mensajes Sin Leer"
-          value={statsError ? "—" : (stats?.unreadMessagesCount ?? "—")}
-          subtitle={statsError ?? undefined}
-          icon={MessageSquareText}
-        />
-      </div>
-
-      <ProfileCompletion
-        completionPercentage={profileCompleteness}
-        message="Mas información completa tu perfil, mejores oportunidades recibirás."
-      />
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div>
-          {challengesError ? (
-            <DashboardErrorState
-              title="Desafíos recomendados"
-              message={challengesError}
-              onRetry={loadRecommendedChallenges}
-              isRetrying={isLoadingChallenges}
-            />
-          ) : isLoadingChallenges ? (
-            <div className="bg-white border border-slate-200 rounded-lg p-6 h-[220px] animate-pulse" />
-          ) : (
-            <RecommendedChallenges challenges={recommendedChallenges} />
-          )}
+          <StatCard
+            title="Mensajes Sin Leer"
+            value={statsError ? "—" : (stats?.unreadMessagesCount ?? "—")}
+            subtitle={statsError ?? undefined}
+            icon={MessageSquareText}
+            loading={isLoadingStats}
+          />
         </div>
 
-        {renderFeedContent()}
+        <ProfileCompletion
+          completionPercentage={profileCompleteness}
+          message="Mas información completa tu perfil, mejores oportunidades recibirás."
+        />
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div>
+            {challengesError ? (
+              <DashboardErrorState
+                title="Desafíos recomendados"
+                message={challengesError}
+                onRetry={loadRecommendedChallenges}
+                isRetrying={isLoadingChallenges}
+              />
+            ) : isLoadingChallenges ? (
+              <Card>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div className="h-5 w-48 animate-pulse rounded bg-muted" />
+                    <div className="h-4 w-64 animate-pulse rounded bg-muted" />
+                    <div className="h-3 w-full animate-pulse rounded bg-muted" />
+                    <div className="h-3 w-5/6 animate-pulse rounded bg-muted" />
+                    <div className="h-10 w-full animate-pulse rounded bg-muted" />
+                  </div>
+                </CardContent>
+              </Card>
+            ) : (
+              <RecommendedChallenges challenges={recommendedChallenges} />
+            )}
+          </div>
+
+          {renderFeedContent()}
+        </div>
       </div>
     </div>
   );
