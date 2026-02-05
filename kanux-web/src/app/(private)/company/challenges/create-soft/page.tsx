@@ -8,5 +8,9 @@ export default function CreateSoftChallengePage() {
   const companyId =
     session?.user.userType === "company" ? session.user.profile.id : undefined;
   if (!companyId) return null;
-  return <CreateSoftChallengeForm companyId={companyId} />;
+  return (
+    <div className="flex flex-col flex-1 p-6">
+      <CreateSoftChallengeForm companyId={companyId} />
+    </div>
+  );
 }

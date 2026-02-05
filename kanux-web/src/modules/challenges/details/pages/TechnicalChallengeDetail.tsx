@@ -50,7 +50,7 @@ export function TechnicalChallengeDetail({
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
-        <LoadingSpinner size="lg" message="Cargando challenge…" />
+        <LoadingSpinner size="lg" message="Cargando desafío…" />
       </div>
     );
   }
@@ -58,8 +58,8 @@ export function TechnicalChallengeDetail({
   if (error || !techData) {
     return (
       <EmptyState
-        title="Challenge no encontrado"
-        description="No pudimos cargar los detalles del challenge técnico. Intenta nuevamente."
+        title="Desafío no encontrado"
+        description="No pudimos cargar los detalles del desafío técnico. Intenta nuevamente."
       />
     );
   }
@@ -72,7 +72,7 @@ export function TechnicalChallengeDetail({
       }
     : {
         name: "KÁNUX",
-        about: "Challenge oficial de la plataforma KÁNUX",
+        about: "Desafío oficial de la plataforma KÁNUX",
         logo: null,
       };
 

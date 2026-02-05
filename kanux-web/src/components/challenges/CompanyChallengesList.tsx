@@ -8,7 +8,6 @@ import { challengesService } from "@/services/challenges.service";
 import { useAuth } from "@/context/AuthContext";
 import { Pagination } from "@/components/ui/pagination";
 import { Badge } from "@/components/ui/badge";
-import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ErrorAlert } from "@/components/ui/error-alert";
 import { Select } from "@/components/ui/select";
@@ -137,7 +136,7 @@ export const CompanyChallengesList: React.FC<CompanyChallengesListProps> = ({
         setTotalPages(res.meta?.lastPage ?? 1);
       } catch (err) {
         console.error(err);
-        setError("Error al cargar los challenges.");
+        setError("Error al cargar los desafíos.");
       } finally {
         setIsLoading(false);
       }
@@ -169,8 +168,41 @@ export const CompanyChallengesList: React.FC<CompanyChallengesListProps> = ({
 
   if (isLoading) {
     return (
-      <div className="flex justify-center py-24">
-        <LoadingSpinner size="lg" message="Cargando challenges..." />
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div className="space-y-2">
+            <div className="h-6 w-40 animate-pulse rounded bg-muted" />
+            <div className="h-4 w-64 animate-pulse rounded bg-muted" />
+          </div>
+          <div className="h-10 w-40 animate-pulse rounded bg-muted" />
+        </div>
+
+        <div className="bg-card border border-border rounded-lg p-4 space-y-4">
+          <div className="h-10 w-full animate-pulse rounded bg-muted" />
+          <div className="h-10 w-60 animate-pulse rounded bg-muted" />
+        </div>
+
+        <div className="bg-card border border-border rounded-lg overflow-hidden">
+          <div className="border-b border-border bg-muted/40 px-6 py-3" />
+          <div className="divide-y">
+            {Array.from({ length: 6 }).map((_, index) => (
+              <div key={index} className="px-6 py-4">
+                <div className="grid grid-cols-5 gap-4 items-center">
+                  <div className="h-4 w-40 animate-pulse rounded bg-muted" />
+                  <div className="h-6 w-24 animate-pulse rounded-full bg-muted" />
+                  <div className="h-4 w-16 animate-pulse rounded bg-muted" />
+                  <div className="h-4 w-24 animate-pulse rounded bg-muted" />
+                  <div className="h-6 w-20 animate-pulse rounded bg-muted" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex justify-between items-center">
+          <div className="h-4 w-56 animate-pulse rounded bg-muted" />
+          <div className="h-10 w-40 animate-pulse rounded bg-muted" />
+        </div>
       </div>
     );
   }
@@ -181,11 +213,11 @@ export const CompanyChallengesList: React.FC<CompanyChallengesListProps> = ({
 
   return (
     <TooltipProvider delayDuration={200}>
-      <div className="space-y-6">
+      <div className="space-y-6 p-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900">Challenges</h1>
+            <h1 className="text-3xl font-bold text-slate-900">Desafíos</h1>
             <p className="text-slate-600">
               Gestiona los desafíos creados por tu empresa.
             </p>
@@ -196,7 +228,7 @@ export const CompanyChallengesList: React.FC<CompanyChallengesListProps> = ({
             className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
           >
             <Plus size={18} />
-            Crear Challenge
+            Crear desafío
           </button>
         </div>
 
@@ -216,7 +248,7 @@ export const CompanyChallengesList: React.FC<CompanyChallengesListProps> = ({
                   setPage(1);
                 }
               }}
-              placeholder="Buscar challenges..."
+              placeholder="Buscar desafíos..."
               className="w-full pl-10 pr-4 py-2 border rounded-lg"
             />
           </div>
@@ -231,14 +263,14 @@ export const CompanyChallengesList: React.FC<CompanyChallengesListProps> = ({
         {/* Table */}
         {filteredChallenges.length === 0 ? (
           <EmptyState
-            title="No se encontraron challenges"
+            title="No se encontraron desafíos"
             description="Intenta ajustar los filtros o crea uno nuevo."
             action={
               <button
                 onClick={onCreateChallenge}
                 className="px-4 py-2 bg-emerald-600 text-white rounded-lg"
               >
-                Crear Challenge
+                Crear desafío
               </button>
             }
           />
@@ -247,7 +279,7 @@ export const CompanyChallengesList: React.FC<CompanyChallengesListProps> = ({
             <table className="w-full">
               <thead className="bg-slate-50 border-b">
                 <tr>
-                  <th className="px-6 py-3 text-left">Challenge</th>
+                  <th className="px-6 py-3 text-left">Desafío</th>
                   <th className="px-6 py-3 text-left">Dificultad</th>
                   <th className="px-6 py-3 text-left">Postulaciones</th>
                   <th className="px-6 py-3 text-left">Creado</th>
@@ -325,7 +357,7 @@ export const CompanyChallengesList: React.FC<CompanyChallengesListProps> = ({
         {/* Pagination */}
         <div className="flex justify-between items-center">
           <span className="text-sm text-slate-600">
-            Mostrando {filteredChallenges.length} de {totalItems} challenges
+            Mostrando {filteredChallenges.length} de {totalItems} desafíos
           </span>
 
           <Pagination

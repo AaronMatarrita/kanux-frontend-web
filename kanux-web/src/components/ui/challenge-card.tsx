@@ -81,7 +81,7 @@ export function ChallengeCard({
           href={`/talent/challenges/${id}/details`}
           className="flex w-full items-center justify-center rounded-md border border-slate-200 bg-[#2EC27E] px-3 py-2 text-xs font-medium text-white transition hover:bg-[#28b76a] focus:outline-none focus:ring-2 focus:ring-slate-950 focus:ring-offset-2"
         >
-          View details
+          Ver detalles
         </Link>
       </div>
     </div>

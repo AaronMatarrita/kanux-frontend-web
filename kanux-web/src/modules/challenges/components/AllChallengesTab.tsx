@@ -3,7 +3,6 @@
 import { FileText } from "lucide-react";
 import { ChallengeCard } from "@/components/ui/challenge-card";
 import { Pagination } from "@/components/ui/pagination";
-import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { ErrorAlert } from "@/components/ui/error-alert";
 
 interface Challenge {
@@ -36,8 +35,26 @@ export function AllChallengesTab({
 }: AllChallengesTabProps) {
   if (loading) {
     return (
-      <div className="flex justify-center py-12">
-        <LoadingSpinner size="lg" message="Cargando desafíos..." />
+      <div>
+        <div className="grid gap-6 grid-cols-[repeat(auto-fit,minmax(280px,1fr))]">
+          {Array.from({ length: 6 }).map((_, index) => (
+            <div
+              key={index}
+              className="rounded-xl border border-border/60 bg-card p-5"
+            >
+              <div className="space-y-3">
+                <div className="h-4 w-40 animate-pulse rounded bg-muted" />
+                <div className="h-3 w-full animate-pulse rounded bg-muted" />
+                <div className="h-3 w-5/6 animate-pulse rounded bg-muted" />
+              </div>
+              <div className="mt-4 flex items-center gap-2">
+                <div className="h-6 w-20 animate-pulse rounded-full bg-muted" />
+                <div className="h-6 w-16 animate-pulse rounded-full bg-muted" />
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="mt-8 h-10 w-40 animate-pulse rounded bg-muted" />
       </div>
     );
   }

@@ -1,7 +1,6 @@
 "use client";
 
 import { CheckCircle } from "lucide-react";
-import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { ErrorAlert } from "@/components/ui/error-alert";
 import { CompletedChallengeCard } from "./CompletedChallengeCard";
 
@@ -33,8 +32,25 @@ export function CompletedTab({
 }: CompletedTabProps) {
   if (loading) {
     return (
-      <div className="flex justify-center py-12">
-        <LoadingSpinner size="lg" message="Cargando desafíos completados..." />
+      <div className="space-y-4">
+        {Array.from({ length: 4 }).map((_, index) => (
+          <div
+            key={index}
+            className="rounded-xl border border-border/60 bg-card p-5"
+          >
+            <div className="flex items-start justify-between gap-4">
+              <div className="space-y-3">
+                <div className="h-4 w-44 animate-pulse rounded bg-muted" />
+                <div className="h-3 w-56 animate-pulse rounded bg-muted" />
+              </div>
+              <div className="h-8 w-16 animate-pulse rounded bg-muted" />
+            </div>
+            <div className="mt-4 flex items-center gap-2">
+              <div className="h-6 w-20 animate-pulse rounded-full bg-muted" />
+              <div className="h-6 w-16 animate-pulse rounded-full bg-muted" />
+            </div>
+          </div>
+        ))}
       </div>
     );
   }

@@ -50,7 +50,7 @@ export function ChallengeHero({
     <>
       {/* HEADER */}
       <div className="flex items-center justify-between">
-        <BackNavigation label="Volver a challenges" onClick={onBack} />
+        <BackNavigation label="Volver a desafíos" onClick={onBack} />
       </div>
 
       {/* HERO */}
@@ -84,7 +84,7 @@ export function ChallengeHero({
 
                 {!isTechnical && (
                   <span className="rounded-full bg-purple-50 px-3 py-1 text-xs font-medium text-purple-700 border border-purple-200">
-                    Soft Skills
+                    Habilidades blandas
                   </span>
                 )}
               </div>
@@ -99,7 +99,7 @@ export function ChallengeHero({
             bg-[#2EC27E] text-white hover:bg-[#28b76a] disabled:bg-slate-200 disabled:text-slate-400`}
           >
             <Play className="h-4 w-4" />
-            {isStarting ? "Iniciando..." : "Iniciar challenge"}
+            {isStarting ? "Iniciando..." : "Iniciar desafío"}
           </button>
         </div>
       </section>

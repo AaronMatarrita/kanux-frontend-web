@@ -14,7 +14,7 @@ function useIsClient() {
   return useSyncExternalStore(
     () => () => {},
     () => true,
-    () => false
+    () => false,
   );
 }
 
@@ -26,13 +26,13 @@ interface SidebarProps {
 export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
   const pathname = usePathname();
   const { session } = useAuth();
- const isClient = useIsClient();
+  const isClient = useIsClient();
 
   const role = !isClient
-    ? mockSession.role  
+    ? mockSession.role
     : session
-    ? mapUserTypeToRole(session.user.userType)
-    : mockSession.role;
+      ? mapUserTypeToRole(session.user.userType)
+      : mockSession.role;
 
   const menuItems = SIDEBAR_MENU[role];
 
@@ -41,13 +41,24 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
   }, [pathname, onClose]);
 
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
-    }
+    const handleOverflow = () => {
+      if (window.innerWidth < 1024) {
+        if (isOpen) {
+          document.body.style.overflow = "hidden";
+        } else {
+          document.body.style.overflow = "unset";
+        }
+      } else {
+        document.body.style.overflow = "unset";
+      }
+    };
+
+    handleOverflow();
+    window.addEventListener("resize", handleOverflow);
+
     return () => {
       document.body.style.overflow = "unset";
+      window.removeEventListener("resize", handleOverflow);
     };
   }, [isOpen]);
 

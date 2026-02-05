@@ -23,7 +23,7 @@ export function ChallengeSummary({
   return (
     <div className="rounded-lg border border-slate-200 bg-white p-6 space-y-4">
       <h3 className="text-sm font-semibold text-slate-900">
-        Resumen del challenge
+        Resumen del desafío
       </h3>
 
       <InfoRow

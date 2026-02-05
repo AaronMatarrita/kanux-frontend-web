@@ -21,5 +21,9 @@ export default function SoftExecutePage({ params }: PageProps) {
 
   if (!id) return null;
 
-  return <SoftExecutionContainer id={id} />;
+  return (
+    <div className="flex flex-col flex-1 p-6">
+      <SoftExecutionContainer id={id} />
+    </div>
+  );
 }

@@ -17,7 +17,13 @@ export default function EditChallengePage() {
       .catch(() => router.replace("/company/challenges"));
   }, [id]);
 
-  if (!challenge) return <p>Cargando...</p>;
+  if (!challenge) {
+    return (
+      <div className="flex flex-col flex-1 p-6">
+        <p>Cargando...</p>
+      </div>
+    );
+  }
 
   const mapped = {
     id: challenge.id,
@@ -44,11 +50,13 @@ export default function EditChallengePage() {
   };
 
   return (
-    <CreateSoftChallengeForm
-      companyId={challenge.company.id}
-      initialData={mapped}
-      mode="edit"
-      onSuccess={() => router.replace("/company/challenges")}
-    />
+    <div className="flex flex-col flex-1 p-6">
+      <CreateSoftChallengeForm
+        companyId={challenge.company.id}
+        initialData={mapped}
+        mode="edit"
+        onSuccess={() => router.replace("/company/challenges")}
+      />
+    </div>
   );
 }

@@ -21,5 +21,9 @@ export default function ChallengeDetailsPage({ params }: PageProps) {
 
   if (!id) return null;
 
-  return <ChallengeDetail id={id} />;
+  return (
+    <div className="flex flex-col flex-1 p-6">
+      <ChallengeDetail id={id} />
+    </div>
+  );
 }

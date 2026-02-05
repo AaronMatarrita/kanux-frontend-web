@@ -55,7 +55,7 @@ export function ResultsHero({
           </h1>
 
           <p className="text-lg md:text-xl opacity-90 font-medium mb-6">
-            {challengeTitle || "Technical Challenge"}
+            {challengeTitle || "Desafío técnico"}
           </p>
 
           <div className="inline-flex items-center gap-3 bg-white/20 backdrop-blur-sm rounded-full px-6 py-3 ring-1 ring-white/30">

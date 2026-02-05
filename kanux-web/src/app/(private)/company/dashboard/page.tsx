@@ -42,6 +42,7 @@ export default function DashboardPage() {
   const [candidatesError, setCandidatesError] = React.useState<string | null>(
     null,
   );
+  const [candidatesLoading, setCandidatesLoading] = React.useState(false);
 
   const greeting = React.useMemo(() => {
     if (!isClient || !session) return "Bienvenido de vuelta";
@@ -60,6 +61,7 @@ export default function DashboardPage() {
     }
 
     setCandidatesError(null);
+    setCandidatesLoading(true);
 
     try {
       const candidatesRes = await candidatesService.getCandidatesDash(
@@ -70,6 +72,8 @@ export default function DashboardPage() {
       console.error("Error cargando candidatos recientes", error);
       setCandidatesError("No se pudieron cargar los candidatos recientes");
       setCandidates([]);
+    } finally {
+      setCandidatesLoading(false);
     }
   }, [session?.token]);
 
@@ -111,55 +115,66 @@ export default function DashboardPage() {
   }, [session?.token, loadRecentCandidates]);
 
   return (
-    <div className="space-y-8">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold text-slate-900">{greeting}</h1>
-        <p className="text-slate-600">
+    <div className="flex flex-col flex-1 p-6">
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold tracking-tight text-foreground">
+          {greeting}
+        </h1>
+        <p className="mt-1 text-muted-foreground">
           Aquí tienes un resumen de la actividad reciente en tu cuenta.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatCard
-          title="Desafíos Activos"
-          value={statsError ? "—" : (stats?.activeChallenges ?? "—")}
-          subtitle={statsError ?? undefined}
-          icon={PaperclipIcon}
-        />
-
-        <StatCard
-          title="Candidatos Evaluados"
-          value={statsError ? "—" : (stats?.candidatesEvaluated ?? "—")}
-          subtitle={statsError ?? undefined}
-          icon={Users}
-        />
-
-        <StatCard
-          title="Aplicaciones Nuevas"
-          value={statsError ? "—" : (stats?.newApplications ?? "—")}
-          subtitle={statsError ?? undefined}
-          icon={FileText}
-        />
-
-        <StatCard
-          title="Mensajes no Leídos"
-          value={statsError ? "—" : (stats?.messages ?? "—")}
-          subtitle={statsError ?? undefined}
-          icon={MessageSquare}
-        />
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-[auto_380px] gap-12">
-        {candidatesError ? (
-          <DashboardErrorState
-            title="Candidatos recientes"
-            message={candidatesError}
-            onRetry={loadRecentCandidates}
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <StatCard
+            title="Desafíos Activos"
+            value={statsError ? "—" : (stats?.activeChallenges ?? "—")}
+            subtitle={statsError ?? undefined}
+            icon={PaperclipIcon}
+            loading={loading}
           />
-        ) : (
-          <LatestSubmissions candidates={candidates} />
-        )}
-        <RecentlyViewed />
+
+          <StatCard
+            title="Candidatos Evaluados"
+            value={statsError ? "—" : (stats?.candidatesEvaluated ?? "—")}
+            subtitle={statsError ?? undefined}
+            icon={Users}
+            loading={loading}
+          />
+
+          <StatCard
+            title="Aplicaciones Nuevas"
+            value={statsError ? "—" : (stats?.newApplications ?? "—")}
+            subtitle={statsError ?? undefined}
+            icon={FileText}
+            loading={loading}
+          />
+
+          <StatCard
+            title="Mensajes no Leídos"
+            value={statsError ? "—" : (stats?.messages ?? "—")}
+            subtitle={statsError ?? undefined}
+            icon={MessageSquare}
+            loading={loading}
+          />
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-[auto_380px] gap-6 items-start">
+          {candidatesError ? (
+            <DashboardErrorState
+              title="Candidatos recientes"
+              message={candidatesError}
+              onRetry={loadRecentCandidates}
+            />
+          ) : (
+            <LatestSubmissions
+              candidates={candidates}
+              loading={loading || candidatesLoading}
+            />
+          )}
+          <RecentlyViewed loading={loading} />
+        </div>
       </div>
     </div>
   );

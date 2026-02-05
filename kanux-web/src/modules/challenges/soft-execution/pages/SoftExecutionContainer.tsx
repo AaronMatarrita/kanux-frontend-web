@@ -85,9 +85,7 @@ export function SoftExecutionContainer({ id }: SoftExecutionContainerProps) {
       if (remainingSec === 0) {
         setExpired(true);
         if (!warned1.current) {
-          toast.error(
-            "Se acabó el tiempo del challenge. La edición se bloqueó.",
-          );
+          toast.error("Se acabó el tiempo del desafío. La edición se bloqueó.");
           warned1.current = true;
         }
         return true;
@@ -95,10 +93,10 @@ export function SoftExecutionContainer({ id }: SoftExecutionContainerProps) {
 
       if (remainingSec <= 60 && !warned1.current) {
         warned1.current = true;
-        toast.warning("Último minuto: el challenge está por terminar.");
+        toast.warning("Último minuto: el desafío está por terminar.");
       } else if (remainingSec <= 300 && !warned5.current) {
         warned5.current = true;
-        toast.info("Quedan 5 minutos para completar el challenge.");
+        toast.info("Quedan 5 minutos para completar el desafío.");
       }
 
       setExpired(false);
@@ -121,14 +119,14 @@ export function SoftExecutionContainer({ id }: SoftExecutionContainerProps) {
   }, [challenge, timerStorageKey]);
 
   if (loading) {
-    return <LoadingOverlay visible message="Cargando challenge..." />;
+    return <LoadingOverlay visible message="Cargando desafío..." />;
   }
 
   if (error || !challenge) {
     return (
       <EmptyState
-        title="Challenge no encontrado"
-        description="No pudimos cargar el challenge de soft skills."
+        title="Desafío no encontrado"
+        description="No pudimos cargar el desafío de habilidades blandas."
       />
     );
   }
@@ -143,7 +141,7 @@ export function SoftExecutionContainer({ id }: SoftExecutionContainerProps) {
 
   const handleAnswerSelect = (questionId: string, optionId: string) => {
     if (expired) {
-      toast.error("El tiempo del challenge ha terminado");
+      toast.error("El tiempo del desafío ha terminado");
       return;
     }
 
@@ -167,7 +165,7 @@ export function SoftExecutionContainer({ id }: SoftExecutionContainerProps) {
 
   const handleSubmit = async () => {
     if (expired) {
-      toast.error("El tiempo del challenge ha terminado");
+      toast.error("El tiempo del desafío ha terminado");
       return;
     }
 
@@ -234,7 +232,7 @@ export function SoftExecutionContainer({ id }: SoftExecutionContainerProps) {
         sessionStorage.removeItem(timerStorageKey);
       }
 
-      toast.success("Challenge enviado exitosamente. Redirigiendo...");
+      toast.success("Desafío enviado exitosamente. Redirigiendo...");
 
       await router.push(
         `/talent/challenges/results?submissionId=${response.submission_id}`,
@@ -242,7 +240,7 @@ export function SoftExecutionContainer({ id }: SoftExecutionContainerProps) {
     } catch (error: any) {
       toast.error(
         error?.response?.data?.message ||
-          "Error al enviar el challenge. Intenta nuevamente.",
+          "Error al enviar el desafío. Intenta nuevamente.",
       );
     } finally {
       setIsSubmitting(false);

@@ -45,58 +45,59 @@ export default function Page() {
   };
 
   return (
-    <div className="space-y-6">
-      <ChallengesHeader
-        challengeType={challengeType}
-        onTypeChange={(type) => {
-          setChallengeType(type);
-          setCurrentPage(1);
-        }}
-      />
+    <div className="flex flex-col flex-1 p-6">
+      <div className="space-y-6">
+        <ChallengesHeader
+          challengeType={challengeType}
+          onTypeChange={(type) => {
+            setChallengeType(type);
+            setCurrentPage(1);
+          }}
+        />
 
-      <Tabs defaultValue="all" className="w-full">
-        <TabsList className="bg-slate-100 p-1 rounded-xl">
-          <TabsTrigger value="all">All Challenges</TabsTrigger>
+        <Tabs defaultValue="all" className="w-full">
+          <TabsList className="bg-slate-100 p-1 rounded-xl">
+            <TabsTrigger value="all">Todos</TabsTrigger>
+            <TabsTrigger value="completed">Completados</TabsTrigger>
+          </TabsList>
 
-          <TabsTrigger value="completed">Completed</TabsTrigger>
-        </TabsList>
+          <TabsContent value="all" className="mt-6">
+            <AllChallengesTab
+              challenges={displayChallenges}
+              loading={loading}
+              error={error}
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+              onRetry={loadChallenges}
+            />
+          </TabsContent>
 
-        <TabsContent value="all" className="mt-6">
-          <AllChallengesTab
-            challenges={displayChallenges}
-            loading={loading}
-            error={error}
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={handlePageChange}
-            onRetry={loadChallenges}
-          />
-        </TabsContent>
+          <TabsContent value="in-progress" className="mt-6">
+            <InProgressTab />
+          </TabsContent>
 
-        <TabsContent value="in-progress" className="mt-6">
-          <InProgressTab />
-        </TabsContent>
+          <TabsContent value="completed" className="mt-6">
+            <CompletedTab
+              challenges={completedChallenges}
+              loading={loadingCompleted}
+              error={errorCompleted}
+              onRetry={loadCompletedChallenges}
+            />
+          </TabsContent>
+        </Tabs>
 
-        <TabsContent value="completed" className="mt-6">
-          <CompletedTab
-            challenges={completedChallenges}
-            loading={loadingCompleted}
-            error={errorCompleted}
-            onRetry={loadCompletedChallenges}
-          />
-        </TabsContent>
-      </Tabs>
-
-      <ConfirmDialog
-        isOpen={confirmOpen}
-        title="Actualizar challenges"
-        description="¿Deseas actualizar la lista de challenges?"
-        isLoading={confirmLoading}
-        confirmLabel="Actualizar"
-        cancelLabel="Cancelar"
-        onConfirm={handleConfirmReload}
-        onCancel={() => setConfirmOpen(false)}
-      />
+        <ConfirmDialog
+          isOpen={confirmOpen}
+          title="Actualizar desafíos"
+          description="¿Deseas actualizar la lista de desafíos?"
+          isLoading={confirmLoading}
+          confirmLabel="Actualizar"
+          cancelLabel="Cancelar"
+          onConfirm={handleConfirmReload}
+          onCancel={() => setConfirmOpen(false)}
+        />
+      </div>
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 interface Tab {
   id: string;
@@ -13,15 +13,15 @@ interface TabsProps {
 
 export const Tabs: React.FC<TabsProps> = ({ tabs, activeTab, onTabChange }) => {
   return (
-    <div className="flex flex-wrap gap-2 md:gap-3">
+    <div className="inline-flex flex-wrap gap-1 rounded-xl bg-slate-100 p-1">
       {tabs.map((tab) => (
         <button
           key={tab.id}
           onClick={() => onTabChange(tab.id)}
-          className={`px-4 md:px-6 py-2 md:py-2.5 rounded-lg font-medium transition-all duration-300 text-sm md:text-base ${
+          className={`cursor-pointer rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200 ${
             activeTab === tab.id
-              ? 'bg-emerald-500 text-white'
-              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              ? "bg-emerald-500 text-white shadow-sm"
+              : "text-slate-600 hover:bg-white/70"
           }`}
         >
           {tab.label}
@@ -30,4 +30,3 @@ export const Tabs: React.FC<TabsProps> = ({ tabs, activeTab, onTabChange }) => {
     </div>
   );
 };
-
