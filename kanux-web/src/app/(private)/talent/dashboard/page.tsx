@@ -151,13 +151,45 @@ export default function TalentDashboardPage() {
   const renderFeedContent = () => {
     if (isLoadingFeed) {
       return (
-        <Card>
-          <CardContent className="py-8">
-            <div className="flex flex-col items-center justify-center">
-              <div className="w-16 h-16 mb-4 rounded-full bg-muted animate-pulse"></div>
-              <div className="h-4 w-32 bg-muted rounded mb-2 animate-pulse"></div>
-              <div className="h-3 w-48 bg-muted rounded animate-pulse"></div>
+        <Card className="h-fit">
+          <div className="flex items-start justify-between gap-4 px-6 pt-6">
+            <div className="space-y-2">
+              <div className="h-5 w-36 animate-pulse rounded bg-muted" />
+              <div className="h-4 w-56 animate-pulse rounded bg-muted" />
             </div>
+            <div className="h-6 w-20 animate-pulse rounded-full bg-muted" />
+          </div>
+
+          <CardContent className="space-y-6 pt-6">
+            {Array.from({ length: 3 }).map((_, index) => (
+              <div
+                key={index}
+                className="rounded-xl border border-border/60 bg-card p-5"
+              >
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-center gap-4">
+                    <div className="h-12 w-12 rounded-xl bg-muted animate-pulse" />
+                    <div className="space-y-2">
+                      <div className="h-4 w-40 animate-pulse rounded bg-muted" />
+                      <div className="h-3 w-28 animate-pulse rounded bg-muted" />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-2 mb-4">
+                  <div className="h-3 w-full animate-pulse rounded bg-muted" />
+                  <div className="h-3 w-5/6 animate-pulse rounded bg-muted" />
+                </div>
+
+                <div className="flex items-center justify-between border-t border-border/60 pt-4">
+                  <div className="flex items-center gap-4">
+                    <div className="h-9 w-24 animate-pulse rounded bg-muted" />
+                    <div className="h-9 w-24 animate-pulse rounded bg-muted" />
+                  </div>
+                  <div className="h-9 w-28 animate-pulse rounded bg-muted" />
+                </div>
+              </div>
+            ))}
           </CardContent>
         </Card>
       );
