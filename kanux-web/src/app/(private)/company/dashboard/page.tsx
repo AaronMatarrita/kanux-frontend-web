@@ -149,7 +149,7 @@ export default function DashboardPage() {
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[auto_380px] gap-12">
+      <div className="grid grid-cols-1 lg:grid-cols-[auto_380px] gap-6 items-start">
         {candidatesError ? (
           <DashboardErrorState
             title="Candidatos recientes"
