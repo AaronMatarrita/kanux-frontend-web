@@ -9,6 +9,7 @@ interface StatCardProps {
   value: string | number;
   subtitle?: string;
   icon: LucideIcon;
+  loading?: boolean;
 }
 
 export const StatCard: React.FC<StatCardProps> = ({
@@ -16,7 +17,20 @@ export const StatCard: React.FC<StatCardProps> = ({
   value,
   subtitle,
   icon: Icon,
+  loading = false,
 }) => {
+  if (loading) {
+    return (
+      <Card className="py-5">
+        <CardContent className="space-y-3">
+          <div className="h-4 w-24 animate-pulse rounded bg-muted" />
+          <div className="h-8 w-20 animate-pulse rounded bg-muted" />
+          <div className="h-3 w-32 animate-pulse rounded bg-muted" />
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card className="py-5">
       <CardContent className="flex flex-col gap-3">
