@@ -80,7 +80,7 @@ export const RecentlyViewed: React.FC<RecentlyViewedProps> = ({
 
       <CardContent>
         <div className="flex flex-col gap-6">
-          <div className="flex-1 bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100 rounded-xl p-5">
+          <div className="flex-1 bg-linear-to-br from-blue-50 to-indigo-50 border border-blue-100 rounded-xl p-5">
             <div className="flex items-start justify-between mb-4">
               <div>
                 <h3 className="font-semibold text-slate-900 text-lg mb-1">
@@ -124,7 +124,7 @@ export const RecentlyViewed: React.FC<RecentlyViewedProps> = ({
             </button>
           </div>
 
-          <div className="flex-1 bg-gradient-to-br from-emerald-50 to-green-50 border border-emerald-100 rounded-xl p-5">
+          <div className="flex-1 bg-linear-to-br from-emerald-50 to-green-50 border border-emerald-100 rounded-xl p-5">
             <div className="flex items-start justify-between mb-4">
               <div>
                 <h3 className="font-semibold text-slate-900 text-lg mb-1">
