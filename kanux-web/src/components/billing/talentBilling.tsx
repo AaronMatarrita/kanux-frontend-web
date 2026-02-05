@@ -2,9 +2,12 @@
 import { useEffect, useState } from "react";
 import PlanCard from "./TalentPlanCard";
 import CurrentPlanDetails from "./CurrentPlanDetails";
-import { TalentPlan, subscriptionsService, TalentSubscriptionResponse } from "@/services/subscriptions.service";
+import {
+  TalentPlan,
+  subscriptionsService,
+  TalentSubscriptionResponse,
+} from "@/services/subscriptions.service";
 
-import { LoadingSpinner } from "../ui/LoadingSpinner";
 import { ErrorAlert } from "@/components/ui/error-alert";
 import { toast, Toaster } from "sonner";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
@@ -12,14 +15,16 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 // Static fallback data
 const FALLBACK_DETAILS = {
   plan: "Free",
-  billingCycle: "Unlimited",
-  nextBillingDate: "No expiration",
-  paymentMethod: "No payment method",
+  billingCycle: "Ilimitado",
+  nextBillingDate: "Sin vencimiento",
+  paymentMethod: "Sin método de pago",
 };
 
 export default function TalentBilling() {
   const [talentPlans, setTalentPlans] = useState<TalentPlan[]>([]);
-  const [currentPlan, setCurrentPlan] = useState<TalentSubscriptionResponse | undefined>();
+  const [currentPlan, setCurrentPlan] = useState<
+    TalentSubscriptionResponse | undefined
+  >();
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -33,16 +38,16 @@ export default function TalentBilling() {
       setLoading(true);
       setError(null);
 
-      // Fetch plans and subscription data independently to avoid blocking
       const responsePlans = await subscriptionsService.getAllTalentPlans();
       setTalentPlans(responsePlans);
-      const responseCurrent = await subscriptionsService.getTalentSubscription();
+      const responseCurrent =
+        await subscriptionsService.getTalentSubscription();
       setCurrentPlan(responseCurrent);
-
     } catch (err: any) {
-      const errorMessage = "Could not load billing information. Please check your connection.";
+      const errorMessage =
+        "No se pudo cargar la información de facturación. Revisa tu conexión.";
       setError(errorMessage);
-      toast.error("Failed to sync subscription data");
+      toast.error("No se pudo sincronizar la suscripción");
     } finally {
       setLoading(false);
     }
@@ -52,46 +57,46 @@ export default function TalentBilling() {
     getData();
   }, []);
 
-  // check if current plan is free
-  const isFreePlan = !currentPlan || Number(currentPlan?.talent_plans?.price_monthly) === 0;
+  const isFreePlan =
+    !currentPlan || Number(currentPlan?.talent_plans?.price_monthly) === 0;
 
-  // Date formatting
   const formattedDate = currentPlan?.end_date
-    ? new Date(currentPlan.end_date).toLocaleDateString('en-US', {
-      month: 'long',
-      day: 'numeric',
-      year: 'numeric'
-    })
+    ? new Date(currentPlan.end_date).toLocaleDateString("es-ES", {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+      })
     : FALLBACK_DETAILS.nextBillingDate;
 
-  // Current plan display data
   const planInfo = {
     name: currentPlan?.talent_plans?.name || FALLBACK_DETAILS.plan,
-    cycle: isFreePlan ? "One-time / Free" : "Monthly",
-    date: isFreePlan ? "No expiration" : formattedDate,
-    method: isFreePlan ? "No payment method" : "Card ending in •••• 4242"
+    cycle: isFreePlan ? "Único / Gratis" : "Mensual",
+    date: isFreePlan ? "Sin vencimiento" : formattedDate,
+    method: isFreePlan
+      ? "Sin método de pago"
+      : "Tarjeta terminada en •••• 4242",
   };
 
-  // Open the confirmation modal
   const handleUpgradeClick = (planId: string) => {
     setSelectedPlanId(planId);
     setIsConfirmOpen(true);
   };
 
-  // upgrade
   const handleConfirmUpgrade = async () => {
     if (!selectedPlanId) return;
 
     try {
       setIsUpgrading(true);
-      const response = await subscriptionsService.upgradeTalentPlan(selectedPlanId, { status: 'active' });
-      // Refresh current subscription data
-      const responseCurrent = await subscriptionsService.getTalentSubscription();
+      await subscriptionsService.upgradeTalentPlan(selectedPlanId, {
+        status: "active",
+      });
+      const responseCurrent =
+        await subscriptionsService.getTalentSubscription();
       setCurrentPlan(responseCurrent);
-      toast.success("Successfully subscribed to the new plan");
+      toast.success("Suscripción actualizada con éxito");
       setIsConfirmOpen(false);
     } catch (err) {
-      toast.error("An error occurred while upgrading your plan.");
+      toast.error("Ocurrió un error al cambiar tu plan.");
       throw err;
     } finally {
       setIsUpgrading(false);
@@ -100,23 +105,54 @@ export default function TalentBilling() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen w-full items-center justify-center">
-        <LoadingSpinner size="md" message="Loading your billing details..." className="Billing" />
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5">
+          {Array.from({ length: 3 }).map((_, index) => (
+            <div
+              key={index}
+              className="rounded-xl border border-border/60 bg-card p-6"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <div className="h-4 w-24 animate-pulse rounded bg-muted" />
+                <div className="h-5 w-16 animate-pulse rounded-full bg-muted" />
+              </div>
+              <div className="h-8 w-24 animate-pulse rounded bg-muted" />
+              <div className="mt-2 h-3 w-32 animate-pulse rounded bg-muted" />
+              <div className="mt-5 space-y-2">
+                {Array.from({ length: 4 }).map((__, itemIndex) => (
+                  <div
+                    key={itemIndex}
+                    className="h-3 w-full animate-pulse rounded bg-muted"
+                  />
+                ))}
+              </div>
+              <div className="mt-6 h-9 w-full animate-pulse rounded bg-muted" />
+            </div>
+          ))}
+        </div>
+
+        <div className="rounded-xl border border-border/60 bg-card p-6">
+          <div className="h-4 w-48 animate-pulse rounded bg-muted" />
+          <div className="mt-4 grid grid-cols-2 gap-y-4 gap-x-8">
+            {Array.from({ length: 4 }).map((_, index) => (
+              <div key={index}>
+                <div className="h-3 w-24 animate-pulse rounded bg-muted" />
+                <div className="mt-2 h-3 w-32 animate-pulse rounded bg-muted" />
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     );
   }
 
-  // Error alert remains as required
-  if (!talentPlans) {
-    return (
-      <ErrorAlert message="Error loading billing. Please try again." onRetry={getData} />
-    );
+  if (error) {
+    return <ErrorAlert message={error} onRetry={getData} />;
   }
 
   return (
     <>
-      <div className="min-h-full px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
-        {/* Available Plans Grid */}
+      <div className="space-y-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5">
           {talentPlans
             .slice()
@@ -134,9 +170,10 @@ export default function TalentBilling() {
             ))}
         </div>
 
-        {/* Subscription Detail Section */}
-        <div className="mt-8">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Subscription Details</h3>
+        <div>
+          <h3 className="text-lg font-semibold text-foreground mb-4">
+            Detalles de la suscripción
+          </h3>
           <CurrentPlanDetails
             planName={planInfo.name}
             billingCycle={planInfo.cycle}
@@ -146,14 +183,13 @@ export default function TalentBilling() {
         </div>
       </div>
 
-      {/* Confirmation Dialog */}
       <ConfirmDialog
         isOpen={isConfirmOpen}
-        title="Confirm Plan Upgrade"
-        description="Are you sure you want to change your current subscription? Your new benefits will be available immediately."
+        title="Confirmar cambio de plan"
+        description="¿Deseas cambiar tu suscripción actual? El nuevo plan se aplicará de inmediato."
         isLoading={isUpgrading}
-        confirmLabel="Confirm Upgrade"
-        cancelLabel="Cancel"
+        confirmLabel="Confirmar"
+        cancelLabel="Cancelar"
         onConfirm={handleConfirmUpgrade}
         onCancel={() => setIsConfirmOpen(false)}
       />
