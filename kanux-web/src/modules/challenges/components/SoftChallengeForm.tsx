@@ -38,7 +38,7 @@ export function CreateSoftChallengeForm({
   const form = useCreateSoftChallenge(companyId, initialData);
   const isEdit = mode === "edit";
   return (
-    <div className="px-8 py-8">
+    <div className="space-y-6">
       {/* Header */}
       <div className="mb-8">
         <Link
@@ -50,7 +50,9 @@ export function CreateSoftChallengeForm({
         </Link>
 
         <h1 className="text-2xl font-bold">
-          {isEdit ? "Editar Soft Challenge" : "Crear Soft Challenge"}
+          {isEdit
+            ? "Editar desafío de habilidades blandas"
+            : "Crear desafío de habilidades blandas"}
         </h1>
         <p className="text-muted-foreground mt-1">
           {isEdit
@@ -261,7 +263,7 @@ export function CreateSoftChallengeForm({
             {form.isSubmitting && (
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
             )}
-            {isEdit ? "Guardar cambios" : "Crear Challenge"}
+            {isEdit ? "Guardar cambios" : "Crear desafío"}
           </Button>
         </div>
       </div>

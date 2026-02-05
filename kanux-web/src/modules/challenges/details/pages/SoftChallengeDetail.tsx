@@ -50,7 +50,7 @@ export function SoftChallengeDetail({ id }: SoftChallengeDetailProps) {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
-        <LoadingSpinner size="lg" message="Cargando challenge…" />
+        <LoadingSpinner size="lg" message="Cargando desafío…" />
       </div>
     );
   }
@@ -58,8 +58,8 @@ export function SoftChallengeDetail({ id }: SoftChallengeDetailProps) {
   if (error || !softData) {
     return (
       <EmptyState
-        title="Challenge no encontrado"
-        description="No pudimos cargar los detalles del challenge de soft skills. Intenta nuevamente."
+        title="Desafío no encontrado"
+        description="No pudimos cargar los detalles del desafío de habilidades blandas. Intenta nuevamente."
       />
     );
   }
@@ -72,7 +72,7 @@ export function SoftChallengeDetail({ id }: SoftChallengeDetailProps) {
       }
     : {
         name: "KÁNUX",
-        about: "Challenge oficial de la plataforma KÁNUX",
+        about: "Desafío oficial de la plataforma KÁNUX",
         logo: null,
       };
 

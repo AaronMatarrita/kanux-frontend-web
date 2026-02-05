@@ -85,7 +85,7 @@ export function ResultsPage({
           setLoadingState("idle");
           return;
         } catch (err) {
-          console.warn("Failed to parse local result, falling back to API", {
+          console.warn("No se pudo leer el resultado local, usando la API", {
             err,
           });
         }
@@ -103,7 +103,7 @@ export function ResultsPage({
             ? err.message
             : "No se pudo cargar el resultado del reto";
 
-        console.error("Failed to load challenge result", {
+        console.error("No se pudo cargar el resultado del desafío", {
           submissionId,
           err,
         });
@@ -156,7 +156,7 @@ export function ResultsPage({
     <div className="min-h-screen bg-linear-to-b from-background to-muted/20">
       <div className="max-w-5xl mx-auto px-4 pt-4">
         <BackNavigation
-          label="Volver a challenges"
+          label="Volver a desafíos"
           onClick={() => router.push("/talent/challenges")}
         />
       </div>

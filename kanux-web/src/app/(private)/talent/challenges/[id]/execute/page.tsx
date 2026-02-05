@@ -35,7 +35,7 @@ export default function Page() {
           );
         setState({ data: res, loading: false });
       } catch (error: any) {
-        setState({ loading: false, error: "Failed to load challenge" });
+        setState({ loading: false, error: "No se pudo cargar el desafío" });
       }
     };
     load();
@@ -73,11 +73,13 @@ export default function Page() {
   }, [submission, challengeId]);
 
   return (
-    <ExecutionContainer
-      challenge={challenge}
-      assets={assets}
-      loading={state.loading}
-      submission={activeSubmission}
-    />
+    <div className="flex flex-col flex-1 p-6">
+      <ExecutionContainer
+        challenge={challenge}
+        assets={assets}
+        loading={state.loading}
+        submission={activeSubmission}
+      />
+    </div>
   );
 }

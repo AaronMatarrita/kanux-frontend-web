@@ -39,7 +39,7 @@ export function ExecutionContainer({
   const challengeAssets = (assets as any)?.challenge;
   const testCases = (assets as any)?.test_cases?.test_cases || [];
   const initialCode =
-    challengeAssets?.initial_code || "// Your implementation here...";
+    challengeAssets?.initial_code || "// Tu implementación aquí...";
   const programmingLanguage =
     challengeAssets?.programming_language || "javascript";
   const persistenceKey = submission?.submissionId
@@ -95,9 +95,7 @@ export function ExecutionContainer({
       if (remainingSec === 0) {
         setExpired(true);
         if (!warned1.current) {
-          toast.error(
-            "Se acabó el tiempo del challenge. La edición se bloqueó.",
-          );
+          toast.error("Se acabó el tiempo del desafío. La edición se bloqueó.");
           warned1.current = true;
         }
         onExpired?.();
@@ -106,10 +104,10 @@ export function ExecutionContainer({
 
       if (remainingSec <= 60 && !warned1.current) {
         warned1.current = true;
-        toast.warning("Último minuto: el challenge está por terminar.");
+        toast.warning("Último minuto: el desafío está por terminar.");
       } else if (remainingSec <= 300 && !warned5.current) {
         warned5.current = true;
-        toast.info("Quedan 5 minutos para completar el challenge.");
+        toast.info("Quedan 5 minutos para completar el desafío.");
       }
 
       setExpired(false);
@@ -133,7 +131,7 @@ export function ExecutionContainer({
 
   const handleSubmitClick = () => {
     if (expired) {
-      toast.error("El tiempo del challenge ha terminado");
+      toast.error("El tiempo del desafío ha terminado");
       return;
     }
 
@@ -265,18 +263,18 @@ export function ExecutionContainer({
     setCurrentLanguage(language);
 
     if (expired) {
-      toast.error("El tiempo del challenge ha terminado");
+      toast.error("El tiempo del desafío ha terminado");
       return { error: "Tiempo expirado" };
     }
 
     if (!submission) {
-      toast.error("Debes iniciar el challenge para ejecutar código");
+      toast.error("Debes iniciar el desafío para ejecutar código");
       return { error: "Submission no iniciada" };
     }
 
     if (!challenge?.id) {
-      toast.error("Challenge ID missing");
-      return { error: "Challenge ID missing" };
+      toast.error("Falta el ID del desafío");
+      return { error: "Falta el ID del desafío" };
     }
     setExecutionState((prev) => ({
       ...prev,
@@ -298,7 +296,8 @@ export function ExecutionContainer({
       );
 
       if (res.status === "error") {
-        const errorMsg = res.error || "Code execution returned an error";
+        const errorMsg =
+          res.error || "La ejecución del código devolvió un error";
         setExecutionState({
           running: false,
           output: res.logs || "",
@@ -316,9 +315,9 @@ export function ExecutionContainer({
 
       const cleanOutput = res.logs
         ? res.logs.includes("{") && res.logs.includes("results")
-          ? "✓ Code executed successfully. Check test cases above."
+          ? "✓ Código ejecutado correctamente. Revisa los casos de prueba."
           : res.logs
-        : "✓ Code executed successfully. Check test cases above.";
+        : "✓ Código ejecutado correctamente. Revisa los casos de prueba.";
       setExecutionState({
         running: false,
         output: cleanOutput,
@@ -326,10 +325,12 @@ export function ExecutionContainer({
         results: res.results || [],
       });
 
-      toast.success(`Execution completed: ${passedCount}/${totalCount} passed`);
+      toast.success(
+        `Ejecución completada: ${passedCount}/${totalCount} correctas`,
+      );
       return { output: res.logs || "", error: "" };
     } catch (err: any) {
-      let errorMsg = "Execution failed";
+      let errorMsg = "La ejecución falló";
       let description = "";
 
       if (err?.response?.data?.data?.error) {
@@ -377,7 +378,7 @@ export function ExecutionContainer({
 
   return (
     <div className="h-screen flex flex-col">
-      <LoadingOverlay visible={loading} message="Cargando challenge..." />
+      <LoadingOverlay visible={loading} message="Cargando desafío..." />
       <ConfirmDialog
         isOpen={submitModalOpen}
         title="Confirmar envío"
@@ -447,8 +448,8 @@ export function ExecutionContainer({
         <div className="px-4 py-3 text-sm text-red-800 bg-red-50 border-t border-red-200 flex items-center gap-2">
           <span className="font-semibold">Tiempo agotado.</span>
           <span>
-            La sesión se bloqueó; revisa tus resultados y reinicia el challenge
-            si es necesario.
+            La sesión se bloqueó; revisa tus resultados y reinicia el desafío si
+            es necesario.
           </span>
         </div>
       )}

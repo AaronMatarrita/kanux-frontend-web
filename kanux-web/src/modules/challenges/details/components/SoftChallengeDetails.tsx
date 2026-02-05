@@ -11,7 +11,7 @@ export function SoftChallengeDetails({ softData }: SoftChallengeDetailsProps) {
   return (
     <section className="rounded-lg border border-slate-200 bg-white p-6 space-y-4">
       <h2 className="text-lg font-semibold text-slate-900">
-        Acerca del challenge
+        Acerca del desafío
       </h2>
 
       {firstChallenge?.instructions && (
@@ -22,9 +22,9 @@ export function SoftChallengeDetails({ softData }: SoftChallengeDetailsProps) {
         <div className="flex items-center gap-2 text-slate-700">
           <HelpCircle className="h-5 w-5" />
           <p className="text-sm font-medium">
-            Este challenge contiene{" "}
+            Este desafío contiene{" "}
             <span className="font-bold text-slate-900">{questionCount}</span>{" "}
-            preguntas para evaluar tus soft skills.
+            preguntas para evaluar tus habilidades blandas.
           </p>
         </div>
       </div>

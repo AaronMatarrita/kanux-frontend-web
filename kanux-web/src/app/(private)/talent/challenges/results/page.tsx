@@ -10,14 +10,16 @@ function ResultsContent() {
 
 export default function ChallengeResultsPage() {
   return (
-    <Suspense
-      fallback={
-        <div className="flex items-center justify-center min-h-screen">
-          <LoadingSpinner />
-        </div>
-      }
-    >
-      <ResultsContent />
-    </Suspense>
+    <div className="flex flex-col flex-1 p-6">
+      <Suspense
+        fallback={
+          <div className="flex items-center justify-center min-h-[60vh]">
+            <LoadingSpinner />
+          </div>
+        }
+      >
+        <ResultsContent />
+      </Suspense>
+    </div>
   );
 }

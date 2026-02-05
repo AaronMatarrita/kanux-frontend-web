@@ -15,11 +15,13 @@ export default function Page() {
   };
 
   return (
-    <div className="space-y-6 py-6 px-8">
-      <CompanyChallengesList
-        onViewDetails={handleViewDetails}
-        onCreateChallenge={handleCreateChallenge}
-      />
+    <div className="flex flex-col flex-1 p-6">
+      <div className="space-y-6">
+        <CompanyChallengesList
+          onViewDetails={handleViewDetails}
+          onCreateChallenge={handleCreateChallenge}
+        />
+      </div>
     </div>
   );
 }
