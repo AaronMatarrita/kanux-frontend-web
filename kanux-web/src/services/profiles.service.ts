@@ -87,6 +87,7 @@ export interface Skill {
   category?: {
     id: string;
     name: string;
+    type_category:string;
   };
 }
 

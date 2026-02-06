@@ -36,7 +36,7 @@ export default function SkillsPage() {
   const groupedSkillsData = useMemo(() => {
     // agroup skills by soft and technical skills
     const filtered = allSkills.filter((s) => {
-      const isSoft = s.category?.name.toLowerCase().includes("soft");
+      const isSoft = s.category?.type_category === "soft" ;
       return activeTab === "soft" ? isSoft : !isSoft;
     });
 
