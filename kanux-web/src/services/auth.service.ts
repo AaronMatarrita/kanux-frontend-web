@@ -4,6 +4,26 @@ import { httpClient } from "@/services/http";
 import { getDeviceId } from "@/lib/device";
 
 
+export type PlanFeatures = {
+  plan: {
+    id: string | null;
+    name: string | null;
+    price_monthly: number | null;
+  };
+  features: {
+    can_contact_talent?: boolean;
+    can_use_advanced_filters?: boolean;
+    can_create_custom_challenges?: boolean;
+    can_access_metrics?: boolean;
+    can_access_reports?: boolean;
+
+    can_access_basic_challenges?: boolean;
+    can_access_advanced_challenges?: boolean;
+    can_access_detailed_reports?: boolean;
+  };
+};
+
+
 export interface PreRegisterRequest {
   email: string;
   password: string;
@@ -41,6 +61,7 @@ export type LoginResponse =
   | {
       token: string;
       sessionId: string;
+      plan: PlanFeatures | null;
       user: {
         id: string;
         email: string;
@@ -51,6 +72,7 @@ export type LoginResponse =
   | {
       token: string;
       sessionId: string;
+      plan: PlanFeatures | null;
       user: {
         id: string;
         email: string;

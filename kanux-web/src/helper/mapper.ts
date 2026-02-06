@@ -55,6 +55,7 @@ export const mapLoginResponseToSession = (
       isAuthenticated: true,
       token: response.token,
       sessionId: response.sessionId,
+      plan: response.plan,
       user: {
         ...baseUser,
         userType: "talent",
@@ -67,6 +68,7 @@ export const mapLoginResponseToSession = (
     isAuthenticated: true,
     token: response.token,
     sessionId: response.sessionId,
+    plan: response.plan,
     user: {
       ...baseUser,
       userType: "company",
