@@ -6,17 +6,17 @@ export const difficultyConfig: Record<
 > = {
   // Spanish variants
   Básico: {
-    label: "Beginner",
+    label: "Básico",
     className: "bg-emerald-50 text-emerald-700 border border-emerald-200",
     icon: FlaskConical,
   },
   Intermedio: {
-    label: "Intermediate",
+    label: "Intermedio",
     className: "bg-amber-50 text-amber-700 border border-amber-200",
     icon: Code2,
   },
   Avanzado: {
-    label: "Advanced",
+    label: "Avanzado",
     className: "bg-rose-50 text-rose-700 border border-rose-200",
     icon: Layers,
   },
