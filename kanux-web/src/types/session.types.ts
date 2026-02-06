@@ -1,3 +1,5 @@
+import { PlanFeatures } from "@/services/auth.service";
+
 export type CompanyProfile = {
   id: string;
   name: string | null;
@@ -38,6 +40,7 @@ export type Session = {
   isAuthenticated: boolean;
   token: string;
   sessionId: string;
+  plan: PlanFeatures | null;
   user: {
     id: string;
     email: string;
