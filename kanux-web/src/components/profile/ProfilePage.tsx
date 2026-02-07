@@ -49,7 +49,7 @@ export function ProfilePage() {
       setChallenges(responseChallenges)
       console.log(responseProfile)
     } catch (err) {
-      toast.error("The profile could not be loaded.");
+      toast.error("No se pudo cargar el perfil.");
     } finally {
       setLoading(false);
     }
@@ -74,9 +74,9 @@ export function ProfilePage() {
       const resprofile: TalentProfile = await profilesService.getMyProfile();
       setProfile(resprofile);
       setOpenModal("none");
-      toast.success("The perfil information has been updated")
+      toast.success("La informacion del perfil fue actualizada.")
     } catch (error) {
-      toast.error("The profile could not be updated.");
+      toast.error("No se pudo actualizar el perfil.");
     }
   };
 
@@ -92,9 +92,9 @@ export function ProfilePage() {
       const resprofile: TalentProfile = await profilesService.getMyProfile();
       setProfile(resprofile);
       setOpenModal("none");
-      toast.success("The about has been updated")
+      toast.success("La descripcion fue actualizada.")
     } catch (error) {
-      toast.error("The profile could not be updated");
+      toast.error("No se pudo actualizar el perfil.");
     }
   };
   //update basic information
@@ -146,9 +146,9 @@ export function ProfilePage() {
       const resprofile: TalentProfile = await profilesService.getMyProfile();
       setProfile(resprofile);
       setOpenModal("none");
-      toast.success("The basic information has been updated")
+      toast.success("La informacion basica fue actualizada.")
     } catch (error) {
-      toast.error("The basic information could not be updated.")
+      toast.error("No se pudo actualizar la informacion basica.")
     }
   };
 
@@ -193,9 +193,9 @@ export function ProfilePage() {
       const resprofile: TalentProfile = await profilesService.getMyProfile();
       setProfile(resprofile);
       setOpenModal("none");
-      toast.success("The skills has been updated");
+      toast.success("Las habilidades fueron actualizadas.");
     } catch (error) {
-      toast.error("The Skills could not be updated.")
+      toast.error("No se pudieron actualizar las habilidades.")
     }
   };
 
@@ -205,12 +205,14 @@ export function ProfilePage() {
       {/* About Section*/}
       <Card>
         <CardContent>
-          <h3 className="text-base font-semibold text-gray-900 mb-3">About</h3>
+          <h3 className="text-base font-semibold text-gray-900 mb-3">
+            Acerca de
+          </h3>
           <div>
             <p className="text-gray-600 leading-relaxed"> {profile?.about}</p>
             <ButtonEdit
               onExecute={() => setOpenModal("about")}
-              label="Edit About"
+              label="Editar descripcion"
             />
           </div>
         </CardContent>
@@ -219,24 +221,37 @@ export function ProfilePage() {
       {/* Basic Information  */}
       <Card>
         <CardContent>
-          <h3 className="text-base font-semibold text-gray-900 mb-4">Basic Information</h3>
+          <h3 className="text-base font-semibold text-gray-900 mb-4">
+            Informacion basica
+          </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <ButtonEdit
               onExecute={() => setOpenModal("basicInfo")}
-              label="Edit Basic Info"
+              label="Editar informacion basica"
             />
-            <InfoItem label="Experience Level" value={`${profile?.experience_level ?? ""}`} />
+            <InfoItem
+              label="Nivel de experiencia"
+              value={`${profile?.experience_level ?? ""}`}
+            />
 
             <div className="flex flex-col gap-2">
-              <span className="text-base font-semibold text-gray-900">Lenguages</span>
+              <span className="text-base font-semibold text-gray-900">
+                Idiomas
+              </span>
               {profile?.languages_talent?.map((language) => (
                 <span key={language.id} className="text-sm text-gray-600">
                   {language.languages?.name} ({language.level})
                 </span>
               ))}
             </div>
-            <InfoItem label="Learning Background" value={`${profile?.learning_backgrounds?.name ?? ""}`} />
-            <InfoItem label="Open to Opportunities" value={`${profile?.opportunity_statuses?.name ?? ""}`} />
+            <InfoItem
+              label="Formacion"
+              value={`${profile?.learning_backgrounds?.name ?? ""}`}
+            />
+            <InfoItem
+              label="Disponible para oportunidades"
+              value={`${profile?.opportunity_statuses?.name ?? ""}`}
+            />
           </div>
         </CardContent>
       </Card>
@@ -264,11 +279,13 @@ export function ProfilePage() {
         {/* Verified Skills */}
         <Card>
           <CardContent>
-            <h3 className="text-base font-semibold text-gray-900 mb-4">Verified Skills</h3>
+            <h3 className="text-base font-semibold text-gray-900 mb-4">
+              Habilidades verificadas
+            </h3>
             <div className="space-y-4">
               <ButtonEdit
                 onExecute={() => setOpenModal("skills")}
-                label="Edit Skills"
+                label="Editar habilidades"
               />
               {Object.values(groupedSkills).map(({ category, skills }) => (
                 <SkillsSection
@@ -297,15 +314,15 @@ export function ProfilePage() {
   };
 
   const tabs = [
-    { label: "Overview", content: <OverviewTab /> },
-    { label: "Skills", content: <SkillsTab /> },
-    { label: "Activity", content: <ActivityTab /> }
+    { label: "Resumen", content: <OverviewTab /> },
+    { label: "Habilidades", content: <SkillsTab /> },
+    { label: "Actividad", content: <ActivityTab /> }
   ];
   //loading spiner
   if (loading) {
     return (
       <div className="flex min-h-screen w-full items-center justify-center">
-        <LoadingSpinner size="md" message="Loading profile" className="profile" />
+        <LoadingSpinner size="md" message="Cargando perfil" className="profile" />
       </div>
     );
   }
@@ -316,21 +333,24 @@ export function ProfilePage() {
         <div className="mx-auto space-y-10">
           {/* title profile */}
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Profile</h1>
+            <h1 className="text-3xl font-bold text-gray-900">Perfil</h1>
             <p className="text-slate-600 mt-1">
-              Manage and review your profile
+              Administra y revisa tu perfil
             </p>
           </div>
           {/*if profile not load show alert else show header card  */}
           {!profile ? (
-            <ErrorAlert message="Error loading challenges. Please try again." onRetry={loadProfileData} />
+            <ErrorAlert
+              message="Error al cargar el perfil. Intenta de nuevo."
+              onRetry={loadProfileData}
+            />
           ) : (
             <>
               <Card>
                 <CardContent>
                   <ButtonEdit
                     onExecute={() => setOpenModal("userInfo")}
-                    label="Edit Profile"
+                    label="Editar perfil"
                   />
                   <ProfileHeader
                     name={`${profile?.first_name + " " + profile?.last_name}`}
@@ -354,7 +374,7 @@ export function ProfilePage() {
       < Modal
         isOpen={openModal === "userInfo"}
         onClose={() => setOpenModal("none")}
-        title="Edit User Information"
+        title="Editar informacion de usuario"
         size="lg"
       >
         <UserInfoFormModal
@@ -374,7 +394,7 @@ export function ProfilePage() {
       <Modal
         isOpen={openModal === "about"}
         onClose={() => setOpenModal("none")}
-        title="Edit Description"
+        title="Editar descripcion"
         size="md"
       >
         <AboutFormModal
@@ -387,7 +407,7 @@ export function ProfilePage() {
       <Modal
         isOpen={openModal === "basicInfo"}
         onClose={() => setOpenModal("none")}
-        title="Edit Basic Information"
+        title="Editar informacion basica"
         size="lg"
       >
         <BasicInfoFormModal
@@ -407,7 +427,7 @@ export function ProfilePage() {
       <Modal
         isOpen={openModal === "skills"}
         onClose={() => setOpenModal("none")}
-        title="Edit Skills"
+        title="Editar habilidades"
         size="md"
       >
         <SkillsFormModal
