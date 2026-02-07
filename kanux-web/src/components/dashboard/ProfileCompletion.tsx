@@ -23,13 +23,13 @@ export const ProfileCompletion: React.FC<ProfileCompletionProps> = ({
             <p className="text-sm font-medium text-slate-700">
               Nivel de progreso
             </p>
-            <p className="text-sm font-semibold text-blue-600">
+            <p className="text-sm font-semibold text-sky-600">
               {completionPercentage}%
             </p>
           </div>
           <div className="w-full bg-slate-200 rounded-full h-2">
             <div
-              className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+              className="h-2 rounded-full bg-linear-to-r from-sky-500 to-emerald-500 transition-all duration-300"
               style={{ width: `${completionPercentage}%` }}
             ></div>
           </div>
