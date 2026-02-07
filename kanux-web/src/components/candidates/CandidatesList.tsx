@@ -13,6 +13,7 @@ import { useAuth } from "@/context/AuthContext";
 import { CandidateProfileDetails } from "@/components/candidates/CandidateProfileDetails";
 import { Pagination } from "@/components/ui/pagination";
 import { useRouter } from "next/navigation";
+import { ActionGuard } from "@/guards/actionGuard";
 
 /* ---------------- COMPONENT ---------------- */
 
@@ -291,13 +292,18 @@ export const CandidatesList: React.FC = ({}) => {
                       <button onClick={() => handleViewProfile(c)}>
                         <Eye size={18} />
                       </button>
-                      <button
-                        onClick={() => handleCreateConversation(c.talent_id)}
-                        disabled={creatingConversation}
-                        className="disabled:opacity-50 disabled:cursor-not-allowed"
+                      <ActionGuard
+                        feature="can_contact_talent"
+                        actionName="Contactar talento"
                       >
-                        <MessageSquare size={18} />
-                      </button>
+                        <button
+                          onClick={() => handleCreateConversation(c.talent_id)}
+                          disabled={creatingConversation}
+                          className="disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          <MessageSquare size={18} />
+                        </button>
+                      </ActionGuard>
                     </td>
                   </tr>
                 ))
