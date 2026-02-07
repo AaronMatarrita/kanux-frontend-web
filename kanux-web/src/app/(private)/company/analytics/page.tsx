@@ -8,6 +8,7 @@ import { PerformanceChart } from "@/modules/company/analytics/components/perform
 import { TopCandidates } from "@/modules/company/analytics/components/top-candidates";
 import { AnalyticsDashboardProvider } from "@/modules/company/analytics/context/AnalyticsDashboardContext";
 import CompanyGuardClient from "./CompanyGuardClient";
+import { FeatureGuard } from "@/guards/featureGuard";
 
 export default function AnalyticsPage() {
   return (
@@ -24,14 +25,19 @@ export default function AnalyticsPage() {
             </p>
           </div>
 
-          <div className="space-y-6">
-            <StatCards />
-            <div className="grid gap-6 lg:grid-cols-2">
-              <QualityChart />
-              <PerformanceChart />
+          <FeatureGuard
+            feature="can_access_metrics"
+            infoText="La analitica de talento"
+          >
+            <div className="space-y-6">
+              <StatCards />
+              <div className="grid gap-6 lg:grid-cols-2">
+                <QualityChart />
+                <PerformanceChart />
+              </div>
+              <TopCandidates />
             </div>
-            <TopCandidates />
-          </div>
+          </FeatureGuard>
         </div>
       </AnalyticsDashboardProvider>
     </CompanyGuardClient>

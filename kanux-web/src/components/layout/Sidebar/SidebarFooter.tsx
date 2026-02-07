@@ -7,31 +7,33 @@ function useMounted() {
   return useSyncExternalStore(
     () => () => {},
     () => true,
-    () => false
+    () => false,
   );
 }
 
 export const SidebarFooter = () => {
-  const { session,loading } = useAuth();
-   const mounted = useMounted();
+  const { session, loading } = useAuth();
+  const mounted = useMounted();
 
   const user = !mounted
-  ? mockSession
-  : loading
-  ? mockSession
-  : session
-  ? {
-      name:
-        session.user.userType === "company"
-          ? session.user.profile.name ?? "Empresa"
-          : session.user.profile.first_name + " " + session.user.profile.last_name || "Talento",
-      email: session.user.email,
-      photoUrl:
-        session.user.userType === "company"
-          ? session.user.profile.url_logo ?? "https://i.pravatar.cc/40"
-          : session.user.profile.photo_url ?? "https://i.pravatar.cc/40",
-    }
-  : mockSession;
+    ? mockSession
+    : loading
+      ? mockSession
+      : session
+        ? {
+            name:
+              session.user.userType === "company"
+                ? (session.user.profile.name ?? "Empresa")
+                : session.user.profile.first_name +
+                    " " +
+                    session.user.profile.last_name || "Talento",
+            email: session.user.email,
+            photoUrl:
+              session.user.userType === "company"
+                ? session.user.profile.url_logo || null
+                : session.user.profile.photo_url || null,
+          }
+        : mockSession;
 
   const userInitial = user.name ? user.name.charAt(0).toUpperCase() : "U";
 

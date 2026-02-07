@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { challengesService } from "@/services/challenges.service";
 import { useAuth } from "@/context/AuthContext";
+import { FeatureGuard } from "@/guards/featureGuard";
 
 const mapSubmissionData = (backendSubmissions: any[] | any) => {
   if (
@@ -143,147 +144,156 @@ export default function ChallengeMetricsPage() {
       </div>
       <p className="text-slate-500 mb-8">Soft Skills Evaluation</p>
 
-      {error && <div className="text-red-500 mb-4">{error}</div>}
-      {loading ? (
-        <div className="text-center py-10">Cargando métricas...</div>
-      ) : (
-        <>
-          {/* Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-5 mb-10">
-            <div className="bg-white rounded-xl border border-slate-200 p-5 flex flex-col gap-2">
-              <div className="flex items-center justify-between text-slate-500 text-sm">
-                <span>Total Submissions</span>
-                <Users className="w-4 h-4" />
+      <FeatureGuard
+        feature="can_access_reports"
+        infoText="Los reportes de desempeño"
+      >
+        {error && <div className="text-red-500 mb-4">{error}</div>}
+        {loading ? (
+          <div className="text-center py-10">Cargando métricas...</div>
+        ) : (
+          <>
+            {/* Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-5 mb-10">
+              <div className="bg-white rounded-xl border border-slate-200 p-5 flex flex-col gap-2">
+                <div className="flex items-center justify-between text-slate-500 text-sm">
+                  <span>Total Submissions</span>
+                  <Users className="w-4 h-4" />
+                </div>
+                <div className="text-3xl font-bold text-slate-900">
+                  {totalSubmissions}
+                </div>
+                <div className="text-xs text-slate-400">
+                  {completedSubmissions} completados
+                </div>
               </div>
-              <div className="text-3xl font-bold text-slate-900">
-                {totalSubmissions}
+              <div className="bg-white rounded-xl border border-slate-200 p-5 flex flex-col gap-2">
+                <div className="flex items-center justify-between text-slate-500 text-sm">
+                  <span>Promedio de Score</span>
+                  <TrendingUp className="w-4 h-4" />
+                </div>
+                <div className="text-3xl font-bold text-slate-900">
+                  {averageScore}
+                  <span className="text-base font-medium text-slate-500">
+                    /100
+                  </span>
+                </div>
+                <div className="text-xs text-slate-400">
+                  Basado en {submissionsWithScore.length} evaluaciones
+                </div>
               </div>
-              <div className="text-xs text-slate-400">
-                {completedSubmissions} completados
+              <div className="bg-white rounded-xl border border-slate-200 p-5 flex flex-col gap-2">
+                <div className="flex items-center justify-between text-slate-500 text-sm">
+                  <span>Última Actividad</span>
+                  <Calendar className="w-4 h-4" />
+                </div>
+                <div className="text-xl font-bold text-slate-900">
+                  {lastActivityDate ? formatDate(lastActivityDate) : "-"}
+                </div>
+                <div className="text-xs text-slate-400">
+                  Fecha de última submission
+                </div>
+              </div>
+              <div className="bg-white rounded-xl border border-slate-200 p-5 flex flex-col gap-2">
+                <div className="flex items-center justify-between text-slate-500 text-sm">
+                  <span>Tasa de Completado</span>
+                  <CheckCircle2 className="w-4 h-4" />
+                </div>
+                <div className="text-3xl font-bold text-slate-900">
+                  {completionRate}
+                  <span className="text-base font-medium text-slate-500">
+                    %
+                  </span>
+                </div>
+                <div className="text-xs text-slate-400">
+                  Submissions completados
+                </div>
               </div>
             </div>
-            <div className="bg-white rounded-xl border border-slate-200 p-5 flex flex-col gap-2">
-              <div className="flex items-center justify-between text-slate-500 text-sm">
-                <span>Promedio de Score</span>
-                <TrendingUp className="w-4 h-4" />
-              </div>
-              <div className="text-3xl font-bold text-slate-900">
-                {averageScore}
-                <span className="text-base font-medium text-slate-500">
-                  /100
-                </span>
-              </div>
-              <div className="text-xs text-slate-400">
-                Basado en {submissionsWithScore.length} evaluaciones
-              </div>
-            </div>
-            <div className="bg-white rounded-xl border border-slate-200 p-5 flex flex-col gap-2">
-              <div className="flex items-center justify-between text-slate-500 text-sm">
-                <span>Última Actividad</span>
-                <Calendar className="w-4 h-4" />
-              </div>
-              <div className="text-xl font-bold text-slate-900">
-                {lastActivityDate ? formatDate(lastActivityDate) : "-"}
-              </div>
-              <div className="text-xs text-slate-400">
-                Fecha de última submission
-              </div>
-            </div>
-            <div className="bg-white rounded-xl border border-slate-200 p-5 flex flex-col gap-2">
-              <div className="flex items-center justify-between text-slate-500 text-sm">
-                <span>Tasa de Completado</span>
-                <CheckCircle2 className="w-4 h-4" />
-              </div>
-              <div className="text-3xl font-bold text-slate-900">
-                {completionRate}
-                <span className="text-base font-medium text-slate-500">%</span>
-              </div>
-              <div className="text-xs text-slate-400">
-                Submissions completados
-              </div>
-            </div>
-          </div>
 
-          {/* Table */}
-          <div className="bg-white rounded-xl border border-slate-200 p-6">
-            <h2 className="text-lg font-semibold text-slate-900 mb-4">
-              Historial de Submissions
-            </h2>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="text-slate-500 border-b">
-                    <th className="py-3 px-3 text-left font-medium">
-                      Candidato
-                    </th>
-                    <th className="py-3 px-3 text-left font-medium">Score</th>
-                    <th className="py-3 px-3 text-left font-medium">Estado</th>
-                    <th className="py-3 px-3 text-left font-medium">
-                      Tipo de Evaluación
-                    </th>
-                    <th className="py-3 px-3 text-left font-medium">Fecha</th>
-                  </tr>
-                </thead>
-                <tbody className="text-slate-700">
-                  {submissions.length === 0 && (
-                    <tr>
-                      <td
-                        colSpan={5}
-                        className="text-center py-6 text-slate-400"
-                      >
-                        No hay submissions
-                      </td>
+            {/* Table */}
+            <div className="bg-white rounded-xl border border-slate-200 p-6">
+              <h2 className="text-lg font-semibold text-slate-900 mb-4">
+                Historial de Submissions
+              </h2>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="text-slate-500 border-b">
+                      <th className="py-3 px-3 text-left font-medium">
+                        Candidato
+                      </th>
+                      <th className="py-3 px-3 text-left font-medium">Score</th>
+                      <th className="py-3 px-3 text-left font-medium">
+                        Estado
+                      </th>
+                      <th className="py-3 px-3 text-left font-medium">
+                        Tipo de Evaluación
+                      </th>
+                      <th className="py-3 px-3 text-left font-medium">Fecha</th>
                     </tr>
-                  )}
-                  {submissions.map((s, idx) => {
-                    const displayDate = s.submitted_at || s.resolution_date;
-                    return (
-                      <tr className="border-b" key={s.submission_id || idx}>
-                        <td className="py-3 px-3">
-                          {s.talent_name && s.talent_name !== "null"
-                            ? s.talent_name
-                            : "-"}
-                        </td>
+                  </thead>
+                  <tbody className="text-slate-700">
+                    {submissions.length === 0 && (
+                      <tr>
                         <td
-                          className={`py-3 px-3 font-semibold ${
-                            typeof s.score === "number" && s.score >= 80
-                              ? "text-emerald-600"
-                              : typeof s.score === "number"
-                                ? "text-orange-500"
-                                : "text-slate-400"
-                          }`}
+                          colSpan={5}
+                          className="text-center py-6 text-slate-400"
                         >
-                          {typeof s.score === "number" ? s.score : "-"}
-                        </td>
-                        <td className="py-3 px-3">
-                          {s.status === "completed" ||
-                          s.status === "evaluated" ? (
-                            <span className="inline-flex items-center gap-1 bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full text-xs font-medium">
-                              <CheckCircle2 className="w-3 h-3" />
-                              Completado
-                            </span>
-                          ) : (
-                            <span className="inline-flex items-center gap-1 bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs font-medium">
-                              <Clock className="w-3 h-3" />
-                              En progreso
-                            </span>
-                          )}
-                        </td>
-                        <td className="py-3 px-3 text-slate-500">
-                          {s.evaluation_type || "-"}
-                        </td>
-                        <td className="py-3 px-3 text-slate-500">
-                          {displayDate ? formatDate(displayDate) : "-"}
+                          No hay submissions
                         </td>
                       </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+                    )}
+                    {submissions.map((s, idx) => {
+                      const displayDate = s.submitted_at || s.resolution_date;
+                      return (
+                        <tr className="border-b" key={s.submission_id || idx}>
+                          <td className="py-3 px-3">
+                            {s.talent_name && s.talent_name !== "null"
+                              ? s.talent_name
+                              : "-"}
+                          </td>
+                          <td
+                            className={`py-3 px-3 font-semibold ${
+                              typeof s.score === "number" && s.score >= 80
+                                ? "text-emerald-600"
+                                : typeof s.score === "number"
+                                  ? "text-orange-500"
+                                  : "text-slate-400"
+                            }`}
+                          >
+                            {typeof s.score === "number" ? s.score : "-"}
+                          </td>
+                          <td className="py-3 px-3">
+                            {s.status === "completed" ||
+                            s.status === "evaluated" ? (
+                              <span className="inline-flex items-center gap-1 bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full text-xs font-medium">
+                                <CheckCircle2 className="w-3 h-3" />
+                                Completado
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1 bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs font-medium">
+                                <Clock className="w-3 h-3" />
+                                En progreso
+                              </span>
+                            )}
+                          </td>
+                          <td className="py-3 px-3 text-slate-500">
+                            {s.evaluation_type || "-"}
+                          </td>
+                          <td className="py-3 px-3 text-slate-500">
+                            {displayDate ? formatDate(displayDate) : "-"}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
-        </>
-      )}
+          </>
+        )}
+      </FeatureGuard>
     </div>
   );
 }

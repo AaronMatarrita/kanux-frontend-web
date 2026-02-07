@@ -2,6 +2,7 @@
 
 import { useCompanyGuard } from "@/guards/useCompanyGuard";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
+import { SubscriptionProvider } from "@/context/SubscriptionContext";
 
 export default function CompanyLayout({
   children,
@@ -18,5 +19,7 @@ export default function CompanyLayout({
     );
   }
 
-  return <>{children}</>;
+  return (
+    <SubscriptionProvider userType="company">{children}</SubscriptionProvider>
+  );
 }

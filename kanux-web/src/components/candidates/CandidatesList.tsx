@@ -13,12 +13,26 @@ import { useAuth } from "@/context/AuthContext";
 import { CandidateProfileDetails } from "@/components/candidates/CandidateProfileDetails";
 import { Pagination } from "@/components/ui/pagination";
 import { useRouter } from "next/navigation";
+import { ActionGuard } from "@/guards/actionGuard";
+import { useSubscription } from "@/context/SubscriptionContext";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 /* ---------------- COMPONENT ---------------- */
 
 export const CandidatesList: React.FC = ({}) => {
   const { session } = useAuth();
   const router = useRouter();
+  const { planData, userType } = useSubscription();
+  const features =
+    userType === "company"
+      ? planData?.company_plans?.company_plan_features?.[0]
+      : null;
+  const canUseAdvancedFilters = !!features?.can_use_advanced_filters;
 
   const [isLoading, setIsLoading] = useState(true);
   const [candidates, setCandidates] = useState<CandidateListItem[]>([]);
@@ -239,17 +253,37 @@ export const CandidatesList: React.FC = ({}) => {
           </div>
 
           <div className="grid md:grid-cols-2 gap-4">
-            <Select
-              value={skillFilter}
-              onChange={setSkillFilter}
-              options={skillSelectOptions}
-            />
-            <Select
-              value={backgroundFilter ?? ""}
-              onChange={(value) => setBackgroundFilter(value || undefined)}
-              options={backgroundSelectOptions}
-              placeholder="Education"
-            />
+            <ActionGuard
+              feature="can_use_advanced_filters"
+              actionName="Usar filtros avanzados"
+            >
+              <div>
+                <Select
+                  value={skillFilter}
+                  onChange={setSkillFilter}
+                  options={skillSelectOptions}
+                  buttonClassName={
+                    canUseAdvancedFilters ? "" : "opacity-60 cursor-not-allowed"
+                  }
+                />
+              </div>
+            </ActionGuard>
+            <ActionGuard
+              feature="can_use_advanced_filters"
+              actionName="Usar filtros avanzados"
+            >
+              <div>
+                <Select
+                  value={backgroundFilter ?? ""}
+                  onChange={(value) => setBackgroundFilter(value || undefined)}
+                  options={backgroundSelectOptions}
+                  placeholder="Education"
+                  buttonClassName={
+                    canUseAdvancedFilters ? "" : "opacity-60 cursor-not-allowed"
+                  }
+                />
+              </div>
+            </ActionGuard>
           </div>
         </div>
 
@@ -288,16 +322,39 @@ export const CandidatesList: React.FC = ({}) => {
                     <td className="px-6 py-4">{c.title}</td>
 
                     <td className="px-6 py-4 flex gap-2">
-                      <button onClick={() => handleViewProfile(c)}>
-                        <Eye size={18} />
-                      </button>
-                      <button
-                        onClick={() => handleCreateConversation(c.talent_id)}
-                        disabled={creatingConversation}
-                        className="disabled:opacity-50 disabled:cursor-not-allowed"
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button
+                            className="cursor-pointer"
+                            onClick={() => handleViewProfile(c)}
+                          >
+                            <Eye size={18} />
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          Ver perfil del candidato
+                        </TooltipContent>
+                      </Tooltip>
+                      <ActionGuard
+                        feature="can_contact_talent"
+                        actionName="Contactar talento"
                       >
-                        <MessageSquare size={18} />
-                      </button>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                handleCreateConversation(c.talent_id)
+                              }
+                              disabled={creatingConversation}
+                              className="cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              <MessageSquare size={18} />
+                            </button>
+                          </TooltipTrigger>
+                          <TooltipContent>Contactar candidato</TooltipContent>
+                        </Tooltip>
+                      </ActionGuard>
                     </td>
                   </tr>
                 ))
