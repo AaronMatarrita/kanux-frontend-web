@@ -14,12 +14,19 @@ import { CandidateProfileDetails } from "@/components/candidates/CandidateProfil
 import { Pagination } from "@/components/ui/pagination";
 import { useRouter } from "next/navigation";
 import { ActionGuard } from "@/guards/actionGuard";
+import { useSubscription } from "@/context/SubscriptionContext";
 
 /* ---------------- COMPONENT ---------------- */
 
 export const CandidatesList: React.FC = ({}) => {
   const { session } = useAuth();
   const router = useRouter();
+  const { planData, userType } = useSubscription();
+  const features =
+    userType === "company"
+      ? planData?.company_plans?.company_plan_features?.[0]
+      : null;
+  const canUseAdvancedFilters = !!features?.can_use_advanced_filters;
 
   const [isLoading, setIsLoading] = useState(true);
   const [candidates, setCandidates] = useState<CandidateListItem[]>([]);
@@ -240,17 +247,37 @@ export const CandidatesList: React.FC = ({}) => {
           </div>
 
           <div className="grid md:grid-cols-2 gap-4">
-            <Select
-              value={skillFilter}
-              onChange={setSkillFilter}
-              options={skillSelectOptions}
-            />
-            <Select
-              value={backgroundFilter ?? ""}
-              onChange={(value) => setBackgroundFilter(value || undefined)}
-              options={backgroundSelectOptions}
-              placeholder="Education"
-            />
+            <ActionGuard
+              feature="can_use_advanced_filters"
+              actionName="Usar filtros avanzados"
+            >
+              <div>
+                <Select
+                  value={skillFilter}
+                  onChange={setSkillFilter}
+                  options={skillSelectOptions}
+                  buttonClassName={
+                    canUseAdvancedFilters ? "" : "opacity-60 cursor-not-allowed"
+                  }
+                />
+              </div>
+            </ActionGuard>
+            <ActionGuard
+              feature="can_use_advanced_filters"
+              actionName="Usar filtros avanzados"
+            >
+              <div>
+                <Select
+                  value={backgroundFilter ?? ""}
+                  onChange={(value) => setBackgroundFilter(value || undefined)}
+                  options={backgroundSelectOptions}
+                  placeholder="Education"
+                  buttonClassName={
+                    canUseAdvancedFilters ? "" : "opacity-60 cursor-not-allowed"
+                  }
+                />
+              </div>
+            </ActionGuard>
           </div>
         </div>
 
