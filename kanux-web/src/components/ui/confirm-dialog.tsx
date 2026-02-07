@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { AlertCircle, Loader2 } from "lucide-react";
 
 interface ConfirmDialogProps {
@@ -25,8 +26,13 @@ export function ConfirmDialog({
   onCancel,
 }: ConfirmDialogProps) {
   const [error, setError] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
 
-  if (!isOpen) return null;
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!isOpen || !mounted) return null;
 
   const handleConfirm = async () => {
     try {
@@ -37,7 +43,7 @@ export function ConfirmDialog({
     }
   };
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
         <div className="flex items-center gap-3 mb-4">
@@ -83,6 +89,7 @@ export function ConfirmDialog({
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

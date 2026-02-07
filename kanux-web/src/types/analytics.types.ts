@@ -51,3 +51,36 @@ export interface AnalyticsDashboard {
   topCandidates: TopCandidate[];
   candidateQuality: CandidateQuality;
 }
+
+export interface TalentAnalyticsSummary {
+  totalSubmissions: number;
+  avgScore: number;
+  bestScore: number;
+  contactedCompanies: number;
+}
+
+export interface TalentTopChallenge {
+  challengeId: string;
+  title: string;
+  avgScore: number;
+  bestScore: number;
+  attempts: number;
+}
+
+export interface ContactedCompany {
+  id: string;
+  name: string;
+  lastMessageAt: string;
+}
+
+export interface TalentAnalyticsDashboard {
+  summary: TalentAnalyticsSummary;
+  summaryChanges: {
+    totalSubmissions: StatChange;
+    avgScore: StatChange;
+    contactedCompanies: StatChange;
+  };
+  topChallenges: TalentTopChallenge[];
+  scoreDistribution: Record<ScoreRange, number>;
+  contactedCompanies: ContactedCompany[];
+}

@@ -7,6 +7,7 @@ import { formatDuration } from "../utils/challenge.utils";
 import { useStartChallenge } from "../hooks/useStartChallenge";
 import { useStartSoftChallenge } from "../hooks/useStartSoftChallenge";
 import { BackNavigation } from "@/modules/challenges/components/BackNavigation";
+import { ActionGuard } from "@/guards/actionGuard";
 
 interface ChallengeHeroProps {
   challenge: any;
@@ -24,6 +25,7 @@ export function ChallengeHero({
   const difficulty = challenge?.difficulty || "Básico";
   const diffConfig = difficultyConfig[difficulty] || difficultyConfig["Básico"];
   const DiffIcon = diffConfig.icon;
+  const isAdvanced = difficulty === "Avanzado";
 
   const { startChallenge: startTechnical, isStarting: isStartingTechnical } =
     useStartChallenge({
@@ -91,16 +93,34 @@ export function ChallengeHero({
             </div>
           </div>
 
-          <button
-            type="button"
-            disabled={isStarting}
-            onClick={handleStart}
-            className={`inline-flex items-center justify-center gap-2 rounded-md px-5 py-2.5 text-sm font-semibold transition
-            bg-[#2EC27E] text-white hover:bg-[#28b76a] disabled:bg-slate-200 disabled:text-slate-400`}
-          >
-            <Play className="h-4 w-4" />
-            {isStarting ? "Iniciando..." : "Iniciar desafío"}
-          </button>
+          {isAdvanced ? (
+            <ActionGuard
+              feature="can_access_advanced_challenges"
+              actionName="Iniciar reto avanzado"
+            >
+              <button
+                type="button"
+                disabled={isStarting}
+                onClick={handleStart}
+                className={`inline-flex items-center justify-center gap-2 rounded-md px-5 py-2.5 text-sm font-semibold transition
+                bg-[#2EC27E] text-white hover:bg-[#28b76a] disabled:bg-slate-200 disabled:text-slate-400`}
+              >
+                <Play className="h-4 w-4" />
+                {isStarting ? "Iniciando..." : "Iniciar desafío"}
+              </button>
+            </ActionGuard>
+          ) : (
+            <button
+              type="button"
+              disabled={isStarting}
+              onClick={handleStart}
+              className={`inline-flex items-center justify-center gap-2 rounded-md px-5 py-2.5 text-sm font-semibold transition
+              bg-[#2EC27E] text-white hover:bg-[#28b76a] disabled:bg-slate-200 disabled:text-slate-400`}
+            >
+              <Play className="h-4 w-4" />
+              {isStarting ? "Iniciando..." : "Iniciar desafío"}
+            </button>
+          )}
         </div>
       </section>
     </>

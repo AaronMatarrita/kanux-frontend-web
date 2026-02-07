@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Clock } from "lucide-react";
 import { difficultyConfig } from "@/modules/challenges/details/config/difficulty.config";
+import { ActionGuard } from "@/guards/actionGuard";
 
 interface ChallengeCardProps {
   id: string;
@@ -37,6 +38,8 @@ export function ChallengeCard({
       ? `${hours}h ${mins > 0 ? `${mins}m` : ""}`
       : `${durationMinutes}m`;
 
+  const isAdvanced = difficulty === "Avanzado";
+
   return (
     <div className="group flex flex-col rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-md">
       {/* Top row */}
@@ -53,7 +56,12 @@ export function ChallengeCard({
           </span>
           {challengeType === "soft" && (
             <span className="rounded-full bg-purple-50 px-2.5 py-0.5 text-xs font-medium text-purple-700 border border-purple-200">
-              Soft Skills
+              Habilidades Blandas
+            </span>
+          )}
+          {challengeType === "technical" && (
+            <span className="rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-medium text-blue-700 border border-blue-200">
+              Desafío de Código
             </span>
           )}
         </div>
@@ -77,12 +85,26 @@ export function ChallengeCard({
         </div>
 
         {/* CTA */}
-        <Link
-          href={`/talent/challenges/${id}/details`}
-          className="flex w-full items-center justify-center rounded-md border border-slate-200 bg-[#2EC27E] px-3 py-2 text-xs font-medium text-white transition hover:bg-[#28b76a] focus:outline-none focus:ring-2 focus:ring-slate-950 focus:ring-offset-2"
-        >
-          Ver detalles
-        </Link>
+        {isAdvanced ? (
+          <ActionGuard
+            feature="can_access_advanced_challenges"
+            actionName="Acceder a retos avanzados"
+          >
+            <Link
+              href={`/talent/challenges/${id}/details`}
+              className="flex w-full items-center justify-center rounded-md border border-slate-200 bg-[#2EC27E] px-3 py-2 text-xs font-medium text-white transition hover:bg-[#28b76a] focus:outline-none focus:ring-2 focus:ring-slate-950 focus:ring-offset-2"
+            >
+              Ver detalles
+            </Link>
+          </ActionGuard>
+        ) : (
+          <Link
+            href={`/talent/challenges/${id}/details`}
+            className="flex w-full items-center justify-center rounded-md border border-slate-200 bg-[#2EC27E] px-3 py-2 text-xs font-medium text-white transition hover:bg-[#28b76a] focus:outline-none focus:ring-2 focus:ring-slate-950 focus:ring-offset-2"
+          >
+            Ver detalles
+          </Link>
+        )}
       </div>
     </div>
   );

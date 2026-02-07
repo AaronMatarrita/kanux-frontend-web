@@ -25,6 +25,7 @@ export const SIDEBAR_MENU: Record<UserRole, SidebarMenuItem[]> = {
     { label: "Desafíos", route: "/talent/challenges", icon: Trophy },
     { label: "Habilidades", route: "/talent/skills", icon: Medal },
     { label: "Mensajes", route: "/talent/messages", icon: MessageSquare },
+    { label: "Analítica", route: "/talent/analytics", icon: BarChart3 },
     { label: "Perfil", route: "/talent/profile", icon: User },
     { label: "Facturación", route: "/talent/billing", icon: CreditCard },
   ],

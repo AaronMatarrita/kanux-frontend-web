@@ -7,6 +7,7 @@ import { TrendingUp } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { BackNavigation } from "@/modules/challenges/components/BackNavigation";
+import { FeatureGuard } from "@/guards/featureGuard";
 import {
   challengesService,
   TechnicalChallengeResultResponse,
@@ -176,7 +177,12 @@ export function ResultsPage({
 
         <div className="grid lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
-            <ResultsFeedback markdown={feedback.markdown} />
+            <FeatureGuard
+              feature="can_access_detailed_reports"
+              infoText="El feedback generado con IA"
+            >
+              <ResultsFeedback markdown={feedback.markdown} />
+            </FeatureGuard>
           </div>
 
           <div className="space-y-6">
@@ -191,6 +197,7 @@ export function ResultsPage({
 
             <div className="space-y-3">
               <Button
+                variant="outline"
                 size="lg"
                 className="w-full cursor-pointer justify-center gap-2"
                 onClick={() => router.push("/talent/challenges")}

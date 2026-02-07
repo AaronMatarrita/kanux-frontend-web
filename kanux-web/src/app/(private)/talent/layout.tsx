@@ -2,6 +2,7 @@
 
 import { useTalentGuard } from "@/guards/useTalentGuard";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
+import { SubscriptionProvider } from "@/context/SubscriptionContext";
 
 export default function TalentLayout({
   children,
@@ -18,5 +19,7 @@ export default function TalentLayout({
     );
   }
 
-  return <>{children}</>;
+  return (
+    <SubscriptionProvider userType="talent">{children}</SubscriptionProvider>
+  );
 }

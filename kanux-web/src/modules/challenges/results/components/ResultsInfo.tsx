@@ -33,7 +33,7 @@ export function ResultsInfo({
   onCopy,
 }: ResultsInfoProps) {
   return (
-    <Card className="shadow-lg border-border/50">
+    <Card className="bg-white border border-slate-200 rounded-xl shadow-sm">
       <CardHeader className="pb-4">
         <CardTitle className="text-base font-semibold text-muted-foreground uppercase tracking-wider">
           Información del Reto
