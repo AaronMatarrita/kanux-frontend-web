@@ -328,21 +328,26 @@ export const CompanyChallengesList: React.FC<CompanyChallengesListProps> = ({
                         <TooltipContent>Ver detalles</TooltipContent>
                       </Tooltip>
 
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <button
-                            className="cursor-pointer"
-                            onClick={() =>
-                              router.push(
-                                `/company/challenges/${ch.id}/metrics`,
-                              )
-                            }
-                          >
-                            <BarChart size={18} />
-                          </button>
-                        </TooltipTrigger>
-                        <TooltipContent>Ver métricas</TooltipContent>
-                      </Tooltip>
+                      <ActionGuard
+                        feature="can_access_reports"
+                        actionName="Ver reportes de desempeno"
+                      >
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <button
+                              className="cursor-pointer"
+                              onClick={() =>
+                                router.push(
+                                  `/company/challenges/${ch.id}/metrics`,
+                                )
+                              }
+                            >
+                              <BarChart size={18} />
+                            </button>
+                          </TooltipTrigger>
+                          <TooltipContent>Ver métricas</TooltipContent>
+                        </Tooltip>
+                      </ActionGuard>
 
                       <Tooltip>
                         <TooltipTrigger asChild>
