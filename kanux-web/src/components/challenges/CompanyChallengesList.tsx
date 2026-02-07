@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ErrorAlert } from "@/components/ui/error-alert";
 import { Select } from "@/components/ui/select";
+import { ActionGuard } from "@/guards/actionGuard";
 import {
   Tooltip,
   TooltipContent,
@@ -223,13 +224,18 @@ export const CompanyChallengesList: React.FC<CompanyChallengesListProps> = ({
             </p>
           </div>
 
-          <button
-            onClick={onCreateChallenge}
-            className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
+          <ActionGuard
+            feature="can_create_custom_challenges"
+            actionName="Crear desafios personalizados"
           >
-            <Plus size={18} />
-            Crear desafío
-          </button>
+            <button
+              onClick={onCreateChallenge}
+              className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
+            >
+              <Plus size={18} />
+              Crear desafío
+            </button>
+          </ActionGuard>
         </div>
 
         {/* Filters */}
@@ -266,12 +272,17 @@ export const CompanyChallengesList: React.FC<CompanyChallengesListProps> = ({
             title="No se encontraron desafíos"
             description="Intenta ajustar los filtros o crea uno nuevo."
             action={
-              <button
-                onClick={onCreateChallenge}
-                className="px-4 py-2 bg-emerald-600 text-white rounded-lg"
+              <ActionGuard
+                feature="can_create_custom_challenges"
+                actionName="Crear desafios personalizados"
               >
-                Crear desafío
-              </button>
+                <button
+                  onClick={onCreateChallenge}
+                  className="px-4 py-2 bg-emerald-600 text-white rounded-lg"
+                >
+                  Crear desafío
+                </button>
+              </ActionGuard>
             }
           />
         ) : (
