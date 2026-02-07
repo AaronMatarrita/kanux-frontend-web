@@ -7,6 +7,7 @@ import { ScoreDistributionChart } from "@/modules/talent/analytics/components/sc
 import { TopChallenges } from "@/modules/talent/analytics/components/top-challenges";
 import { ContactedCompanies } from "@/modules/talent/analytics/components/contacted-companies";
 import { TalentAnalyticsDashboardProvider } from "@/modules/talent/analytics/context/TalentAnalyticsDashboardContext";
+import { FeatureGuard } from "@/guards/featureGuard";
 
 export default function TalentAnalyticsPage() {
   return (
@@ -21,14 +22,19 @@ export default function TalentAnalyticsPage() {
           </p>
         </div>
 
-        <div className="space-y-6">
-          <StatCards />
-          <div className="grid gap-6 lg:grid-cols-2">
-            <ScoreDistributionChart />
-            <TopChallenges />
+        <FeatureGuard
+          feature="can_access_detailed_reports"
+          infoText="La analitica de talento"
+        >
+          <div className="space-y-6">
+            <StatCards />
+            <div className="grid gap-6 lg:grid-cols-2">
+              <ScoreDistributionChart />
+              <TopChallenges />
+            </div>
+            <ContactedCompanies />
           </div>
-          <ContactedCompanies />
-        </div>
+        </FeatureGuard>
       </div>
     </TalentAnalyticsDashboardProvider>
   );
