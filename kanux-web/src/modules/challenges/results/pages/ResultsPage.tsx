@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { TrendingUp } from "lucide-react";
@@ -22,7 +22,10 @@ import {
   ResultsState,
 } from "../components";
 
-import { normalizeFeedback } from "@/modules/challenges/results/utils/normalize-feedback";
+import {
+  normalizeFeedback,
+  NormalizedFeedback,
+} from "@/modules/challenges/results/utils/normalize-feedback";
 
 type LocalStoredResult = {
   submission_id: string;
@@ -64,17 +67,26 @@ export function ResultsPage({
 
   const submissionId = propSubmissionId ?? searchParams.get("submissionId");
 
-  useEffect(() => {
-    if (initialData) return;
+  const hasFeedbackContent = useCallback((value: NormalizedFeedback) => {
+    return Boolean(
+      (value.strengths && value.strengths.length > 0) ||
+      (value.areasForImprovement && value.areasForImprovement.length > 0) ||
+      (value.nextSteps && value.nextSteps.length > 0) ||
+      value.answersOverview ||
+      (value.perQuestionFeedback && value.perQuestionFeedback.length > 0) ||
+      (value.scoreBreakdown && Object.keys(value.scoreBreakdown).length > 0) ||
+      (value.codeQuality && Object.keys(value.codeQuality).length > 0) ||
+      value.tests ||
+      (value.tags && value.tags.length > 0),
+    );
+  }, []);
 
-    if (!submissionId) {
-      setError("No se proporcionó ID de envío");
-      setLoadingState("error");
-      return;
-    }
+  const applyLatestFeedback = useCallback(
+    (feedback: ChallengeFeedbackWrapper | null) => {
+      if (!submissionId || !feedback) return;
+      const normalized = normalizeFeedback(feedback);
+      if (!hasFeedbackContent(normalized)) return;
 
-    const applyLatestFeedback = (feedback: ChallengeFeedbackWrapper | null) => {
-      if (!feedback) return;
       setResultData((prev) =>
         prev
           ? { ...prev, feedback }
@@ -96,7 +108,18 @@ export function ResultsPage({
           }
         }
       }
-    };
+    },
+    [hasFeedbackContent, submissionId],
+  );
+
+  useEffect(() => {
+    if (initialData) return;
+
+    if (!submissionId) {
+      setError("No se proporcionó ID de envío");
+      setLoadingState("error");
+      return;
+    }
 
     (async () => {
       setLoadingState("loading");
@@ -159,12 +182,46 @@ export function ResultsPage({
         setLoadingState("error");
       }
     })();
-  }, [initialData, submissionId]);
+  }, [applyLatestFeedback, initialData, submissionId]);
 
   const feedback = useMemo(
     () => normalizeFeedback(resultData?.feedback),
     [resultData?.feedback],
   );
+
+  const feedbackHasContent = useMemo(
+    () => hasFeedbackContent(feedback),
+    [feedback, hasFeedbackContent],
+  );
+
+  useEffect(() => {
+    if (!submissionId || feedbackHasContent || loadingState === "loading") {
+      return;
+    }
+
+    let attempts = 0;
+    const maxAttempts = 30;
+    const intervalMs = 4000;
+
+    const intervalId = setInterval(async () => {
+      attempts += 1;
+      try {
+        const latest =
+          await challengesService.getLatestChallengeFeedback(submissionId);
+        applyLatestFeedback(latest);
+      } catch {
+        // ignore polling errors
+      }
+
+      if (attempts >= maxAttempts) {
+        clearInterval(intervalId);
+      }
+    }, intervalMs);
+
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [applyLatestFeedback, feedbackHasContent, loadingState, submissionId]);
 
   if (loadingState === "loading" || loadingState === "error") {
     return (
