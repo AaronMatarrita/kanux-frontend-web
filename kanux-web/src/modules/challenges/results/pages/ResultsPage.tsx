@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { TrendingUp } from "lucide-react";
@@ -10,6 +10,7 @@ import { BackNavigation } from "@/modules/challenges/components/BackNavigation";
 import { FeatureGuard } from "@/guards/featureGuard";
 import {
   challengesService,
+  ChallengeFeedbackWrapper,
   TechnicalChallengeResultResponse,
 } from "@/services/challenges.service";
 
@@ -21,7 +22,10 @@ import {
   ResultsState,
 } from "../components";
 
-import { normalizeFeedback } from "@/modules/challenges/results/utils/normalize-feedback";
+import {
+  normalizeFeedback,
+  NormalizedFeedback,
+} from "@/modules/challenges/results/utils/normalize-feedback";
 
 type LocalStoredResult = {
   submission_id: string;
@@ -29,7 +33,7 @@ type LocalStoredResult = {
   score?: number;
   total_questions?: number;
   correct_answers?: number;
-  feedback?: string;
+  feedback?: unknown;
   submitted_at?: string;
   challenge?: {
     id?: string;
@@ -63,6 +67,51 @@ export function ResultsPage({
 
   const submissionId = propSubmissionId ?? searchParams.get("submissionId");
 
+  const hasFeedbackContent = useCallback((value: NormalizedFeedback) => {
+    return Boolean(
+      (value.strengths && value.strengths.length > 0) ||
+      (value.areasForImprovement && value.areasForImprovement.length > 0) ||
+      (value.nextSteps && value.nextSteps.length > 0) ||
+      value.answersOverview ||
+      (value.perQuestionFeedback && value.perQuestionFeedback.length > 0) ||
+      (value.scoreBreakdown && Object.keys(value.scoreBreakdown).length > 0) ||
+      (value.codeQuality && Object.keys(value.codeQuality).length > 0) ||
+      value.tests ||
+      (value.tags && value.tags.length > 0),
+    );
+  }, []);
+
+  const applyLatestFeedback = useCallback(
+    (feedback: ChallengeFeedbackWrapper | null) => {
+      if (!submissionId || !feedback) return;
+      const normalized = normalizeFeedback(feedback);
+      if (!hasFeedbackContent(normalized)) return;
+
+      setResultData((prev) =>
+        prev
+          ? { ...prev, feedback }
+          : { submission_id: submissionId, feedback },
+      );
+
+      if (typeof window !== "undefined") {
+        const localKey = `challenge:result:${submissionId}`;
+        const localResultRaw = localStorage.getItem(localKey);
+        if (localResultRaw) {
+          try {
+            const parsed = JSON.parse(localResultRaw) as LocalStoredResult;
+            localStorage.setItem(
+              localKey,
+              JSON.stringify({ ...parsed, feedback }),
+            );
+          } catch {
+            // ignore cache update errors
+          }
+        }
+      }
+    },
+    [hasFeedbackContent, submissionId],
+  );
+
   useEffect(() => {
     if (initialData) return;
 
@@ -84,6 +133,10 @@ export function ResultsPage({
           const parsed: LocalStoredResult = JSON.parse(localResultRaw);
           setResultData(parsed);
           setLoadingState("idle");
+          const latest = await challengesService
+            .getLatestChallengeFeedback(submissionId)
+            .catch(() => null);
+          applyLatestFeedback(latest);
           return;
         } catch (err) {
           console.warn("No se pudo leer el resultado local, usando la API", {
@@ -93,10 +146,25 @@ export function ResultsPage({
       }
 
       try {
-        const res =
-          await challengesService.getTechnicalChallengeResult(submissionId);
+        const [resultResponse, feedbackResponse] = await Promise.allSettled([
+          challengesService.getTechnicalChallengeResult(submissionId),
+          challengesService.getLatestChallengeFeedback(submissionId),
+        ]);
 
-        setResultData(res);
+        if (resultResponse.status === "fulfilled") {
+          setResultData(resultResponse.value);
+        }
+
+        if (feedbackResponse.status === "fulfilled") {
+          applyLatestFeedback(feedbackResponse.value);
+        }
+
+        if (
+          resultResponse.status === "rejected" &&
+          feedbackResponse.status === "rejected"
+        ) {
+          throw resultResponse.reason;
+        }
         setLoadingState("idle");
       } catch (err: unknown) {
         const message =
@@ -114,12 +182,46 @@ export function ResultsPage({
         setLoadingState("error");
       }
     })();
-  }, [initialData, submissionId]);
+  }, [applyLatestFeedback, initialData, submissionId]);
 
   const feedback = useMemo(
     () => normalizeFeedback(resultData?.feedback),
     [resultData?.feedback],
   );
+
+  const feedbackHasContent = useMemo(
+    () => hasFeedbackContent(feedback),
+    [feedback, hasFeedbackContent],
+  );
+
+  useEffect(() => {
+    if (!submissionId || feedbackHasContent || loadingState === "loading") {
+      return;
+    }
+
+    let attempts = 0;
+    const maxAttempts = 30;
+    const intervalMs = 4000;
+
+    const intervalId = setInterval(async () => {
+      attempts += 1;
+      try {
+        const latest =
+          await challengesService.getLatestChallengeFeedback(submissionId);
+        applyLatestFeedback(latest);
+      } catch {
+        // ignore polling errors
+      }
+
+      if (attempts >= maxAttempts) {
+        clearInterval(intervalId);
+      }
+    }, intervalMs);
+
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [applyLatestFeedback, feedbackHasContent, loadingState, submissionId]);
 
   if (loadingState === "loading" || loadingState === "error") {
     return (
@@ -181,7 +283,7 @@ export function ResultsPage({
               feature="can_access_detailed_reports"
               infoText="El feedback generado con IA"
             >
-              <ResultsFeedback markdown={feedback.markdown} />
+              <ResultsFeedback feedback={feedback} />
             </FeatureGuard>
           </div>
 

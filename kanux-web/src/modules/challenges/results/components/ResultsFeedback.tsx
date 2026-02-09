@@ -1,14 +1,41 @@
 import { BookOpen, AlertTriangle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
+import { Badge } from "@/components/ui/badge";
+import { NormalizedFeedback } from "@/modules/challenges/results/utils/normalize-feedback";
 
 interface ResultsFeedbackProps {
-  markdown?: string;
+  feedback: NormalizedFeedback;
 }
 
-export function ResultsFeedback({ markdown }: ResultsFeedbackProps) {
-  if (!markdown) return null;
+function formatLabel(label: string) {
+  return label.replace(/_/g, " ");
+}
+
+export function ResultsFeedback({ feedback }: ResultsFeedbackProps) {
+  const {
+    strengths,
+    areasForImprovement,
+    nextSteps,
+    answersOverview,
+    perQuestionFeedback,
+    scoreBreakdown,
+    tests,
+    codeQuality,
+    tags,
+  } = feedback;
+
+  const hasAnyContent =
+    (strengths && strengths.length > 0) ||
+    (areasForImprovement && areasForImprovement.length > 0) ||
+    (nextSteps && nextSteps.length > 0) ||
+    answersOverview ||
+    (perQuestionFeedback && perQuestionFeedback.length > 0) ||
+    (scoreBreakdown && Object.keys(scoreBreakdown).length > 0) ||
+    (codeQuality && Object.keys(codeQuality).length > 0) ||
+    tests ||
+    (tags && tags.length > 0);
+
+  if (!hasAnyContent) return null;
 
   return (
     <Card className="shadow-lg border-border/50">
@@ -29,19 +56,217 @@ export function ResultsFeedback({ markdown }: ResultsFeedbackProps) {
       </CardHeader>
 
       <CardContent>
-        <div
-          className="
-            prose prose-sm max-w-none
-            prose-headings:font-semibold
-            prose-headings:text-foreground
-            prose-h2:mt-6 prose-h2:mb-2
-            prose-p:leading-relaxed
-            prose-li:my-1
-            prose-strong:text-foreground
-            dark:prose-invert
-          "
-        >
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>{markdown}</ReactMarkdown>
+        <div className="space-y-6">
+          {(scoreBreakdown || tests || codeQuality || answersOverview) && (
+            <div className="grid gap-3 md:grid-cols-3">
+              {answersOverview && (
+                <div className="rounded-lg border border-border/60 bg-white p-3">
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
+                    Respuestas
+                  </p>
+                  <div className="space-y-1 text-sm">
+                    {typeof answersOverview.total === "number" && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-muted-foreground">Total</span>
+                        <span className="font-semibold text-foreground">
+                          {answersOverview.total}
+                        </span>
+                      </div>
+                    )}
+                    {typeof answersOverview.correct === "number" && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-muted-foreground">Correctas</span>
+                        <span className="font-semibold text-emerald-600">
+                          {answersOverview.correct}
+                        </span>
+                      </div>
+                    )}
+                    {typeof answersOverview.incorrect === "number" && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-muted-foreground">
+                          Incorrectas
+                        </span>
+                        <span className="font-semibold text-rose-600">
+                          {answersOverview.incorrect}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+              {scoreBreakdown && (
+                <div className="rounded-lg border border-border/60 bg-white p-3">
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
+                    Desglose de Puntaje
+                  </p>
+                  <div className="space-y-1">
+                    {Object.entries(scoreBreakdown).map(([key, value]) => (
+                      <div
+                        key={key}
+                        className="flex items-center justify-between text-sm"
+                      >
+                        <span className="text-muted-foreground">
+                          {formatLabel(key)}
+                        </span>
+                        <span className="font-semibold text-foreground">
+                          {value}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {tests && (
+                <div className="rounded-lg border border-border/60 bg-white p-3">
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
+                    Pruebas
+                  </p>
+                  <div className="space-y-1 text-sm">
+                    {typeof tests.total === "number" && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-muted-foreground">Total</span>
+                        <span className="font-semibold text-foreground">
+                          {tests.total}
+                        </span>
+                      </div>
+                    )}
+                    {typeof tests.passed === "number" && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-muted-foreground">Exitos</span>
+                        <span className="font-semibold text-emerald-600">
+                          {tests.passed}
+                        </span>
+                      </div>
+                    )}
+                    {typeof tests.failed === "number" && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-muted-foreground">Fallos</span>
+                        <span className="font-semibold text-rose-600">
+                          {tests.failed}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {codeQuality && (
+                <div className="rounded-lg border border-border/60 bg-white p-3">
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
+                    Calidad de Codigo
+                  </p>
+                  <div className="space-y-1">
+                    {Object.entries(codeQuality).map(([key, value]) => (
+                      <div
+                        key={key}
+                        className="flex items-center justify-between text-sm"
+                      >
+                        <span className="text-muted-foreground">
+                          {formatLabel(key)}
+                        </span>
+                        <span className="font-semibold text-foreground">
+                          {value}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {(strengths || areasForImprovement || nextSteps) && (
+            <div className="grid gap-4 md:grid-cols-3">
+              {strengths && strengths.length > 0 && (
+                <div className="rounded-lg border border-border/60 bg-emerald-50/40 p-4">
+                  <p className="text-sm font-semibold text-emerald-700 mb-2">
+                    Fortalezas
+                  </p>
+                  <ul className="space-y-1 text-sm text-emerald-900">
+                    {strengths.map((item, idx) => (
+                      <li key={idx}>- {item}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {areasForImprovement && areasForImprovement.length > 0 && (
+                <div className="rounded-lg border border-border/60 bg-amber-50/40 p-4">
+                  <p className="text-sm font-semibold text-amber-700 mb-2">
+                    Mejoras
+                  </p>
+                  <ul className="space-y-1 text-sm text-amber-900">
+                    {areasForImprovement.map((item, idx) => (
+                      <li key={idx}>- {item}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {nextSteps && nextSteps.length > 0 && (
+                <div className="rounded-lg border border-border/60 bg-sky-50/40 p-4">
+                  <p className="text-sm font-semibold text-sky-700 mb-2">
+                    Siguientes pasos
+                  </p>
+                  <ul className="space-y-1 text-sm text-sky-900">
+                    {nextSteps.map((item, idx) => (
+                      <li key={idx}>- {item}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          )}
+
+          {tags && tags.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {tags.map((tag, idx) => (
+                <Badge key={idx} variant="secondary" className="text-xs">
+                  {tag.trim()}
+                </Badge>
+              ))}
+            </div>
+          )}
+
+          {perQuestionFeedback && perQuestionFeedback.length > 0 && (
+            <div className="rounded-lg border border-border/60 bg-white p-4">
+              <p className="text-sm font-semibold text-foreground mb-3">
+                Retroalimentacion por pregunta
+              </p>
+              <div className="space-y-3">
+                {perQuestionFeedback.map((item, idx) => (
+                  <div
+                    key={`${item.questionId ?? "q"}-${idx}`}
+                    className="rounded-md border border-border/60 bg-muted/20 p-3"
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="text-xs text-muted-foreground truncate">
+                        {item.questionId || `Pregunta ${idx + 1}`}
+                      </p>
+                      {typeof item.correct === "boolean" && (
+                        <Badge
+                          variant="secondary"
+                          className={
+                            item.correct
+                              ? "bg-emerald-100 text-emerald-700"
+                              : "bg-rose-100 text-rose-700"
+                          }
+                        >
+                          {item.correct ? "Correcta" : "Incorrecta"}
+                        </Badge>
+                      )}
+                    </div>
+                    {item.explanation && (
+                      <p className="text-sm text-foreground mt-2">
+                        {item.explanation}
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>

@@ -215,6 +215,7 @@ export function SoftExecutionContainer({ id }: SoftExecutionContainerProps) {
         score: response.score || 0,
         total_questions: response.total_questions || 0,
         correct_answers: response.correct_answers || 0,
+        feedback: response.feedback,
         challenge: {
           id: challenge.id,
           title: challenge.title,
