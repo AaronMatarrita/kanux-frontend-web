@@ -10,6 +10,7 @@ import { BackNavigation } from "@/modules/challenges/components/BackNavigation";
 import { FeatureGuard } from "@/guards/featureGuard";
 import {
   challengesService,
+  ChallengeFeedbackWrapper,
   TechnicalChallengeResultResponse,
 } from "@/services/challenges.service";
 
@@ -29,7 +30,7 @@ type LocalStoredResult = {
   score?: number;
   total_questions?: number;
   correct_answers?: number;
-  feedback?: string;
+  feedback?: unknown;
   submitted_at?: string;
   challenge?: {
     id?: string;
@@ -72,6 +73,31 @@ export function ResultsPage({
       return;
     }
 
+    const applyLatestFeedback = (feedback: ChallengeFeedbackWrapper | null) => {
+      if (!feedback) return;
+      setResultData((prev) =>
+        prev
+          ? { ...prev, feedback }
+          : { submission_id: submissionId, feedback },
+      );
+
+      if (typeof window !== "undefined") {
+        const localKey = `challenge:result:${submissionId}`;
+        const localResultRaw = localStorage.getItem(localKey);
+        if (localResultRaw) {
+          try {
+            const parsed = JSON.parse(localResultRaw) as LocalStoredResult;
+            localStorage.setItem(
+              localKey,
+              JSON.stringify({ ...parsed, feedback }),
+            );
+          } catch {
+            // ignore cache update errors
+          }
+        }
+      }
+    };
+
     (async () => {
       setLoadingState("loading");
 
@@ -84,6 +110,10 @@ export function ResultsPage({
           const parsed: LocalStoredResult = JSON.parse(localResultRaw);
           setResultData(parsed);
           setLoadingState("idle");
+          const latest = await challengesService
+            .getLatestChallengeFeedback(submissionId)
+            .catch(() => null);
+          applyLatestFeedback(latest);
           return;
         } catch (err) {
           console.warn("No se pudo leer el resultado local, usando la API", {
@@ -93,10 +123,25 @@ export function ResultsPage({
       }
 
       try {
-        const res =
-          await challengesService.getTechnicalChallengeResult(submissionId);
+        const [resultResponse, feedbackResponse] = await Promise.allSettled([
+          challengesService.getTechnicalChallengeResult(submissionId),
+          challengesService.getLatestChallengeFeedback(submissionId),
+        ]);
 
-        setResultData(res);
+        if (resultResponse.status === "fulfilled") {
+          setResultData(resultResponse.value);
+        }
+
+        if (feedbackResponse.status === "fulfilled") {
+          applyLatestFeedback(feedbackResponse.value);
+        }
+
+        if (
+          resultResponse.status === "rejected" &&
+          feedbackResponse.status === "rejected"
+        ) {
+          throw resultResponse.reason;
+        }
         setLoadingState("idle");
       } catch (err: unknown) {
         const message =
@@ -181,7 +226,7 @@ export function ResultsPage({
               feature="can_access_detailed_reports"
               infoText="El feedback generado con IA"
             >
-              <ResultsFeedback markdown={feedback.markdown} />
+              <ResultsFeedback feedback={feedback} />
             </FeatureGuard>
           </div>
 
