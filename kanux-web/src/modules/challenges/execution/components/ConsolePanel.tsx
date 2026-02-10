@@ -16,9 +16,9 @@ export function ConsolePanel({ output = "", error = "" }: ConsolePanelProps) {
   const hasError = error.trim().length > 0;
 
   return (
-    <div className="flex flex-col h-full bg-[#1e1e1e] border-t border-slate-700">
+    <div className="flex flex-col h-full bg-[#1e1e1e] border-t border-border">
       {/* Tabs */}
-      <div className="flex items-center gap-1 px-2 bg-[#252526] border-b border-slate-700">
+      <div className="flex items-center gap-1 px-2 bg-[#252526] border-b border-border">
         <button
           type="button"
           onClick={() => setActiveTab("console")}

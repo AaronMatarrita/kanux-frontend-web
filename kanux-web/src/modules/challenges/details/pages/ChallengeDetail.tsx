@@ -40,7 +40,7 @@ export function ChallengeDetail({ id }: ChallengeDetailProps) {
   if (isDetecting) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
-        <p className="text-slate-500">Detectando tipo de challenge…</p>
+        <p className="text-muted-foreground">Detectando tipo de challenge…</p>
       </div>
     );
   }

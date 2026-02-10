@@ -117,7 +117,7 @@ export function EditorWorkspace({
   return (
     <div className="h-full flex flex-col">
       {/* Header: Language selector + Run button */}
-      <div className="flex items-center justify-between p-3 bg-white border-b border-slate-200">
+      <div className="flex items-center justify-between p-3 bg-background border-b border-border">
         <LanguageSelector
           value={language}
           onChange={setLanguage}
@@ -147,7 +147,7 @@ export function EditorWorkspace({
         </div>
 
         {/* Console - Takes up more space */}
-        <div className="h-72 border-t border-slate-700 shrink-0">
+        <div className="h-72 border-t border-border shrink-0">
           <ConsolePanel output={output} error={error} />
         </div>
       </div>

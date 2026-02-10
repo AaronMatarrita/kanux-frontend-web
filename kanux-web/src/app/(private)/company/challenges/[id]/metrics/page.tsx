@@ -134,92 +134,94 @@ export default function ChallengeMetricsPage() {
     <div className="mx-auto py-10 px-8">
       <button
         onClick={() => router.back()}
-        className="mb-4 flex items-center gap-1 text-slate-500 hover:text-emerald-600 text-sm font-medium"
+        className="mb-4 flex items-center gap-1 text-muted-foreground hover:text-emerald-500 text-sm font-medium"
       >
         <ArrowLeft size={16} /> Volver al listado
       </button>
 
       <div className="flex items-center gap-2 mb-1">
-        <h1 className="text-2xl font-bold text-slate-900">Métricas</h1>
+        <h1 className="text-2xl font-bold text-foreground">Métricas</h1>
       </div>
-      <p className="text-slate-500 mb-8">Soft Skills Evaluation</p>
+      <p className="text-muted-foreground mb-8">Soft Skills Evaluation</p>
 
       <FeatureGuard
         feature="can_access_reports"
         infoText="Los reportes de desempeño"
       >
-        {error && <div className="text-red-500 mb-4">{error}</div>}
+        {error && <div className="text-destructive mb-4">{error}</div>}
         {loading ? (
-          <div className="text-center py-10">Cargando métricas...</div>
+          <div className="text-center py-10 text-muted-foreground">
+            Cargando métricas...
+          </div>
         ) : (
           <>
             {/* Cards */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-5 mb-10">
-              <div className="bg-white rounded-xl border border-slate-200 p-5 flex flex-col gap-2">
-                <div className="flex items-center justify-between text-slate-500 text-sm">
+              <div className="bg-card rounded-xl border border-border p-5 flex flex-col gap-2">
+                <div className="flex items-center justify-between text-muted-foreground text-sm">
                   <span>Total Submissions</span>
                   <Users className="w-4 h-4" />
                 </div>
-                <div className="text-3xl font-bold text-slate-900">
+                <div className="text-3xl font-bold text-foreground">
                   {totalSubmissions}
                 </div>
-                <div className="text-xs text-slate-400">
+                <div className="text-xs text-muted-foreground">
                   {completedSubmissions} completados
                 </div>
               </div>
-              <div className="bg-white rounded-xl border border-slate-200 p-5 flex flex-col gap-2">
-                <div className="flex items-center justify-between text-slate-500 text-sm">
+              <div className="bg-card rounded-xl border border-border p-5 flex flex-col gap-2">
+                <div className="flex items-center justify-between text-muted-foreground text-sm">
                   <span>Promedio de Score</span>
                   <TrendingUp className="w-4 h-4" />
                 </div>
-                <div className="text-3xl font-bold text-slate-900">
+                <div className="text-3xl font-bold text-foreground">
                   {averageScore}
-                  <span className="text-base font-medium text-slate-500">
+                  <span className="text-base font-medium text-muted-foreground">
                     /100
                   </span>
                 </div>
-                <div className="text-xs text-slate-400">
+                <div className="text-xs text-muted-foreground">
                   Basado en {submissionsWithScore.length} evaluaciones
                 </div>
               </div>
-              <div className="bg-white rounded-xl border border-slate-200 p-5 flex flex-col gap-2">
-                <div className="flex items-center justify-between text-slate-500 text-sm">
+              <div className="bg-card rounded-xl border border-border p-5 flex flex-col gap-2">
+                <div className="flex items-center justify-between text-muted-foreground text-sm">
                   <span>Última Actividad</span>
                   <Calendar className="w-4 h-4" />
                 </div>
-                <div className="text-xl font-bold text-slate-900">
+                <div className="text-xl font-bold text-foreground">
                   {lastActivityDate ? formatDate(lastActivityDate) : "-"}
                 </div>
-                <div className="text-xs text-slate-400">
+                <div className="text-xs text-muted-foreground">
                   Fecha de última submission
                 </div>
               </div>
-              <div className="bg-white rounded-xl border border-slate-200 p-5 flex flex-col gap-2">
-                <div className="flex items-center justify-between text-slate-500 text-sm">
+              <div className="bg-card rounded-xl border border-border p-5 flex flex-col gap-2">
+                <div className="flex items-center justify-between text-muted-foreground text-sm">
                   <span>Tasa de Completado</span>
                   <CheckCircle2 className="w-4 h-4" />
                 </div>
-                <div className="text-3xl font-bold text-slate-900">
+                <div className="text-3xl font-bold text-foreground">
                   {completionRate}
-                  <span className="text-base font-medium text-slate-500">
+                  <span className="text-base font-medium text-muted-foreground">
                     %
                   </span>
                 </div>
-                <div className="text-xs text-slate-400">
+                <div className="text-xs text-muted-foreground">
                   Submissions completados
                 </div>
               </div>
             </div>
 
             {/* Table */}
-            <div className="bg-white rounded-xl border border-slate-200 p-6">
-              <h2 className="text-lg font-semibold text-slate-900 mb-4">
+            <div className="bg-card rounded-xl border border-border p-6">
+              <h2 className="text-lg font-semibold text-foreground mb-4">
                 Historial de Submissions
               </h2>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="text-slate-500 border-b">
+                    <tr className="text-muted-foreground border-b border-border">
                       <th className="py-3 px-3 text-left font-medium">
                         Candidato
                       </th>
@@ -233,12 +235,12 @@ export default function ChallengeMetricsPage() {
                       <th className="py-3 px-3 text-left font-medium">Fecha</th>
                     </tr>
                   </thead>
-                  <tbody className="text-slate-700">
+                  <tbody className="text-foreground">
                     {submissions.length === 0 && (
                       <tr>
                         <td
                           colSpan={5}
-                          className="text-center py-6 text-slate-400"
+                          className="text-center py-6 text-muted-foreground"
                         >
                           No hay submissions
                         </td>
@@ -247,7 +249,10 @@ export default function ChallengeMetricsPage() {
                     {submissions.map((s, idx) => {
                       const displayDate = s.submitted_at || s.resolution_date;
                       return (
-                        <tr className="border-b" key={s.submission_id || idx}>
+                        <tr
+                          className="border-b border-border"
+                          key={s.submission_id || idx}
+                        >
                           <td className="py-3 px-3">
                             {s.talent_name && s.talent_name !== "null"
                               ? s.talent_name
@@ -259,7 +264,7 @@ export default function ChallengeMetricsPage() {
                                 ? "text-emerald-600"
                                 : typeof s.score === "number"
                                   ? "text-orange-500"
-                                  : "text-slate-400"
+                                  : "text-foreground"
                             }`}
                           >
                             {typeof s.score === "number" ? s.score : "-"}
@@ -267,21 +272,21 @@ export default function ChallengeMetricsPage() {
                           <td className="py-3 px-3">
                             {s.status === "completed" ||
                             s.status === "evaluated" ? (
-                              <span className="inline-flex items-center gap-1 bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full text-xs font-medium">
+                              <span className="inline-flex items-center gap-1 bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full text-xs font-medium dark:bg-emerald-500/15 dark:text-emerald-300">
                                 <CheckCircle2 className="w-3 h-3" />
                                 Completado
                               </span>
                             ) : (
-                              <span className="inline-flex items-center gap-1 bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs font-medium">
+                              <span className="inline-flex items-center gap-1 bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs font-medium dark:bg-blue-500/15 dark:text-blue-300">
                                 <Clock className="w-3 h-3" />
                                 En progreso
                               </span>
                             )}
                           </td>
-                          <td className="py-3 px-3 text-slate-500">
+                          <td className="py-3 px-3 text-muted-foreground">
                             {s.evaluation_type || "-"}
                           </td>
-                          <td className="py-3 px-3 text-slate-500">
+                          <td className="py-3 px-3 text-muted-foreground">
                             {displayDate ? formatDate(displayDate) : "-"}
                           </td>
                         </tr>

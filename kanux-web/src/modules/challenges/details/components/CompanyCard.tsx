@@ -12,11 +12,11 @@ interface CompanyCardProps {
 
 export function CompanyCard({ companyInfo }: CompanyCardProps) {
   return (
-    <div className="rounded-lg border border-slate-200 bg-white p-6">
-      <h3 className="text-sm font-semibold text-slate-900 mb-4">Creado por</h3>
+    <div className="rounded-lg border border-border bg-card p-6">
+      <h3 className="text-sm font-semibold text-foreground mb-4">Creado por</h3>
 
       <div className="flex items-start gap-3">
-        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-600">
+        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
           {companyInfo.logo ? (
             <img
               src={companyInfo.logo}
@@ -29,11 +29,11 @@ export function CompanyCard({ companyInfo }: CompanyCardProps) {
         </div>
 
         <div className="flex-1 min-w-0">
-          <h4 className="text-sm font-semibold text-slate-900 truncate">
+          <h4 className="text-sm font-semibold text-foreground truncate">
             {companyInfo.name}
           </h4>
           {companyInfo.about && (
-            <p className="mt-1 text-xs text-slate-600 line-clamp-3">
+            <p className="mt-1 text-xs text-muted-foreground line-clamp-3">
               {companyInfo.about}
             </p>
           )}

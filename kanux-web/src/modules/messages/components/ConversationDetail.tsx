@@ -96,18 +96,20 @@ export function ConversationDetail({
 
   if (!conversation) {
     return (
-      <div className="hidden md:flex h-full flex-col items-center justify-center bg-gray-50">
-        <p className="text-gray-400 text-lg">Selecciona una conversación</p>
+      <div className="hidden md:flex h-full flex-col items-center justify-center bg-muted/30">
+        <p className="text-muted-foreground text-lg">
+          Selecciona una conversación
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="h-full flex flex-col bg-white">
-      <div className="h-16 px-4 flex items-center border-b border-gray-200 bg-white">
+    <div className="h-full flex flex-col bg-card">
+      <div className="h-16 px-4 flex items-center border-b border-border bg-background">
         <div className="flex items-center justify-between w-full">
           <div className="flex items-center gap-3">
-            <div className="relative w-10 h-10 rounded-full overflow-hidden bg-gray-200 shrink-0">
+            <div className="relative w-10 h-10 rounded-full overflow-hidden bg-muted shrink-0">
               {otherPartyAvatar ? (
                 <Image
                   src={otherPartyAvatar}
@@ -123,34 +125,34 @@ export function ConversationDetail({
             </div>
 
             <div>
-              <p className="font-semibold text-gray-900">{displayName}</p>
-              <p className="text-xs text-gray-500">Activo ahora</p>
+              <p className="font-semibold text-foreground">{displayName}</p>
+              <p className="text-xs text-muted-foreground">Activo ahora</p>
             </div>
           </div>
 
           <div className="hidden md:flex items-center gap-2">
             <div className="relative">
-              <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <input
                 type="text"
                 placeholder="Buscar en el chat..."
                 value={messageSearch}
                 onChange={(e) => setMessageSearch(e.target.value)}
-                className="pl-8 pr-3 py-1.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="pl-8 pr-3 py-1.5 border border-border rounded-lg text-sm bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring/40"
               />
             </div>
           </div>
 
           <button
             onClick={onClose}
-            className="md:hidden p-2 hover:bg-gray-100 rounded-lg"
+            className="md:hidden p-2 hover:bg-muted/60 rounded-lg"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50">
+      <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-muted/30">
         {loading && (
           <div className="flex justify-center py-8">
             <LoadingSpinner size="lg" message="Cargando mensajes..." />
@@ -158,15 +160,15 @@ export function ConversationDetail({
         )}
 
         {error && (
-          <div className="p-4 bg-red-50 border border-red-200 rounded">
-            <p className="text-red-700 text-sm font-semibold">Error</p>
-            <p className="text-red-600 text-xs mt-1">{error}</p>
+          <div className="p-4 bg-destructive/10 border border-destructive/30 rounded">
+            <p className="text-destructive text-sm font-semibold">Error</p>
+            <p className="text-destructive text-xs mt-1">{error}</p>
           </div>
         )}
 
         {!loading && messages.length === 0 && (
           <div className="flex items-center justify-center h-full text-center">
-            <p className="text-gray-400 text-sm">
+            <p className="text-muted-foreground text-sm">
               Comienza la conversación escribiendo un mensaje
             </p>
           </div>
@@ -175,11 +177,11 @@ export function ConversationDetail({
         {groupedMessages.map((group) => (
           <div key={group.date}>
             <div className="flex items-center gap-3 my-4">
-              <div className="flex-1 h-px bg-gray-300" />
-              <span className="text-xs text-gray-500 font-medium px-2 py-1 bg-gray-200 rounded-full">
+              <div className="flex-1 h-px bg-border" />
+              <span className="text-xs text-muted-foreground font-medium px-2 py-1 bg-muted rounded-full">
                 {group.dateLabel}
               </span>
-              <div className="flex-1 h-px bg-gray-300" />
+              <div className="flex-1 h-px bg-border" />
             </div>
 
             {group.messages.map((message) => {
@@ -196,7 +198,7 @@ export function ConversationDetail({
                   } mb-2`}
                 >
                   {!isOwn && (
-                    <div className="relative w-8 h-8 rounded-full overflow-hidden bg-gray-200">
+                    <div className="relative w-8 h-8 rounded-full overflow-hidden bg-muted">
                       {otherPartyAvatar ? (
                         <Image
                           src={otherPartyAvatar}
@@ -213,7 +215,7 @@ export function ConversationDetail({
                   )}
 
                   {isOwn && currentUserAvatar && (
-                    <div className="relative w-8 h-8 rounded-full overflow-hidden bg-gray-200 order-2">
+                    <div className="relative w-8 h-8 rounded-full overflow-hidden bg-muted order-2">
                       <Image
                         src={currentUserAvatar}
                         alt="Tu avatar"
@@ -224,7 +226,7 @@ export function ConversationDetail({
                   )}
 
                   {isOwn && !currentUserAvatar && (
-                    <div className="relative w-8 h-8 rounded-full overflow-hidden bg-gray-200 order-2">
+                    <div className="relative w-8 h-8 rounded-full overflow-hidden bg-muted order-2">
                       <div className="w-full h-full flex items-center justify-center bg-green-500 text-white text-xs font-bold">
                         {userName?.[0] || "T"}
                       </div>
@@ -234,14 +236,14 @@ export function ConversationDetail({
                   <div
                     className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
                       isOwn
-                        ? "bg-green-500 text-white rounded-br-none order-1"
-                        : "bg-white text-gray-900 border border-gray-200 rounded-bl-none"
+                        ? "bg-emerald-600 text-white rounded-br-none order-1"
+                        : "bg-card text-foreground border border-border rounded-bl-none"
                     }`}
                   >
                     <p className="text-sm">{highlightText(message.content)}</p>
                     <p
                       className={`text-xs mt-1 ${
-                        isOwn ? "text-green-100" : "text-gray-400"
+                        isOwn ? "text-emerald-100" : "text-muted-foreground"
                       }`}
                     >
                       {formatMessageTime(message.created_at)}
@@ -256,7 +258,7 @@ export function ConversationDetail({
         <div ref={messagesEndRef} />
       </div>
 
-      <div className="p-4 border-t border-gray-200 bg-white">
+      <div className="p-4 border-t border-border bg-background">
         <div className="flex gap-2">
           <input
             type="text"
@@ -270,12 +272,12 @@ export function ConversationDetail({
             }}
             placeholder="Escribe un mensaje..."
             disabled={sending}
-            className="flex-1 px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
+            className="flex-1 px-4 py-2 border border-border rounded-lg text-sm bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring/40 disabled:bg-muted"
           />
           <button
             onClick={handleSendMessage}
             disabled={!messageInput.trim() || sending}
-            className="px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 disabled:bg-gray-300 transition-colors flex items-center gap-2"
+            className="px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 disabled:bg-muted transition-colors flex items-center gap-2"
           >
             <Send className="w-4 h-4" />
           </button>

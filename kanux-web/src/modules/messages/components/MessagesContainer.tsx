@@ -39,7 +39,7 @@ export function MessagesContainer({
   } = useConversationMessages(selectedConversation?.id, userRole);
 
   return (
-    <div className="h-full flex bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+    <div className="h-full flex bg-card border border-border rounded-lg shadow-sm overflow-hidden">
       <MessagesPanel
         isVisible={!selectedConversation || false}
         className="w-full md:w-80 shrink-0"

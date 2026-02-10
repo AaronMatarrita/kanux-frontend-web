@@ -16,8 +16,10 @@ export function GenericHeader({
   return (
     <div className="flex items-start justify-between gap-4">
       <div>
-        <h1 className="text-3xl font-bold text-slate-900">{title}</h1>
-        <p className="mt-2 max-w-2xl text-slate-600">{description}</p>
+        <h1 className="text-3xl font-bold tracking-tight text-foreground">
+          {title}
+        </h1>
+        <p className="mt-1 text-muted-foreground">{description}</p>
       </div>
 
       {rightContent && (

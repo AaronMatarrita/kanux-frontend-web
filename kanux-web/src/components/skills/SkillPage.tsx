@@ -36,7 +36,7 @@ export default function SkillsPage() {
   const groupedSkillsData = useMemo(() => {
     // agroup skills by soft and technical skills
     const filtered = allSkills.filter((s) => {
-      const isSoft = s.category?.type_category === "soft" ;
+      const isSoft = s.category?.type_category === "soft";
       return activeTab === "soft" ? isSoft : !isSoft;
     });
 
@@ -74,7 +74,7 @@ export default function SkillsPage() {
   if (loading) {
     return (
       <div className="space-y-6">
-        <div className="inline-flex flex-wrap gap-1 rounded-xl bg-slate-100 p-1">
+        <div className="inline-flex flex-wrap gap-1 rounded-xl bg-muted p-1">
           <div className="h-9 w-36 animate-pulse rounded-lg bg-muted" />
           <div className="h-9 w-36 animate-pulse rounded-lg bg-muted" />
         </div>

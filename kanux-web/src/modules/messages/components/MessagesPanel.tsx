@@ -15,7 +15,7 @@ export function MessagesPanel({
   return (
     <div
       className={cn(
-        "flex flex-col border-r border-gray-200 last:border-r-0 transition-all duration-200 ease-in-out",
+        "flex flex-col border-r border-border last:border-r-0 transition-all duration-200 ease-in-out",
         isVisible ? "flex" : "hidden md:flex",
         className,
       )}

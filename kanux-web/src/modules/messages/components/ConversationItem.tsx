@@ -43,16 +43,16 @@ export function ConversationItem({
     <button
       onClick={onClick}
       className={`w-full px-4 py-3 border-b transition-colors text-left flex gap-3 items-center
-        hover:bg-gray-50
+        hover:bg-muted/40
         ${
           isSelected
-            ? "bg-blue-50 border-l-4 border-l-blue-500"
+            ? "bg-blue-50 border-l-4 border-l-blue-500 dark:bg-blue-500/10"
             : "border-l-4 border-l-transparent"
         }
       `}
     >
       {/* Avatar */}
-      <div className="relative w-12 h-12 shrink-0 rounded-full overflow-hidden bg-gray-200">
+      <div className="relative w-12 h-12 shrink-0 rounded-full overflow-hidden bg-muted">
         {avatar ? (
           <Image
             src={avatar}
@@ -72,12 +72,14 @@ export function ConversationItem({
         <div className="flex justify-between items-center gap-2">
           <p
             className={`font-semibold truncate ${
-              isSelected ? "text-blue-700" : "text-gray-900"
+              isSelected
+                ? "text-blue-700 dark:text-blue-300"
+                : "text-foreground"
             }`}
           >
             {displayName || "Sin nombre"}
           </p>
-          <span className="text-xs text-gray-400 shrink-0">
+          <span className="text-xs text-muted-foreground shrink-0">
             {conversation.last_message_at
               ? formatMessageTime(conversation.last_message_at)
               : ""}
@@ -86,7 +88,9 @@ export function ConversationItem({
 
         <p
           className={`text-sm truncate mt-1 ${
-            isSelected ? "text-blue-600" : "text-gray-600"
+            isSelected
+              ? "text-blue-600 dark:text-blue-300"
+              : "text-muted-foreground"
           }`}
         >
           {lastMessagePreview}

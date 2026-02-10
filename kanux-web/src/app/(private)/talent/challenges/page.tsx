@@ -56,7 +56,7 @@ export default function Page() {
         />
 
         <Tabs defaultValue="all" className="w-full">
-          <TabsList className="bg-slate-100 p-1 rounded-xl">
+          <TabsList className="bg-muted p-1 rounded-xl">
             <TabsTrigger value="all">Todos</TabsTrigger>
             <TabsTrigger value="completed">Completados</TabsTrigger>
           </TabsList>

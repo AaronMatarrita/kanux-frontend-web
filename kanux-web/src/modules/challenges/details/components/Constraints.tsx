@@ -8,11 +8,11 @@ export function Constraints({ constraints }: ConstraintsProps) {
   }
 
   return (
-    <section className="rounded-lg border border-slate-200 bg-white p-6">
-      <h2 className="text-lg font-semibold text-slate-900 mb-3">
+    <section className="rounded-lg border border-border bg-card p-6">
+      <h2 className="text-lg font-semibold text-foreground mb-3">
         Restricciones
       </h2>
-      <ul className="list-disc pl-5 text-sm text-slate-700 space-y-2">
+      <ul className="list-disc pl-5 text-sm text-muted-foreground space-y-2">
         {constraints.map((constraint: string, i: number) => (
           <li key={i}>{constraint}</li>
         ))}
