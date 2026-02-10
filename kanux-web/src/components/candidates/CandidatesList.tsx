@@ -50,7 +50,9 @@ export const CandidatesList: React.FC = ({}) => {
     LearningBackground[]
   >([]);
 
-  const [skillFilter, setSkillFilter] = useState<string>("All Skills");
+  const [skillFilter, setSkillFilter] = useState<string>(
+    "Todas las habilidades",
+  );
   const [backgroundFilter, setBackgroundFilter] = useState<string | undefined>(
     undefined,
   );
@@ -97,7 +99,8 @@ export const CandidatesList: React.FC = ({}) => {
         session.token,
         {
           searchText: searchTerm || undefined,
-          skill: skillFilter !== "All Skills" ? skillFilter : undefined,
+          skill:
+            skillFilter !== "Todas las habilidades" ? skillFilter : undefined,
           learningBackgroundId: backgroundFilter || undefined,
         },
         page,
@@ -173,7 +176,7 @@ export const CandidatesList: React.FC = ({}) => {
     const uniqueSkills = Array.from(new Set(skillsOptions));
 
     return [
-      { label: "All Skills", value: "All Skills" },
+      { label: "Todas las habilidades", value: "Todas las habilidades" },
       ...uniqueSkills.map((s) => ({
         label: s,
         value: s,
@@ -183,7 +186,7 @@ export const CandidatesList: React.FC = ({}) => {
 
   const backgroundSelectOptions = useMemo(
     () => [
-      { label: "All", value: "" },
+      { label: "Todas", value: "" },
       ...learningBackgrounds.map((b) => ({
         label: b.name,
         value: b.id,
@@ -195,7 +198,7 @@ export const CandidatesList: React.FC = ({}) => {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-slate-500">Loading candidates...</div>
+        <div className="text-slate-500">Cargando candidatos...</div>
       </div>
     );
   }
@@ -213,6 +216,7 @@ export const CandidatesList: React.FC = ({}) => {
       </div>
     );
   }
+
   return (
     <>
       {creatingConversation && (
@@ -228,8 +232,10 @@ export const CandidatesList: React.FC = ({}) => {
 
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">Candidates</h1>
-          <p className="text-slate-600">Explore and evaluate talent.</p>
+          <h1 className="text-3xl font-bold text-slate-900">Candidatos</h1>
+          <p className="text-slate-600">
+            Explora y evalúa el talento disponible.
+          </p>
         </div>
 
         <div className="bg-white rounded-lg border p-4 space-y-4">
@@ -247,7 +253,7 @@ export const CandidatesList: React.FC = ({}) => {
                   setPage(1);
                 }
               }}
-              placeholder="Search candidates..."
+              placeholder="Buscar candidatos..."
               className="w-full pl-10 pr-4 py-2 border rounded-lg"
             />
           </div>
@@ -268,6 +274,7 @@ export const CandidatesList: React.FC = ({}) => {
                 />
               </div>
             </ActionGuard>
+
             <ActionGuard
               feature="can_use_advanced_filters"
               actionName="Usar filtros avanzados"
@@ -277,7 +284,7 @@ export const CandidatesList: React.FC = ({}) => {
                   value={backgroundFilter ?? ""}
                   onChange={(value) => setBackgroundFilter(value || undefined)}
                   options={backgroundSelectOptions}
-                  placeholder="Education"
+                  placeholder="Educación"
                   buttonClassName={
                     canUseAdvancedFilters ? "" : "opacity-60 cursor-not-allowed"
                   }
@@ -322,38 +329,43 @@ export const CandidatesList: React.FC = ({}) => {
                     <td className="px-6 py-4">{c.title}</td>
 
                     <td className="px-6 py-4 flex gap-2">
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <button
-                            className="cursor-pointer"
-                            onClick={() => handleViewProfile(c)}
-                          >
-                            <Eye size={18} />
-                          </button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          Ver perfil del candidato
-                        </TooltipContent>
-                      </Tooltip>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <button
+                              className="cursor-pointer"
+                              onClick={() => handleViewProfile(c)}
+                            >
+                              <Eye size={18} />
+                            </button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            Ver perfil del candidato
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+
                       <ActionGuard
                         feature="can_contact_talent"
                         actionName="Contactar talento"
                       >
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <button
-                              type="button"
-                              onClick={() =>
-                                handleCreateConversation(c.talent_id)
-                              }
-                              disabled={creatingConversation}
-                              className="cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                              <MessageSquare size={18} />
-                            </button>
-                          </TooltipTrigger>
-                          <TooltipContent>Contactar candidato</TooltipContent>
-                        </Tooltip>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  handleCreateConversation(c.talent_id)
+                                }
+                                disabled={creatingConversation}
+                                className="cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                              >
+                                <MessageSquare size={18} />
+                              </button>
+                            </TooltipTrigger>
+                            <TooltipContent>Contactar candidato</TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
                       </ActionGuard>
                     </td>
                   </tr>
@@ -361,7 +373,7 @@ export const CandidatesList: React.FC = ({}) => {
               ) : (
                 <tr>
                   <td colSpan={5} className="text-center py-8 text-slate-500">
-                    No candidates found
+                    No se encontraron candidatos
                   </td>
                 </tr>
               )}
@@ -371,7 +383,7 @@ export const CandidatesList: React.FC = ({}) => {
 
         <div className="flex items-center justify-between">
           <div className="text-sm text-slate-600">
-            Showing {candidates.length} of {totalItems} candidates
+            Mostrando {candidates.length} de {totalItems} candidatos
           </div>
 
           <Pagination
