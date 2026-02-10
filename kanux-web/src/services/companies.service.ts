@@ -24,6 +24,16 @@ export interface ContactTalentRequest {
   [key: string]: unknown;
 }
 
+export interface CompanyProfileViewsStatusResponse {
+  success: boolean;
+  data: {
+    viewsUsed: number;
+    maxViews: number;
+    periodStart: string;
+    periodEnd: string;
+  };
+}
+
 // ============================================================================
 // Response DTOs
 // ============================================================================
@@ -53,12 +63,12 @@ export interface CompanyDashboardResponse {
 }
 
 export interface RegisterCompanyResponse {
-  success: boolean; 
+  success: boolean;
   user: {
     id: string;
     email: string;
     user_type: string;
-    profile: Company; 
+    profile: Company;
     [key: string]: unknown;
   };
 }
@@ -182,8 +192,8 @@ export const companiesService = {
     return res.data;
   },
 
-   getCompanyDashboard: async (
-    token: string
+  getCompanyDashboard: async (
+    token: string,
   ): Promise<CompanyDashboardResponse> => {
     const res = await httpClient.get<CompanyDashboardResponse>(
       `/companies/company/dashboard`,
@@ -191,7 +201,21 @@ export const companiesService = {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      }
+      },
+    );
+
+    return res.data;
+  },
+  getProfileViewsStatus: async (
+    token: string,
+  ): Promise<CompanyProfileViewsStatusResponse> => {
+    const res = await httpClient.get<CompanyProfileViewsStatusResponse>(
+      `/companies/company/dashboard/getViewUsed`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
     );
 
     return res.data;
