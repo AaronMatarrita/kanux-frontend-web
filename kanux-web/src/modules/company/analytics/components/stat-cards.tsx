@@ -33,37 +33,38 @@ export function StatCards() {
   if (error || !data) {
     return (
       <p className="text-sm text-muted-foreground">
-        Unable to load analytics summary.
+        No fue posible cargar el resumen de analíticas. Por favor, inténtalo de
+        nuevo más tarde.
       </p>
     );
   }
 
   const stats = [
     {
-      title: "Total Candidates",
+      title: "Total de Candidatos",
       value: data.summary.totalCandidates.toLocaleString(),
-      change: "Updated in real time",
+      change: "Actualizado en tiempo real",
       changeType: "info" as const,
       icon: Users,
     },
     {
-      title: "Avg. Completion Rate",
+      title: "Promedio de Tasa de Finalización",
       value: `${data.summary.completionRate}%`,
-      change: "Based on submitted profiles",
+      change: "Basado en perfiles enviados",
       changeType: "positive" as const,
       icon: Target,
     },
     {
-      title: "Top Match Score",
+      title: "Mejor Puntaje de Coincidencia",
       value: `${data.summary.topMatchScore}%`,
-      change: "Best performing candidate",
+      change: "Mejor candidato",
       changeType: "neutral" as const,
       icon: Trophy,
     },
     {
-      title: "Active Challenges",
+      title: "Desafíos Activos",
       value: data.summary.activeChallenges.toString(),
-      change: "Currently open",
+      change: "Actualmente abiertos",
       changeType: "info" as const,
       icon: Zap,
     },
