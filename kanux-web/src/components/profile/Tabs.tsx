@@ -1,9 +1,12 @@
 "use client";
 import { useState } from "react";
 
-export function Tabs({  tabs, defaultTab = 0 }: { 
-  tabs: { label: string; content: React.ReactNode }[]; 
-  defaultTab?: number 
+export function Tabs({
+  tabs,
+  defaultTab = 0,
+}: {
+  tabs: { label: string; content: React.ReactNode }[];
+  defaultTab?: number;
 }) {
   const [activeTab, setActiveTab] = useState(defaultTab);
 
@@ -18,16 +21,14 @@ export function Tabs({  tabs, defaultTab = 0 }: {
             className={`px-6 py-2 font-medium text-sm rounded-lg transition-all ${
               activeTab === index
                 ? "bg-emerald-500 text-white"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                : "bg-muted text-muted-foreground hover:bg-muted/80"
             }`}
           >
             {tab.label}
           </button>
         ))}
       </div>
-      <div>
-        {tabs[activeTab]?.content}
-      </div>
+      <div>{tabs[activeTab]?.content}</div>
     </div>
   );
 }

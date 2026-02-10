@@ -1,23 +1,23 @@
-export function Button({ 
-  children, 
-  variant = "primary", 
+export function Button({
+  children,
+  variant = "primary",
   onClick,
   type = "button",
-  disabled = false
-}: { 
-  children: React.ReactNode; 
-  variant?: "primary" | "outline"; 
+  disabled = false,
+}: {
+  children: React.ReactNode;
+  variant?: "primary" | "outline";
   onClick?: () => void;
   type?: "button" | "submit" | "reset";
   disabled?: boolean;
 }) {
   const variants = {
-    primary: disabled 
-      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+    primary: disabled
+      ? "bg-muted text-muted-foreground cursor-not-allowed"
       : "bg-emerald-500 hover:bg-emerald-600 text-white",
     outline: disabled
-      ? "bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed"
-      : "bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-200"
+      ? "bg-muted text-muted-foreground border border-border cursor-not-allowed"
+      : "bg-background hover:bg-muted text-foreground border border-border",
   };
 
   return (

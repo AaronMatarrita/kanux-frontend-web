@@ -5,25 +5,28 @@ import { DynamicSkillList } from "./DynamicSkillList";
 import { Button } from "./Button";
 import { Catalogs, Skill } from "@/services/profiles.service";
 
-
 type SkillsForm = {
   skills: Skill[];
 };
 
-export function SkillsFormModal({ initialData, catalogs, onSubmit, onCancel }: {
+export function SkillsFormModal({
+  initialData,
+  catalogs,
+  onSubmit,
+  onCancel,
+}: {
   initialData?: Skill[];
   catalogs: Catalogs | null;
   onSubmit: (data: Skill[]) => void;
   onCancel: () => void;
 }) {
-
   const [localSkills, setLocalSkills] = useState<Skill[]>(initialData || []);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    setLocalSkills(initialData??[]);
-  }, [initialData])
+    setLocalSkills(initialData ?? []);
+  }, [initialData]);
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -32,7 +35,7 @@ export function SkillsFormModal({ initialData, catalogs, onSubmit, onCancel }: {
       newErrors.skills = "You must add at least one skill";
     }
     const invalidSkills = localSkills.some(
-      skill => !skill.id_category || !skill.name.trim() || !skill.level
+      (skill) => !skill.id_category || !skill.name.trim() || !skill.level,
     );
     if (invalidSkills) {
       newErrors.skills = "All skills must have a category, name and a level.";
@@ -48,20 +51,22 @@ export function SkillsFormModal({ initialData, catalogs, onSubmit, onCancel }: {
       id_category: catalogs?.categories[0]?.id || "",
       name: "",
       level: "beginner",
-      _isNew: true
+      _isNew: true,
     } as any;
     setLocalSkills([...localSkills, tempLanguage]);
   };
   //remove to local
   const removeSkillLocal = (id: string) => {
-    setLocalSkills(localSkills.filter(lang => lang.id !== id));
+    setLocalSkills(localSkills.filter((lang) => lang.id !== id));
   };
   // update to local
-  const updateSkillLocal = (id: string, field: "id_category" | "name" | "level", value: string) => {
+  const updateSkillLocal = (
+    id: string,
+    field: "id_category" | "name" | "level",
+    value: string,
+  ) => {
     setLocalSkills(
-      localSkills.map(sk =>
-        sk.id === id ? { ...sk, [field]: value } : sk
-      )
+      localSkills.map((sk) => (sk.id === id ? { ...sk, [field]: value } : sk)),
     );
   };
 
@@ -85,7 +90,7 @@ export function SkillsFormModal({ initialData, catalogs, onSubmit, onCancel }: {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="text-sm text-gray-600">
+      <div className="text-sm text-muted-foreground">
         Add your technical skills organized by category.
       </div>
 
@@ -101,21 +106,12 @@ export function SkillsFormModal({ initialData, catalogs, onSubmit, onCancel }: {
         <p className="text-sm text-red-600 -mt-2">{errors.skills}</p>
       )}
 
-
       {/* buttons*/}
-      <div className="flex gap-3 justify-end pt-4 border-t border-gray-200">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onCancel}
-        >
+      <div className="flex gap-3 justify-end pt-4 border-t border-border">
+        <Button type="button" variant="outline" onClick={onCancel}>
           Cancel
         </Button>
-        <Button
-          type="submit"
-          variant="primary"
-          disabled={isSubmitting}
-        >
+        <Button type="submit" variant="primary" disabled={isSubmitting}>
           {isSubmitting ? "Saving..." : "Save"}
         </Button>
       </div>

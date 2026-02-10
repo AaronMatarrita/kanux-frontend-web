@@ -5,7 +5,7 @@ import { mockSession } from "@/store/session.mock";
 import { SidebarItem } from "./SidebarItem";
 import { SidebarFooter } from "./SidebarFooter";
 import { usePathname } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { mapUserTypeToRole } from "@/helper/mapper";
 import { useSyncExternalStore } from "react";
@@ -27,6 +27,7 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
   const pathname = usePathname();
   const { session } = useAuth();
   const isClient = useIsClient();
+  const [isDark, setIsDark] = useState(false);
 
   const role = !isClient
     ? mockSession.role
@@ -62,6 +63,24 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
     };
   }, [isOpen]);
 
+  useEffect(() => {
+    if (!isClient) return;
+
+    const root = document.documentElement;
+    const updateTheme = () => {
+      setIsDark(root.classList.contains("dark"));
+    };
+
+    updateTheme();
+
+    const observer = new MutationObserver(updateTheme);
+    observer.observe(root, { attributes: true, attributeFilter: ["class"] });
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [isClient]);
+
   return (
     <>
       <div
@@ -80,7 +99,14 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
         {/* Logo */}
         <div className="h-16 flex items-center px-6 border-b border-sidebar-border">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/brand/kanux-logo-sidebar.svg" alt="Kanux" />
+          <img
+            src={
+              isDark
+                ? "/brand/kanux-logo-variant-white.svg"
+                : "/brand/kanux-logo-sidebar.svg"
+            }
+            alt="Kanux"
+          />
         </div>
 
         {/* Section title */}

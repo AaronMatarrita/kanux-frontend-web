@@ -19,7 +19,7 @@ export function LanguageInput({
 }: LanguageInputProps) {
   return (
     <div className="w-full mb-5">
-      <label className="block text-sm text-gray-700 font-medium mb-2">
+      <label className="block text-sm text-foreground font-medium mb-2">
         Languages
       </label>
       <div className="flex gap-2 mb-3">
@@ -31,10 +31,10 @@ export function LanguageInput({
             e.key === "Enter" && (e.preventDefault(), onAddLanguage())
           }
           placeholder="Add a language"
-          className={`flex-1 px-4 py-3 border rounded-lg text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all ${
+          className={`flex-1 px-4 py-3 border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all bg-background ${
             error
-              ? "border-red-500 bg-red-50 focus:ring-red-500 focus:border-red-500"
-              : "border-gray-200 bg-white focus:ring-green-500"
+              ? "border-red-500 bg-red-500/10 focus:ring-red-500/20 focus:border-red-500"
+              : "border-border"
           }`}
         />
         <button
@@ -51,13 +51,13 @@ export function LanguageInput({
         {languages.map((lang, index) => (
           <div
             key={index}
-            className="inline-flex items-center gap-2 bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm"
+            className="inline-flex items-center gap-2 bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 px-3 py-1 rounded-full text-sm"
           >
             {lang}
             <button
               type="button"
               onClick={() => onRemoveLanguage(index)}
-              className="text-green-700 hover:text-green-900 font-bold"
+              className="text-emerald-700 dark:text-emerald-300 hover:text-emerald-900 dark:hover:text-emerald-200 font-bold"
             >
               ×
             </button>

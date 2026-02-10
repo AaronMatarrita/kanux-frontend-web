@@ -26,14 +26,14 @@ export function ProfileHeader({
       <Avatar src={avatar} alt={name} size="xxlg" />
 
       <div className="flex-1 mt-auto mb-auto">
-        <h1 className="text-wrap text-2xl font-bold text-gray-900">{name}</h1>
-        <p className="text-wrap text-sm text-gray-600 mb-3">{title}</p>
+        <h1 className="text-wrap text-2xl font-bold text-foreground">{name}</h1>
+        <p className="text-wrap text-sm text-muted-foreground mb-3">{title}</p>
 
         {contact &&
           Object.entries(contact).map(([key, value]) => (
             <div
               key={key}
-              className="flex flex-wrap gap-4 text-sm text-gray-600"
+              className="flex flex-wrap gap-4 text-sm text-muted-foreground"
             >
               <div className="flex items-center gap-1.5">
                 <Contact className="w-4 h-4" />

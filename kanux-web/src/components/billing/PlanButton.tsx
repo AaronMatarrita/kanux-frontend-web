@@ -22,7 +22,7 @@ export default function PlanButton({
     return (
       <button
         disabled
-        className="w-full py-2.5 rounded-lg border border-gray-300 bg-transparent text-gray-400 text-sm font-medium cursor-default"
+        className="w-full py-2.5 rounded-lg border border-border bg-transparent text-muted-foreground text-sm font-medium cursor-default"
       >
         Plan actual
       </button>
@@ -36,7 +36,7 @@ export default function PlanButton({
       className={`w-full py-2.5 rounded-lg text-sm font-semibold transition-colors duration-200 
     ${
       upgrade
-        ? "bg-gray-400 cursor-not-allowed opacity-70"
+        ? "bg-muted text-muted-foreground cursor-not-allowed opacity-70"
         : "bg-emerald-600 text-white hover:bg-emerald-700"
     }`}
     >

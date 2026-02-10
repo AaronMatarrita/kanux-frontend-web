@@ -24,30 +24,30 @@ export function RegisterBackground({ children, step }: Props) {
       <div className="z-10 flex items-center gap-4 mb-10 text-white/90 text-sm font-medium">
         <div className="flex items-center gap-2">
           <span
-            className={`flex items-center justify-center w-8 h-8 rounded-full border ${step === 1 ? "bg-[#2B8CE6] border-[#2B8CE6]" : "border-slate-500 text-slate-400"}`}
+            className={`flex items-center justify-center w-8 h-8 rounded-full border ${step === 1 ? "bg-[#2B8CE6] border-[#2B8CE6]" : "border-white/30 text-white/60"}`}
           >
             1
           </span>
-          <span className={step === 1 ? "text-white" : "text-slate-400"}>
+          <span className={step === 1 ? "text-white" : "text-white/60"}>
             Create account
           </span>
         </div>
 
-        <div className="w-12 h-1px bg-slate-600" />
+        <div className="w-12 h-1px bg-white/25" />
 
         <div className="flex items-center gap-2">
           <span
-            className={`flex items-center justify-center w-8 h-8 rounded-full border ${step === 2 ? "bg-[#2B8CE6] border-[#2B8CE6]" : "border-slate-500 text-slate-400"}`}
+            className={`flex items-center justify-center w-8 h-8 rounded-full border ${step === 2 ? "bg-[#2B8CE6] border-[#2B8CE6]" : "border-white/30 text-white/60"}`}
           >
             2
           </span>
-          <span className={step === 2 ? "text-white" : "text-slate-400"}>
+          <span className={step === 2 ? "text-white" : "text-white/60"}>
             Complete profile
           </span>
         </div>
       </div>
       {/* set forms */}
-      <div className="z-10 w-full max-w-137.5 bg-white rounded-[40px] shadow-2xl p-10 mx-4">
+      <div className="z-10 w-full max-w-137.5 bg-card text-foreground border border-border rounded-[40px] shadow-2xl p-10 mx-4">
         {children}
       </div>
 

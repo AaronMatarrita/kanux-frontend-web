@@ -4,25 +4,34 @@ import { useEffect, useState } from "react";
 import { Select } from "./Select";
 import { Button } from "./Button";
 import { DynamicLanguageList } from "./DynamicLanguageList";
-import { Catalogs, Language, CreateLanguageRequest } from "@/services/profiles.service";
+import {
+  Catalogs,
+  Language,
+  CreateLanguageRequest,
+} from "@/services/profiles.service";
 import { profilesService } from "@/services/profiles.service";
 
 type BasicInfoFormData = {
   experienceLevel: string;
   learningBackground: string;
   openToOpportunities: string;
-
 };
 
 const EXPERIENCE_LEVELS = [
   { id: "beginner", label: "Beginner" },
   { id: "intermediate", label: "Intermediate" },
   { id: "advanced", label: "Advanced" },
-  { id: "expert", label: "Expert" }
+  { id: "expert", label: "Expert" },
 ];
 
-export function BasicInfoFormModal({ initialData, initialLanguages, catalogs, onSubmit, onCancel }: {
-  initialData: BasicInfoFormData,
+export function BasicInfoFormModal({
+  initialData,
+  initialLanguages,
+  catalogs,
+  onSubmit,
+  onCancel,
+}: {
+  initialData: BasicInfoFormData;
   initialLanguages?: Language[];
   catalogs: Catalogs | null;
   onSubmit: (data: BasicInfoFormData) => void;
@@ -31,10 +40,12 @@ export function BasicInfoFormModal({ initialData, initialLanguages, catalogs, on
   const [formData, setFormData] = useState<BasicInfoFormData>({
     experienceLevel: initialData.experienceLevel || "",
     learningBackground: initialData.learningBackground || "",
-    openToOpportunities: initialData.openToOpportunities || ""
+    openToOpportunities: initialData.openToOpportunities || "",
   });
 
-  const [languages, setLanguages] = useState<Language[]>(initialLanguages || []);
+  const [languages, setLanguages] = useState<Language[]>(
+    initialLanguages || [],
+  );
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [localLanguages, setLocalLanguages] = useState<Language[]>(languages);
@@ -49,20 +60,24 @@ export function BasicInfoFormModal({ initialData, initialLanguages, catalogs, on
       id: `temp-${Date.now()}`,
       id_languages: catalogs?.languages[0]?.id || "",
       level: "Básico",
-      _isNew: true
+      _isNew: true,
     } as any;
     setLocalLanguages([...localLanguages, tempLanguage]);
   };
   //remove to local
   const removeLanguageLocal = (id: string) => {
-    setLocalLanguages(localLanguages.filter(lang => lang.id !== id));
+    setLocalLanguages(localLanguages.filter((lang) => lang.id !== id));
   };
   // update to local
-  const updateLanguageLocal = (id: string, field: "id_languages" | "level", value: string) => {
+  const updateLanguageLocal = (
+    id: string,
+    field: "id_languages" | "level",
+    value: string,
+  ) => {
     setLocalLanguages(
-      localLanguages.map(lang =>
-        lang.id === id ? { ...lang, [field]: value } : lang
-      )
+      localLanguages.map((lang) =>
+        lang.id === id ? { ...lang, [field]: value } : lang,
+      ),
     );
   };
 
@@ -83,10 +98,11 @@ export function BasicInfoFormModal({ initialData, initialLanguages, catalogs, on
 
     // validate languages
     const invalidLanguages = localLanguages.some(
-      lang => !lang.id_languages || !lang.level
+      (lang) => !lang.id_languages || !lang.level,
     );
     if (invalidLanguages) {
-      newErrors.languages = "All languages must have language and level selected";
+      newErrors.languages =
+        "All languages must have language and level selected";
     }
 
     if (!formData.learningBackground) {
@@ -115,8 +131,8 @@ export function BasicInfoFormModal({ initialData, initialLanguages, catalogs, on
         experienceLevel: formData.experienceLevel,
         learningBackground: formData.learningBackground,
         openToOpportunities: formData.openToOpportunities,
-        localLanguages: localLanguages
-      }
+        localLanguages: localLanguages,
+      };
 
       //sent data to profile page
       await onSubmit(data);
@@ -135,7 +151,9 @@ export function BasicInfoFormModal({ initialData, initialLanguages, catalogs, on
           label="Experience Level"
           name="experienceLevel"
           value={formData.experienceLevel}
-          onChange={(e) => setFormData({ ...formData, experienceLevel: e.target.value })}
+          onChange={(e) =>
+            setFormData({ ...formData, experienceLevel: e.target.value })
+          }
           options={EXPERIENCE_LEVELS}
           placeholder="Select level"
           error={errors.experienceLevel}
@@ -160,11 +178,15 @@ export function BasicInfoFormModal({ initialData, initialLanguages, catalogs, on
           label="Learning Background"
           name="learningBackground"
           value={formData.learningBackground}
-          onChange={(e) => setFormData({ ...formData, learningBackground: e.target.value })}
-          options={catalogs?.learning_backgrounds.map(bg => ({
-            id: bg.id,
-            label: bg.name
-          })) || []}
+          onChange={(e) =>
+            setFormData({ ...formData, learningBackground: e.target.value })
+          }
+          options={
+            catalogs?.learning_backgrounds.map((bg) => ({
+              id: bg.id,
+              label: bg.name,
+            })) || []
+          }
           placeholder="Select background"
           error={errors.learningBackground}
           required
@@ -175,11 +197,15 @@ export function BasicInfoFormModal({ initialData, initialLanguages, catalogs, on
           label="Open to Opportunities"
           name="openToOpportunities"
           value={formData.openToOpportunities}
-          onChange={(e) => setFormData({ ...formData, openToOpportunities: e.target.value })}
-          options={catalogs?.opportunity_statuses.map(status => ({
-            id: status.id,
-            label: status.name
-          })) || []}
+          onChange={(e) =>
+            setFormData({ ...formData, openToOpportunities: e.target.value })
+          }
+          options={
+            catalogs?.opportunity_statuses.map((status) => ({
+              id: status.id,
+              label: status.name,
+            })) || []
+          }
           placeholder="Select type"
           error={errors.openToOpportunities}
           required
@@ -187,19 +213,11 @@ export function BasicInfoFormModal({ initialData, initialLanguages, catalogs, on
       </div>
 
       {/* Buttons */}
-      <div className="flex gap-3 justify-end pt-4 border-t border-gray-200">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onCancel}
-        >
+      <div className="flex gap-3 justify-end pt-4 border-t border-border">
+        <Button type="button" variant="outline" onClick={onCancel}>
           Cancel
         </Button>
-        <Button
-          type="submit"
-          variant="primary"
-          disabled={isSubmitting}
-        >
+        <Button type="submit" variant="primary" disabled={isSubmitting}>
           {isSubmitting ? "Saving..." : "Save"}
         </Button>
       </div>

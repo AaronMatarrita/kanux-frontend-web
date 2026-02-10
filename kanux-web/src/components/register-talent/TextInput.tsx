@@ -15,19 +15,19 @@ export function TextInput({
 }: TextInputProps) {
   return (
     <div className="w-full mb-5">
-      <label className="block text-sm text-gray-700 font-medium mb-2">
+      <label className="block text-sm text-foreground font-medium mb-2">
         {label}
       </label>
       <input
         {...props}
-        className={`w-full px-4 py-3 border rounded-lg text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all ${
+        className={`w-full px-4 py-3 border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all bg-background ${
           error
-            ? "border-red-500 bg-red-50 focus:ring-red-500 focus:border-red-500"
-            : "border-gray-200 bg-white focus:ring-green-500"
+            ? "border-red-500 bg-red-500/10 focus:ring-red-500/20 focus:border-red-500"
+            : "border-border"
         } ${className || ""}`}
       />
       {helperText && !error && (
-        <p className="text-xs text-gray-500 mt-2">{helperText}</p>
+        <p className="text-xs text-muted-foreground mt-2">{helperText}</p>
       )}
       {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
     </div>
