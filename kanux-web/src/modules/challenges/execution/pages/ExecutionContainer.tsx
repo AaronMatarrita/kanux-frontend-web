@@ -408,10 +408,10 @@ export function ExecutionContainer({
         submitDisabled={loading || expired || !submission?.submissionId}
       />
 
-      <div className="flex-1 bg-white">
+      <div className="flex-1 bg-background">
         <div className="h-full grid grid-cols-1 lg:grid-cols-[320px_1fr_320px]">
           {/* Left: Instructions / Markdown */}
-          <div className="h-full bg-white border-r border-slate-200 overflow-hidden">
+          <div className="h-full bg-background border-r border-border overflow-hidden">
             <ChallengeDescriptionPanel
               headerTitle="Instrucciones"
               assets={challengeAssets}
@@ -421,7 +421,7 @@ export function ExecutionContainer({
 
           {/* Center: Editor / Console / Language selector */}
           <div
-            className={`h-full bg-white border-r border-slate-200 overflow-hidden relative ${expired ? "pointer-events-none opacity-60" : ""}`}
+            className={`h-full bg-background border-r border-border overflow-hidden relative ${expired ? "pointer-events-none opacity-60" : ""}`}
           >
             <EditorWorkspace
               initialCode={initialCode}
@@ -433,19 +433,19 @@ export function ExecutionContainer({
               persistenceKey={persistenceKey}
             />
             {expired && (
-              <div className="absolute inset-0 bg-white/60" aria-hidden />
+              <div className="absolute inset-0 bg-background/60" aria-hidden />
             )}
           </div>
 
           {/* Right: Test cases / Summary */}
-          <div className="h-full bg-white p-4 overflow-auto">
+          <div className="h-full bg-background p-4 overflow-auto">
             <TestCasesPanel testCases={mergedTestCases} />
           </div>
         </div>
       </div>
 
       {expired && (
-        <div className="px-4 py-3 text-sm text-red-800 bg-red-50 border-t border-red-200 flex items-center gap-2">
+        <div className="px-4 py-3 text-sm text-destructive bg-destructive/10 border-t border-destructive/30 flex items-center gap-2">
           <span className="font-semibold">Tiempo agotado.</span>
           <span>
             La sesión se bloqueó; revisa tus resultados y reinicia el desafío si

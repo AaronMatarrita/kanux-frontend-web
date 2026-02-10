@@ -20,7 +20,6 @@ export function CreateAccountCompany() {
     confirmPassword: "",
   });
 
-
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [isLoading, setIsLoading] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
@@ -34,29 +33,23 @@ export function CreateAccountCompany() {
   const validate = () => {
     const newErrors: { [key: string]: string } = {};
 
-    if (!formData.email)
-      newErrors.email = "El email es requerido";
-
+    if (!formData.email) newErrors.email = "El email es requerido";
     else if (!/\S+@\S+\.\S+/.test(formData.email))
       newErrors.email = "Email inválido";
 
-    if (!formData.password)
-      newErrors.password = "La contraseña es requerida";
-
+    if (!formData.password) newErrors.password = "La contraseña es requerida";
     else if (formData.password.length < 8)
       newErrors.password = "La contraseña debe tener al menos 8 caracteres";
 
     if (!formData.confirmPassword)
       newErrors.confirmPassword = "Confirma tu contraseña";
-
     else if (formData.password !== formData.confirmPassword)
       newErrors.confirmPassword = "Las contraseñas no coinciden";
-
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-  // handle form submit 
+  // handle form submit
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -78,13 +71,17 @@ export function CreateAccountCompany() {
         //save data in local storage
         localStorage.setItem("kanux_token", response.token);
         localStorage.setItem("kanux_session", response.sessionId);
-        localStorage.setItem("kanux_user_id",response.user);
-        
-        setSuccess(true);
-        setTimeout(() => {router.push("/onboarding/register-company/about");}, 1500);
+        localStorage.setItem("kanux_user_id", response.user);
 
+        setSuccess(true);
+        setTimeout(() => {
+          router.push("/onboarding/register-company/about");
+        }, 1500);
       } catch (error: any) {
-        setServerError(error.response?.data?.message || "Ocurrió un error al registrar la cuenta.");
+        setServerError(
+          error.response?.data?.message ||
+            "Ocurrió un error al registrar la cuenta.",
+        );
       } finally {
         setIsLoading(false);
       }
@@ -95,8 +92,12 @@ export function CreateAccountCompany() {
     <div className="w-full">
       {/* title */}
       <div className="mb-6">
-        <h1 className="text-center text-2xl font-bold text-blue-800 mb-2">Create your company account</h1>
-        <p className="text-center text-gray-500 text-sm">Start your journey by creating your account.</p>
+        <h1 className="text-center text-2xl font-bold text-foreground mb-2">
+          Crea tu cuenta de empresa
+        </h1>
+        <p className="text-center text-muted-foreground text-sm">
+          Empieza tu camino creando tu cuenta.
+        </p>
       </div>
 
       {serverError && (
@@ -105,12 +106,11 @@ export function CreateAccountCompany() {
         </div>
       )}
       <form onSubmit={handleSubmit} className="space-y-4">
-
         {/* Divider */}
         <div className="flex items-center gap-4 my-4">
-          <div className="flex-1 h-px bg-gray-300"></div>
-          <span className="text-xs text-gray-500 font-medium">SIGN UP WITH EMAIL</span>
-          <div className="flex-1 h-px bg-gray-300"></div>
+          <div className="flex-1 h-px bg-border"></div>
+          <span className="text-xs text-muted-foreground font-medium"></span>
+          <div className="flex-1 h-px bg-border"></div>
         </div>
         {/* company email */}
         <FormInput
@@ -156,9 +156,14 @@ export function CreateAccountCompany() {
 
       {/* Sign in link */}
       <div className="text-center mt-4">
-        <span className="text-sm text-gray-600">Already have an account? </span>
-        <a href="#" className="text-sm text-green-500 hover:text-green-600 font-medium">
-          Sign in
+        <span className="text-sm text-muted-foreground">
+          Ya tienes una cuenta?{" "}
+        </span>
+        <a
+          href="#"
+          className="text-sm text-green-500 hover:text-green-600 font-medium"
+        >
+          Inicia sesión
         </a>
       </div>
     </div>

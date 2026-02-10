@@ -21,7 +21,7 @@ export const Topbar = ({ onToggleSidebar, isSidebarOpen }: TopbarProps) => {
   return (
     <>
       <header
-        className={`fixed top-0 right-0 h-16 bg-white border-b border-slate-200 z-30 transition-all duration-300 ${
+        className={`fixed top-0 right-0 h-16 bg-sidebar border-b border-border backdrop-blur z-30 transition-transform duration-300 ease-in-out ${
           isSidebarOpen ? "left-0 lg:left-72" : "left-0"
         }`}
       >

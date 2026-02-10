@@ -1,12 +1,16 @@
 import { Mail, MapPin, Phone } from "lucide-react";
 
-export function ContactInfo({ email, location, phone }: { 
-  email: string; 
-  location: string; 
-  phone: string 
+export function ContactInfo({
+  email,
+  location,
+  phone,
+}: {
+  email: string;
+  location: string;
+  phone: string;
 }) {
   return (
-    <div className="flex flex-wrap gap-4 text-sm text-gray-600">
+    <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
       <div className="flex items-center gap-1.5">
         <MapPin className="w-4 h-4" />
         <span>{location}</span>

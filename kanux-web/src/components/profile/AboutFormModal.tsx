@@ -8,13 +8,17 @@ type AboutFormData = {
   about: string;
 };
 
-export function AboutFormModal({initialData,onSubmit,onCancel}: {
+export function AboutFormModal({
+  initialData,
+  onSubmit,
+  onCancel,
+}: {
   initialData?: Partial<AboutFormData>;
   onSubmit: (data: AboutFormData) => void;
   onCancel: () => void;
 }) {
   const [formData, setFormData] = useState<AboutFormData>({
-    about: initialData?.about || ""
+    about: initialData?.about || "",
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -34,7 +38,7 @@ export function AboutFormModal({initialData,onSubmit,onCancel}: {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
@@ -61,24 +65,16 @@ export function AboutFormModal({initialData,onSubmit,onCancel}: {
         rows={8}
       />
 
-      <div className="text-sm text-gray-500">
+      <div className="text-sm text-muted-foreground">
         {formData.about.length} characters (minimum 50)
       </div>
 
       {/*buttons*/}
-      <div className="flex gap-3 justify-end pt-4 border-t border-gray-200">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onCancel}
-        >
+      <div className="flex gap-3 justify-end pt-4 border-t border-border">
+        <Button type="button" variant="outline" onClick={onCancel}>
           Cancel
         </Button>
-        <Button
-          type="submit"
-          variant="primary"
-          disabled={isSubmitting}
-        >
+        <Button type="submit" variant="primary" disabled={isSubmitting}>
           {isSubmitting ? "Saving..." : "Save"}
         </Button>
       </div>

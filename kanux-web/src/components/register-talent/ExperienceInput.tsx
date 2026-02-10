@@ -22,14 +22,14 @@ export function ExperienceInput({
 }: ExperienceInputProps) {
   return (
     <div className="w-full mb-5">
-      <label className="block text-sm text-gray-700 font-medium mb-4">
+      <label className="block text-sm text-foreground font-medium mb-4">
         {label}
       </label>
-      <div className={`space-y-3 p-4 rounded-lg border transition-all ${
-        error
-          ? "border-red-500 bg-red-50"
-          : "border-gray-200 bg-white"
-      }`}>
+      <div
+        className={`space-y-3 p-4 rounded-lg border transition-all ${
+          error ? "border-red-500 bg-red-500/10" : "border-border bg-background"
+        }`}
+      >
         {options.map(({ key, label: optionLabel }) => (
           <div key={key} className="flex items-center">
             <input
@@ -40,7 +40,10 @@ export function ExperienceInput({
               onChange={() => onSelect(key)}
               className="w-4 h-4 text-green-500 cursor-pointer"
             />
-            <label htmlFor={key} className="ml-3 text-sm text-gray-700 cursor-pointer">
+            <label
+              htmlFor={key}
+              className="ml-3 text-sm text-foreground cursor-pointer"
+            >
               {optionLabel}
             </label>
           </div>

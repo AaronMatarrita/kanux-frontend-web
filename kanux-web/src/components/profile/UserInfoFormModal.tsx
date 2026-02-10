@@ -11,12 +11,20 @@ type UserInfoFormData = {
   last_name: string;
   title: string;
   location: string;
-  avatar?: File | null;          
-  removeAvatar?: boolean;         
+  avatar?: File | null;
+  removeAvatar?: boolean;
   currentAvatarUrl?: string;
   contacts: Contact[];
 };
-export function UserInfoFormModal({ initialData, onSubmit, onCancel }: { initialData?: Partial<UserInfoFormData>; onSubmit: (data: UserInfoFormData) => void; onCancel: () => void; }) {
+export function UserInfoFormModal({
+  initialData,
+  onSubmit,
+  onCancel,
+}: {
+  initialData?: Partial<UserInfoFormData>;
+  onSubmit: (data: UserInfoFormData) => void;
+  onCancel: () => void;
+}) {
   const [formData, setFormData] = useState<UserInfoFormData>({
     first_name: initialData?.first_name || "",
     last_name: initialData?.last_name || "",
@@ -37,13 +45,13 @@ export function UserInfoFormModal({ initialData, onSubmit, onCancel }: { initial
       setFormData({
         ...formData,
         avatar: file,
-        removeAvatar: false
+        removeAvatar: false,
       });
     } else if (file === null && formData.avatar) {
       setFormData({
         ...formData,
         avatar: null,
-        removeAvatar: false
+        removeAvatar: false,
       });
     }
   };
@@ -52,7 +60,7 @@ export function UserInfoFormModal({ initialData, onSubmit, onCancel }: { initial
     setFormData({
       ...formData,
       avatar: null,
-      removeAvatar: true
+      removeAvatar: true,
     });
   };
   //validate data
@@ -74,8 +82,8 @@ export function UserInfoFormModal({ initialData, onSubmit, onCancel }: { initial
     }
 
     const invalidContacts = formData.contacts.some(
-      contact => !contact.type || !contact.value.trim()
-    )
+      (contact) => !contact.type || !contact.value.trim(),
+    );
 
     if (invalidContacts) {
       newErrors.contacts = "All contacts must have a type and value";
@@ -100,7 +108,7 @@ export function UserInfoFormModal({ initialData, onSubmit, onCancel }: { initial
         title: formData.title,
         location: formData.location,
         contacts: formData.contacts,
-        image_profile: formData.avatar
+        image_profile: formData.avatar,
       };
       await onSubmit(submitData);
     } catch (error) {
@@ -124,7 +132,9 @@ export function UserInfoFormModal({ initialData, onSubmit, onCancel }: { initial
         label="Name"
         name="name"
         value={formData.first_name}
-        onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
+        onChange={(e) =>
+          setFormData({ ...formData, first_name: e.target.value })
+        }
         placeholder="Ej: Alex"
         error={errors.name}
         required
@@ -134,7 +144,9 @@ export function UserInfoFormModal({ initialData, onSubmit, onCancel }: { initial
         label="Last name"
         name="last_name"
         value={formData.last_name}
-        onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
+        onChange={(e) =>
+          setFormData({ ...formData, last_name: e.target.value })
+        }
         placeholder="Ej: Smith"
         error={errors.name}
         required
@@ -171,19 +183,11 @@ export function UserInfoFormModal({ initialData, onSubmit, onCancel }: { initial
       )}
 
       {/* buttons */}
-      <div className="flex gap-3 justify-end pt-4 border-t border-gray-200">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onCancel}
-        >
+      <div className="flex gap-3 justify-end pt-4 border-t border-border">
+        <Button type="button" variant="outline" onClick={onCancel}>
           Cancel
         </Button>
-        <Button
-          type="submit"
-          variant="primary"
-          disabled={isSubmitting}
-        >
+        <Button type="submit" variant="primary" disabled={isSubmitting}>
           {isSubmitting ? "Saving..." : "Save"}
         </Button>
       </div>

@@ -21,8 +21,8 @@ export function ChallengeSummary({
   const DiffIcon = diffConfig.icon;
 
   return (
-    <div className="rounded-lg border border-slate-200 bg-white p-6 space-y-4">
-      <h3 className="text-sm font-semibold text-slate-900">
+    <div className="rounded-lg border border-border bg-card p-6 space-y-4">
+      <h3 className="text-sm font-semibold text-foreground">
         Resumen del desafío
       </h3>
 

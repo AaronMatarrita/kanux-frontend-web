@@ -55,7 +55,7 @@ export function TopCandidates() {
       <Card>
         <CardHeader className="pb-4">
           <CardTitle className="text-base font-semibold">
-            Top Performing Candidates
+            Mejores Candidatos
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -71,7 +71,7 @@ export function TopCandidates() {
     <Card>
       <CardHeader className="pb-4">
         <CardTitle className="text-base font-semibold">
-          Top Performing Candidates
+          Mejores candidatos
         </CardTitle>
       </CardHeader>
 

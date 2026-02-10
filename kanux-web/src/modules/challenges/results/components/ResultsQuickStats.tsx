@@ -21,11 +21,11 @@ interface ResultsQuickStatsProps {
 function getDifficultyStyles(difficulty: string) {
   switch (difficulty) {
     case "Avanzado":
-      return "bg-rose-50 text-rose-700 border-rose-200";
+      return "bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-500/15 dark:text-rose-300 dark:border-rose-500/30";
     case "Intermedio":
-      return "bg-amber-50 text-amber-700 border-amber-200";
+      return "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/15 dark:text-amber-300 dark:border-amber-500/30";
     default:
-      return "bg-emerald-50 text-emerald-700 border-emerald-200";
+      return "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-300 dark:border-emerald-500/30";
   }
 }
 
@@ -47,12 +47,16 @@ export function ResultsQuickStats({
       label: "Estado",
       value: isPassed ? "Aprobado" : "No Aprobado",
       icon: isPassed ? (
-        <CheckCircle2 className="h-5 w-5 text-emerald-600" />
+        <CheckCircle2 className="h-5 w-5 text-emerald-600 dark:text-emerald-300" />
       ) : (
-        <XCircle className="h-5 w-5 text-rose-600" />
+        <XCircle className="h-5 w-5 text-rose-600 dark:text-rose-300" />
       ),
-      bgColor: isPassed ? "bg-emerald-100" : "bg-rose-100",
-      iconColor: isPassed ? "text-emerald-600" : "text-rose-600",
+      bgColor: isPassed
+        ? "bg-emerald-100 dark:bg-emerald-500/15"
+        : "bg-rose-100 dark:bg-rose-500/15",
+      iconColor: isPassed
+        ? "text-emerald-600 dark:text-emerald-300"
+        : "text-rose-600 dark:text-rose-300",
     },
   ];
 
@@ -85,8 +89,8 @@ export function ResultsQuickStats({
       <Card className="bg-card/80 backdrop-blur-sm border-border/50  ">
         <CardContent className="p-4 text-center">
           <div className="flex justify-center mb-2">
-            <div className="h-10 w-10 rounded-full bg-amber-100 flex items-center justify-center">
-              <Zap className="h-5 w-5 text-amber-600" />
+            <div className="h-10 w-10 rounded-full bg-amber-100 flex items-center justify-center dark:bg-amber-500/15">
+              <Zap className="h-5 w-5 text-amber-600 dark:text-amber-300" />
             </div>
           </div>
           <Badge
@@ -103,8 +107,8 @@ export function ResultsQuickStats({
       <Card className="bg-card/80 backdrop-blur-sm border-border/50  ">
         <CardContent className="p-4 text-center">
           <div className="flex justify-center mb-2">
-            <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-              <Clock className="h-5 w-5 text-blue-600" />
+            <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center dark:bg-blue-500/15">
+              <Clock className="h-5 w-5 text-blue-600 dark:text-blue-300" />
             </div>
           </div>
           <p className="text-sm font-medium text-foreground">

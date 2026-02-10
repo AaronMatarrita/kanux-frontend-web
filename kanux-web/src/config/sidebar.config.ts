@@ -37,6 +37,5 @@ export const SIDEBAR_MENU: Record<UserRole, SidebarMenuItem[]> = {
     { label: "Mensajes", route: "/company/messages", icon: MessageSquare },
     { label: "Analítica", route: "/company/analytics", icon: BarChart3 },
     { label: "Facturación", route: "/company/billing", icon: CreditCard },
-    { label: "Configuración", route: "/company/settings", icon: Settings },
   ],
 };

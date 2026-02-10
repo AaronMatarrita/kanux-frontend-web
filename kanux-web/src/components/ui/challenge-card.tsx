@@ -41,10 +41,10 @@ export function ChallengeCard({
   const isAdvanced = difficulty === "Avanzado";
 
   return (
-    <div className="group flex flex-col rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-md">
+    <div className="group flex flex-col rounded-xl border border-border bg-card p-5 shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-md">
       {/* Top row */}
       <div className="flex items-start justify-between">
-        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-100 text-slate-600">
+        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted text-muted-foreground">
           <Icon className="h-5 w-5" />
         </div>
 
@@ -55,12 +55,12 @@ export function ChallengeCard({
             {config.label}
           </span>
           {challengeType === "soft" && (
-            <span className="rounded-full bg-purple-50 px-2.5 py-0.5 text-xs font-medium text-purple-700 border border-purple-200">
+            <span className="rounded-full bg-purple-50 px-2.5 py-0.5 text-xs font-medium text-purple-700 border border-purple-200 dark:bg-purple-500/15 dark:text-purple-300 dark:border-purple-500/30">
               Habilidades Blandas
             </span>
           )}
           {challengeType === "technical" && (
-            <span className="rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-medium text-blue-700 border border-blue-200">
+            <span className="rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-medium text-blue-700 border border-blue-200 dark:bg-blue-500/15 dark:text-blue-300 dark:border-blue-500/30">
               Desafío de Código
             </span>
           )}
@@ -68,18 +68,18 @@ export function ChallengeCard({
       </div>
 
       {/* Content */}
-      <h3 className="mt-4 text-base font-semibold text-slate-900 leading-snug">
+      <h3 className="mt-4 text-base font-semibold text-foreground leading-snug">
         {title}
       </h3>
 
-      <p className="mt-2 text-sm text-slate-600 line-clamp-2">
+      <p className="mt-2 text-sm text-muted-foreground line-clamp-2">
         {cleanDescription}
       </p>
 
       {/* Footer */}
       <div className="mt-auto pt-4">
         {/* Timer */}
-        <div className="mb-3 flex items-center gap-2 text-sm text-slate-500">
+        <div className="mb-3 flex items-center gap-2 text-sm text-muted-foreground">
           <Clock className="h-4 w-4" />
           {durationStr}
         </div>
@@ -92,7 +92,7 @@ export function ChallengeCard({
           >
             <Link
               href={`/talent/challenges/${id}/details`}
-              className="flex w-full items-center justify-center rounded-md border border-slate-200 bg-[#2EC27E] px-3 py-2 text-xs font-medium text-white transition hover:bg-[#28b76a] focus:outline-none focus:ring-2 focus:ring-slate-950 focus:ring-offset-2"
+              className="flex w-full items-center justify-center rounded-md border border-border bg-emerald-600 px-3 py-2 text-xs font-medium text-white transition hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-300 focus:ring-offset-2"
             >
               Ver detalles
             </Link>
@@ -100,7 +100,7 @@ export function ChallengeCard({
         ) : (
           <Link
             href={`/talent/challenges/${id}/details`}
-            className="flex w-full items-center justify-center rounded-md border border-slate-200 bg-[#2EC27E] px-3 py-2 text-xs font-medium text-white transition hover:bg-[#28b76a] focus:outline-none focus:ring-2 focus:ring-slate-950 focus:ring-offset-2"
+            className="flex w-full items-center justify-center rounded-md border border-border bg-emerald-600 px-3 py-2 text-xs font-medium text-white transition hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-300 focus:ring-offset-2"
           >
             Ver detalles
           </Link>

@@ -99,8 +99,8 @@ export const LatestSubmissions: React.FC<LatestCandidatesProps> = ({
               className="group relative rounded-xl border border-border/60 bg-card p-5 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md"
             >
               <div className="flex items-start gap-4">
-                <div className="shrink-0 w-12 h-12 rounded-full bg-linear-to-br from-blue-100 to-indigo-100 flex items-center justify-center">
-                  <span className="text-blue-700 font-semibold text-lg">
+                <div className="shrink-0 w-12 h-12 rounded-full bg-linear-to-br from-blue-100 to-indigo-100 flex items-center justify-center dark:from-blue-500/20 dark:to-indigo-500/20">
+                  <span className="text-blue-700 font-semibold text-lg dark:text-blue-200">
                     {candidate.first_name?.[0]}
                     {candidate.last_name?.[0]}
                   </span>

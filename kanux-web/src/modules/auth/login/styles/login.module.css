@@ -1,13 +1,19 @@
-
 .loginContainer {
   display: flex;
   min-height: 100vh;
-  background: white;
+  background: var(--background);
+  color: var(--foreground);
 }
 
 .brandingSide {
   flex: 1;
-  background: linear-gradient(135deg, #0d2851 0%, #1e5aa0 30%, #2ba8d6 60%, #1abc9c 100%);
+  background: linear-gradient(
+    135deg,
+    #0d2851 0%,
+    #1e5aa0 30%,
+    #2ba8d6 60%,
+    #1abc9c 100%
+  );
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -61,14 +67,15 @@
   align-items: center;
   justify-content: center;
   padding: 40px;
-  background: #f8f9fa;
+  background: var(--muted);
 }
 
 .loginCard {
   width: 100%;
   max-width: 450px;
   padding: 40px;
-  background: white;
+  background: var(--card);
+  border: 1px solid var(--border);
   border-radius: 8px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
@@ -88,26 +95,26 @@
 .title {
   font-size: 32px;
   font-weight: 600;
-  color: #1e5ba8;
+  color: var(--foreground);
   margin-bottom: 8px;
   margin-top: 0;
 }
 
 .subtitle {
   font-size: 14px;
-  color: #999;
+  color: var(--muted-foreground);
   margin: 0;
 }
 
 .googleButton {
   width: 100%;
   padding: 12px 16px;
-  border: 1px solid #ddd;
+  border: 1px solid var(--border);
   border-radius: 6px;
-  background: white;
+  background: var(--background);
   font-size: 14px;
   font-weight: 500;
-  color: #1a1a1a;
+  color: var(--foreground);
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
@@ -118,8 +125,8 @@
 }
 
 .googleButton:hover:not(:disabled) {
-  background: #f9f9f9;
-  border-color: #bbb;
+  background: color-mix(in srgb, var(--muted) 70%, transparent);
+  border-color: color-mix(in srgb, var(--border) 70%, transparent);
 }
 
 .googleButton:disabled {
@@ -133,7 +140,7 @@
   gap: 16px;
   margin: 24px 0;
   font-size: 13px;
-  color: #999;
+  color: var(--muted-foreground);
   position: relative;
 }
 
@@ -142,7 +149,7 @@
   content: "";
   flex: 1;
   height: 1px;
-  background-color: #e5e5e5;
+  background-color: var(--border);
 }
 
 .divider span {
@@ -164,31 +171,33 @@
 .label {
   font-size: 14px;
   font-weight: 500;
-  color: #1a1a1a;
+  color: var(--foreground);
 }
 
 .input {
   padding: 12px 16px;
-  border: 1px solid #ddd;
+  border: 1px solid var(--border);
   border-radius: 6px;
   font-size: 14px;
   font-family: inherit;
   transition: all 0.3s ease;
+  background: var(--background);
+  color: var(--foreground);
 }
 
 .input:focus {
   outline: none;
   border-color: #2ba8d6;
-  box-shadow: 0 0 0 3px rgba(43, 168, 214, 0.1);
+  box-shadow: 0 0 0 3px rgba(43, 168, 214, 0.2);
 }
 
 .input:disabled {
-  background-color: #f5f5f5;
+  background-color: var(--muted);
   cursor: not-allowed;
 }
 
 .input::placeholder {
-  color: #999;
+  color: var(--muted-foreground);
 }
 
 .input.error {
@@ -210,7 +219,7 @@
   align-items: center;
   gap: 8px;
   font-size: 14px;
-  color: #1a1a1a;
+  color: var(--foreground);
 }
 
 .rememberMe input[type="checkbox"] {
@@ -222,7 +231,7 @@
 
 .rememberMe label {
   cursor: pointer;
-  color: #1a1a1a;
+  color: var(--foreground);
   margin: 0;
 }
 
@@ -287,7 +296,7 @@
 .userTypeSelector label {
   font-size: 14px;
   font-weight: 500;
-  color: #1a1a1a;
+  color: var(--foreground);
 }
 
 .userTypeOptions {
@@ -298,14 +307,14 @@
 .userTypeButton {
   flex: 1;
   padding: 10px 12px;
-  border: 1px solid #ddd;
-  background-color: white;
+  border: 1px solid var(--border);
+  background-color: var(--background);
   border-radius: 6px;
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
-  color: #666;
+  color: var(--muted-foreground);
 }
 
 .userTypeButton:hover {
@@ -326,8 +335,8 @@
 
 .submitError {
   padding: 12px;
-  background-color: #fee2e2;
-  border: 1px solid #fca5a5;
+  background-color: color-mix(in srgb, #ef4444 12%, transparent);
+  border: 1px solid color-mix(in srgb, #ef4444 45%, transparent);
   border-radius: 6px;
   color: #dc2626;
   font-size: 14px;
@@ -341,9 +350,9 @@
   gap: 8px;
   margin-top: 24px;
   padding-top: 24px;
-  border-top: 1px solid #e5e5e5;
+  border-top: 1px solid var(--border);
   font-size: 14px;
-  color: #666;
+  color: var(--muted-foreground);
 }
 
 .footer a {
@@ -381,7 +390,7 @@
   gap: 12px;
   margin: 20px 0;
   font-size: 13px;
-  color: #999;
+  color: var(--muted-foreground);
 }
 
 .divider::before,
@@ -389,7 +398,7 @@
   content: "";
   flex: 1;
   height: 1px;
-  background-color: #e5e5e5;
+  background-color: var(--border);
 }
 
 .googleButton {
@@ -398,19 +407,19 @@
   justify-content: center;
   gap: 10px;
   padding: 12px 16px;
-  background-color: white;
-  border: 1.5px solid #e5e7eb;
+  background-color: var(--background);
+  border: 1.5px solid var(--border);
   border-radius: 8px;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  color: #1f2937;
+  color: var(--foreground);
 }
 
 .googleButton:hover {
-  background-color: #f9fafb;
-  border-color: #d1d5db;
+  background-color: color-mix(in srgb, var(--muted) 70%, transparent);
+  border-color: color-mix(in srgb, var(--border) 70%, transparent);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
@@ -425,7 +434,7 @@
   gap: 12px;
   margin: 20px 0 24px;
   font-size: 12px;
-  color: #9ca3af;
+  color: var(--muted-foreground);
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.3px;
@@ -436,7 +445,7 @@
   content: "";
   flex: 1;
   height: 1px;
-  background-color: #e5e7eb;
+  background-color: var(--border);
 }
 
 @media (max-width: 1024px) {
@@ -577,11 +586,10 @@
   }
 }
 
-
 .loadingOverlay {
   position: fixed;
   inset: 0;
-  background: rgba(255, 255, 255, 0.85);
+  background: color-mix(in srgb, var(--background) 85%, transparent);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -593,18 +601,19 @@
   align-items: center;
   gap: 12px;
   padding: 16px 24px;
-  background: white;
+  background: var(--card);
+  border: 1px solid var(--border);
   border-radius: 10px;
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
   font-weight: 500;
-  color: #284b8c;
+  color: var(--foreground);
 }
 
 .spinner {
   width: 20px;
   height: 20px;
-  border: 3px solid #dbe4f3;
-  border-top: 3px solid #284b8c;
+  border: 3px solid color-mix(in srgb, var(--muted) 70%, transparent);
+  border-top: 3px solid #2ba8d6;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }

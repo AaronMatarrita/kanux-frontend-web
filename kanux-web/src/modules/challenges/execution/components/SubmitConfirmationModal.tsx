@@ -33,30 +33,30 @@ export function SubmitConfirmationModal({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+      <div className="bg-card rounded-lg shadow-xl max-w-md w-full p-6">
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center">
-            <AlertCircle className="w-6 h-6 text-amber-600" />
+          <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center dark:bg-amber-500/15">
+            <AlertCircle className="w-6 h-6 text-amber-600 dark:text-amber-300" />
           </div>
-          <h2 className="text-lg font-semibold text-slate-900">
+          <h2 className="text-lg font-semibold text-foreground">
             Confirmar envío
           </h2>
         </div>
 
         <div className="mb-6">
-          <p className="text-slate-600 mb-3">
+          <p className="text-muted-foreground mb-3">
             ¿Estás seguro de que deseas enviar tu solución para{" "}
             <span className="font-semibold">{challengeTitle}</span>?
           </p>
-          <p className="text-sm text-slate-500">
+          <p className="text-sm text-muted-foreground">
             Una vez enviada, no podrás editarla. Tu código será evaluado
             automáticamente.
           </p>
         </div>
 
         {error && (
-          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
-            <p className="text-sm text-red-700">{error}</p>
+          <div className="mb-4 p-3 bg-destructive/10 border border-destructive/30 rounded-md">
+            <p className="text-sm text-destructive">{error}</p>
           </div>
         )}
 
@@ -64,7 +64,7 @@ export function SubmitConfirmationModal({
           <button
             onClick={onCancel}
             disabled={isLoading}
-            className="flex-1 px-4 py-2 text-sm font-medium text-slate-700 bg-slate-100 rounded-md hover:bg-slate-200 disabled:opacity-50 disabled:cursor-not-allowed transition"
+            className="flex-1 px-4 py-2 text-sm font-medium text-foreground bg-muted rounded-md hover:bg-muted/80 disabled:opacity-50 disabled:cursor-not-allowed transition"
           >
             Cancelar
           </button>

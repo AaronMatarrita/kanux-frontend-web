@@ -26,7 +26,7 @@ export default function PrivateLayout({
   const closeSidebar = () => setIsSidebarOpen(false);
 
   return (
-    <div className="min-h-screen bg-[#f8f8f8] flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col">
       <Sidebar isOpen={isSidebarOpen} onClose={closeSidebar} />
       <Topbar onToggleSidebar={toggleSidebar} isSidebarOpen={isSidebarOpen} />
 

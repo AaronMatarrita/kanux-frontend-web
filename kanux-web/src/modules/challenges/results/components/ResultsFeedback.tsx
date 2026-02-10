@@ -60,7 +60,7 @@ export function ResultsFeedback({ feedback }: ResultsFeedbackProps) {
           {(scoreBreakdown || tests || codeQuality || answersOverview) && (
             <div className="grid gap-3 md:grid-cols-3">
               {answersOverview && (
-                <div className="rounded-lg border border-border/60 bg-white p-3">
+                <div className="rounded-lg border border-border/60 bg-card p-3">
                   <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
                     Respuestas
                   </p>
@@ -95,7 +95,7 @@ export function ResultsFeedback({ feedback }: ResultsFeedbackProps) {
                 </div>
               )}
               {scoreBreakdown && (
-                <div className="rounded-lg border border-border/60 bg-white p-3">
+                <div className="rounded-lg border border-border/60 bg-card p-3">
                   <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
                     Desglose de Puntaje
                   </p>
@@ -118,7 +118,7 @@ export function ResultsFeedback({ feedback }: ResultsFeedbackProps) {
               )}
 
               {tests && (
-                <div className="rounded-lg border border-border/60 bg-white p-3">
+                <div className="rounded-lg border border-border/60 bg-card p-3">
                   <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
                     Pruebas
                   </p>
@@ -152,7 +152,7 @@ export function ResultsFeedback({ feedback }: ResultsFeedbackProps) {
               )}
 
               {codeQuality && (
-                <div className="rounded-lg border border-border/60 bg-white p-3">
+                <div className="rounded-lg border border-border/60 bg-card p-3">
                   <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
                     Calidad de Codigo
                   </p>
@@ -179,11 +179,11 @@ export function ResultsFeedback({ feedback }: ResultsFeedbackProps) {
           {(strengths || areasForImprovement || nextSteps) && (
             <div className="grid gap-4 md:grid-cols-3">
               {strengths && strengths.length > 0 && (
-                <div className="rounded-lg border border-border/60 bg-emerald-50/40 p-4">
-                  <p className="text-sm font-semibold text-emerald-700 mb-2">
+                <div className="rounded-lg border border-border/60 bg-emerald-50/40 p-4 dark:bg-emerald-500/10">
+                  <p className="text-sm font-semibold text-emerald-700 mb-2 dark:text-emerald-300">
                     Fortalezas
                   </p>
-                  <ul className="space-y-1 text-sm text-emerald-900">
+                  <ul className="space-y-1 text-sm text-emerald-900 dark:text-emerald-200">
                     {strengths.map((item, idx) => (
                       <li key={idx}>- {item}</li>
                     ))}
@@ -192,11 +192,11 @@ export function ResultsFeedback({ feedback }: ResultsFeedbackProps) {
               )}
 
               {areasForImprovement && areasForImprovement.length > 0 && (
-                <div className="rounded-lg border border-border/60 bg-amber-50/40 p-4">
-                  <p className="text-sm font-semibold text-amber-700 mb-2">
+                <div className="rounded-lg border border-border/60 bg-amber-50/40 p-4 dark:bg-amber-500/10">
+                  <p className="text-sm font-semibold text-amber-700 mb-2 dark:text-amber-300">
                     Mejoras
                   </p>
-                  <ul className="space-y-1 text-sm text-amber-900">
+                  <ul className="space-y-1 text-sm text-amber-900 dark:text-amber-200">
                     {areasForImprovement.map((item, idx) => (
                       <li key={idx}>- {item}</li>
                     ))}
@@ -205,11 +205,11 @@ export function ResultsFeedback({ feedback }: ResultsFeedbackProps) {
               )}
 
               {nextSteps && nextSteps.length > 0 && (
-                <div className="rounded-lg border border-border/60 bg-sky-50/40 p-4">
-                  <p className="text-sm font-semibold text-sky-700 mb-2">
+                <div className="rounded-lg border border-border/60 bg-sky-50/40 p-4 dark:bg-sky-500/10">
+                  <p className="text-sm font-semibold text-sky-700 mb-2 dark:text-sky-300">
                     Siguientes pasos
                   </p>
-                  <ul className="space-y-1 text-sm text-sky-900">
+                  <ul className="space-y-1 text-sm text-sky-900 dark:text-sky-200">
                     {nextSteps.map((item, idx) => (
                       <li key={idx}>- {item}</li>
                     ))}
@@ -230,7 +230,7 @@ export function ResultsFeedback({ feedback }: ResultsFeedbackProps) {
           )}
 
           {perQuestionFeedback && perQuestionFeedback.length > 0 && (
-            <div className="rounded-lg border border-border/60 bg-white p-4">
+            <div className="rounded-lg border border-border/60 bg-card p-4">
               <p className="text-sm font-semibold text-foreground mb-3">
                 Retroalimentacion por pregunta
               </p>
@@ -249,8 +249,8 @@ export function ResultsFeedback({ feedback }: ResultsFeedbackProps) {
                           variant="secondary"
                           className={
                             item.correct
-                              ? "bg-emerald-100 text-emerald-700"
-                              : "bg-rose-100 text-rose-700"
+                              ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300"
+                              : "bg-rose-100 text-rose-700 dark:bg-rose-500/15 dark:text-rose-300"
                           }
                         >
                           {item.correct ? "Correcta" : "Incorrecta"}

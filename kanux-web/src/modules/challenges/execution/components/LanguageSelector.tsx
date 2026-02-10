@@ -30,7 +30,7 @@ export function LanguageSelector({
         type="button"
         onClick={() => !disabled && setIsOpen(!isOpen)}
         disabled={disabled}
-        className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-md hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-foreground bg-background border border-border rounded-md hover:bg-muted focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {selected.label}
         <ChevronDown className="w-4 h-4" />
@@ -42,7 +42,7 @@ export function LanguageSelector({
             className="fixed inset-0 z-10"
             onClick={() => setIsOpen(false)}
           />
-          <div className="absolute left-0 top-full mt-1 w-40 bg-white border border-slate-200 rounded-md shadow-lg z-20">
+          <div className="absolute left-0 top-full mt-1 w-40 bg-popover text-popover-foreground border border-border rounded-md shadow-lg z-20">
             {languages.map((lang) => (
               <button
                 key={lang.value}
@@ -51,10 +51,10 @@ export function LanguageSelector({
                   onChange(lang.value);
                   setIsOpen(false);
                 }}
-                className={`w-full text-left px-3 py-2 text-sm hover:bg-slate-50 ${
+                className={`w-full text-left px-3 py-2 text-sm hover:bg-muted ${
                   lang.value === value
-                    ? "bg-emerald-50 text-emerald-700 font-medium"
-                    : "text-slate-700"
+                    ? "bg-emerald-50 text-emerald-700 font-medium dark:bg-emerald-500/15 dark:text-emerald-300"
+                    : "text-foreground"
                 }`}
               >
                 {lang.label}

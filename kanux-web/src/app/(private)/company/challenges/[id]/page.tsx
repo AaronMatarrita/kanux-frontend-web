@@ -142,36 +142,38 @@ export default function ChallengeDetailPage() {
         {/* Back */}
         <button
           onClick={() => router.back()}
-          className="mb-4 flex items-center gap-1 text-slate-500 hover:text-emerald-600 text-sm font-medium"
+          className="mb-4 flex items-center gap-1 text-muted-foreground hover:text-emerald-500 text-sm font-medium"
         >
           <ArrowLeft size={16} /> Volver al listado
         </button>
 
         {/* Header */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-6 mb-6">
+        <div className="bg-card rounded-2xl border border-border p-6 mb-6">
           <div className="flex justify-between items-start">
             <div>
-              <h1 className="text-2xl font-bold text-slate-900">
+              <h1 className="text-2xl font-bold text-foreground">
                 {challenge.title}
               </h1>
-              <p className="text-sm text-slate-500 flex items-center gap-1 mt-1">
+              <p className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
                 <Building2 size={14} />
                 {challenge.company?.name}
               </p>
             </div>
             <div className="flex gap-2">
-              <span className="px-3 py-1 text-xs rounded-full bg-emerald-100 text-emerald-700 font-medium">
+              <span className="px-3 py-1 text-xs rounded-full bg-emerald-100 text-emerald-700 font-medium dark:bg-emerald-500/15 dark:text-emerald-300">
                 {challenge.difficulty === "Básico"
                   ? "Principiante"
                   : challenge.difficulty}
               </span>
-              <span className="px-3 py-1 text-xs rounded-full bg-green-100 text-green-700 font-medium">
+              <span className="px-3 py-1 text-xs rounded-full bg-green-100 text-green-700 font-medium dark:bg-green-500/15 dark:text-green-300">
                 Vista de empresa
               </span>
             </div>
           </div>
 
-          <p className="text-slate-600 mt-4 text-sm">{challenge.description}</p>
+          <p className="text-muted-foreground mt-4 text-sm">
+            {challenge.description}
+          </p>
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
             <StatCard
@@ -198,17 +200,17 @@ export default function ChallengeDetailPage() {
         </div>
 
         {/* Questions */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-6">
-          <h2 className="text-lg font-semibold text-slate-900 flex items-center gap-2 mb-4">
+        <div className="bg-card rounded-2xl border border-border p-6">
+          <h2 className="text-lg font-semibold text-foreground flex items-center gap-2 mb-4">
             <HelpCircle size={20} />
             Preguntas del desafío
           </h2>
 
-          <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 mb-6 flex gap-2">
-            <Info size={16} className="text-slate-500 mt-0.5" />
-            <p className="text-xs text-slate-500">
+          <div className="bg-muted/40 border border-border rounded-lg p-4 mb-6 flex gap-2">
+            <Info size={16} className="text-muted-foreground mt-0.5" />
+            <p className="text-xs text-muted-foreground">
               Instrucciones:{" "}
-              <span className="text-slate-700">
+              <span className="text-foreground">
                 {block?.instructions ?? "Sin instrucciones"}
               </span>
             </p>
@@ -218,13 +220,13 @@ export default function ChallengeDetailPage() {
             {questions.map((q, i) => (
               <div key={q.id}>
                 <div className="flex items-center gap-3">
-                  <span className="w-7 h-7 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-sm font-bold">
+                  <span className="w-7 h-7 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-sm font-bold dark:bg-emerald-500/15 dark:text-emerald-300">
                     {i + 1}
                   </span>
-                  <h3 className="font-medium text-slate-900">{q.question}</h3>
+                  <h3 className="font-medium text-foreground">{q.question}</h3>
                 </div>
 
-                <p className="ml-10 text-xs text-slate-400 mt-1">
+                <p className="ml-10 text-xs text-muted-foreground/70 mt-1">
                   Tipo de respuesta: Selección única
                 </p>
 
@@ -235,12 +237,18 @@ export default function ChallengeDetailPage() {
                     return (
                       <div
                         key={opt.id}
-                        className={`flex items-center gap-3 px-4 py-2 rounded-lg border ${isCorrect ? "bg-emerald-50 border-emerald-400" : "bg-slate-50 border-slate-200"}`}
+                        className={`flex items-center gap-3 px-4 py-2 rounded-lg border ${
+                          isCorrect
+                            ? "bg-emerald-50 border-emerald-400 dark:bg-emerald-500/15 dark:border-emerald-500/40"
+                            : "bg-muted/30 border-border"
+                        }`}
                       >
                         <Circle
                           size={16}
                           className={
-                            isCorrect ? "text-emerald-500" : "text-slate-300"
+                            isCorrect
+                              ? "text-emerald-500"
+                              : "text-muted-foreground/50"
                           }
                           fill={isCorrect ? "#10b981" : "none"}
                         />
@@ -249,14 +257,14 @@ export default function ChallengeDetailPage() {
                           className={`text-sm ${
                             isCorrect
                               ? "text-emerald-700 font-semibold"
-                              : "text-slate-700"
+                              : "text-foreground"
                           }`}
                         >
                           {opt.option_text}
                         </span>
 
                         {isCorrect && (
-                          <span className="ml-auto text-xs px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-medium">
+                          <span className="ml-auto text-xs px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-medium dark:bg-emerald-500/15 dark:text-emerald-300">
                             Correcta
                           </span>
                         )}
@@ -269,7 +277,7 @@ export default function ChallengeDetailPage() {
           </div>
         </div>
 
-        <p className="text-center text-xs text-slate-400 mt-6">
+        <p className="text-center text-xs text-muted-foreground mt-6">
           Creado el {formatDate(challenge.created_at)}
         </p>
       </div>
@@ -286,13 +294,13 @@ const StatCard = ({
   label: string;
   value: string;
 }) => (
-  <div className="bg-white border border-slate-200 rounded-xl p-4 flex items-center gap-3">
-    <div className="w-9 h-9 flex items-center justify-center rounded-lg bg-slate-50">
-      <Icon size={18} className="text-slate-500" />
+  <div className="bg-card border border-border rounded-xl p-4 flex items-center gap-3">
+    <div className="w-9 h-9 flex items-center justify-center rounded-lg bg-muted/40">
+      <Icon size={18} className="text-muted-foreground" />
     </div>
     <div>
-      <p className="text-xs text-slate-500">{label}</p>
-      <p className="text-sm font-semibold text-slate-900">{value}</p>
+      <p className="text-xs text-muted-foreground">{label}</p>
+      <p className="text-sm font-semibold text-foreground">{value}</p>
     </div>
   </div>
 );

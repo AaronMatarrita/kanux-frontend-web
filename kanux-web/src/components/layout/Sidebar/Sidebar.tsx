@@ -5,7 +5,7 @@ import { mockSession } from "@/store/session.mock";
 import { SidebarItem } from "./SidebarItem";
 import { SidebarFooter } from "./SidebarFooter";
 import { usePathname } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { mapUserTypeToRole } from "@/helper/mapper";
 import { useSyncExternalStore } from "react";
@@ -27,6 +27,7 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
   const pathname = usePathname();
   const { session } = useAuth();
   const isClient = useIsClient();
+  const [isDark, setIsDark] = useState(false);
 
   const role = !isClient
     ? mockSession.role
@@ -62,6 +63,24 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
     };
   }, [isOpen]);
 
+  useEffect(() => {
+    if (!isClient) return;
+
+    const root = document.documentElement;
+    const updateTheme = () => {
+      setIsDark(root.classList.contains("dark"));
+    };
+
+    updateTheme();
+
+    const observer = new MutationObserver(updateTheme);
+    observer.observe(root, { attributes: true, attributeFilter: ["class"] });
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [isClient]);
+
   return (
     <>
       <div
@@ -73,18 +92,25 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
       />
 
       <aside
-        className={`fixed left-0 top-0 z-50 h-screen w-72 bg-white border-r border-slate-200 flex flex-col transition-transform duration-300 ease-in-out ${
+        className={`fixed left-0 top-0 z-50 h-screen w-72 bg-sidebar border-r border-sidebar-border flex flex-col transition-transform duration-300 ease-in-out ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         {/* Logo */}
-        <div className="h-16 flex items-center px-6 border-b border-slate-200">
+        <div className="h-16 flex items-center px-6 border-b border-sidebar-border">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/brand/kanux-logo-sidebar.svg" alt="Kanux" />
+          <img
+            src={
+              isDark
+                ? "/brand/kanux-logo-variant-white.svg"
+                : "/brand/kanux-logo-sidebar.svg"
+            }
+            alt="Kanux"
+          />
         </div>
 
         {/* Section title */}
-        <div className="px-6 pt-6 pb-2 text-xs font-semibold tracking-wide text-slate-500 uppercase">
+        <div className="px-6 pt-6 pb-2 text-xs font-semibold tracking-wide text-sidebar-foreground/60 uppercase">
           Pages
         </div>
 

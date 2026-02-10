@@ -41,21 +41,21 @@ export function ConversationsList({
   });
 
   return (
-    <div className="h-full flex flex-col bg-white border-r border-gray-200">
-      <div className="h-16 px-4 flex items-center border-b border-gray-200">
+    <div className="h-full flex flex-col bg-card border-r border-border">
+      <div className="h-16 px-4 flex items-center border-b border-border">
         <div className="relative w-full">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input
             type="text"
             placeholder="Buscar conversaciones..."
             value={searchQuery}
             onChange={(e) => onSearchChange?.(e.target.value)}
-            className="w-full pl-10 pr-10 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full pl-10 pr-10 py-2 border border-border rounded-lg text-sm bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring/40"
           />
           {searchQuery && (
             <button
               onClick={() => onSearchChange?.("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
             >
               <X className="w-4 h-4" />
             </button>
@@ -67,10 +67,10 @@ export function ConversationsList({
       <div className="flex-1 overflow-y-auto">
         {/* Loading */}
         {loading && (
-          <div className="p-4 text-center text-gray-500">
+          <div className="p-4 text-center text-muted-foreground">
             <div className="animate-pulse space-y-3">
               {[...Array(5)].map((_, i) => (
-                <div key={i} className="h-14 bg-gray-200 rounded-lg" />
+                <div key={i} className="h-14 bg-muted rounded-lg" />
               ))}
             </div>
           </div>
@@ -79,16 +79,16 @@ export function ConversationsList({
         {/* Error */}
         {error && !loading && (
           <div className="p-4">
-            <div className="p-4 bg-red-50 border border-red-200 rounded">
-              <p className="text-red-700 text-sm font-semibold">Error</p>
-              <p className="text-red-600 text-xs mt-1">{error}</p>
+            <div className="p-4 bg-destructive/10 border border-destructive/30 rounded">
+              <p className="text-destructive text-sm font-semibold">Error</p>
+              <p className="text-destructive text-xs mt-1">{error}</p>
             </div>
           </div>
         )}
 
         {/* Empty */}
         {!loading && !error && conversations.length === 0 && (
-          <div className="p-4 text-center text-gray-500">
+          <div className="p-4 text-center text-muted-foreground">
             <p className="text-sm">No hay conversaciones aún</p>
           </div>
         )}
@@ -98,7 +98,7 @@ export function ConversationsList({
           !error &&
           conversations.length > 0 &&
           filteredConversations.length === 0 && (
-            <div className="p-4 text-center text-gray-500">
+            <div className="p-4 text-center text-muted-foreground">
               <p className="text-sm">No se encontraron resultados</p>
             </div>
           )}
@@ -120,7 +120,7 @@ export function ConversationsList({
 
       {/* Footer */}
       {conversations.length > 0 && (
-        <div className="px-4 py-3 border-t border-gray-200 bg-gray-50 text-xs text-gray-500">
+        <div className="px-4 py-3 border-t border-border bg-muted/40 text-xs text-muted-foreground">
           {filteredConversations.length} de {conversations.length}{" "}
           conversación(es)
         </div>

@@ -2,7 +2,12 @@
 import { Camera, Upload, X } from "lucide-react";
 import { useRef, useState, useEffect } from "react";
 
-export function ImageUpload({currentImage, onImageChange, onImageRemove,label = "Foto de Perfil"}: {
+export function ImageUpload({
+  currentImage,
+  onImageChange,
+  onImageRemove,
+  label = "Foto de Perfil",
+}: {
   currentImage?: string;
   onImageChange: (file: File | null) => void;
   onImageRemove?: () => void;
@@ -20,12 +25,13 @@ export function ImageUpload({currentImage, onImageChange, onImageRemove,label = 
     }
   }, [currentImage, selectedFile]);
 
-
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
-      reader.onloadend = () => {setPreview(reader.result as string);};
+      reader.onloadend = () => {
+        setPreview(reader.result as string);
+      };
       reader.readAsDataURL(file);
 
       setSelectedFile(file);
@@ -42,7 +48,7 @@ export function ImageUpload({currentImage, onImageChange, onImageRemove,label = 
     setPreview(undefined);
     setSelectedFile(null);
     setHasChanges(true);
-    
+
     //clear file input
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
@@ -70,21 +76,21 @@ export function ImageUpload({currentImage, onImageChange, onImageRemove,label = 
 
   return (
     <div className="flex flex-col gap-4">
-      <label className="text-sm font-medium text-gray-700">{label}</label>
-      
+      <label className="text-sm font-medium text-foreground">{label}</label>
+
       {/* conteiner*/}
       <div className="flex flex-col items-center gap-4">
         {/* image center */}
         <div className="relative">
-          <div 
+          <div
             onClick={handleClick}
-            className="relative w-50 h-50 rounded-full overflow-hidden bg-gray-100 cursor-pointer group border-2 border-gray-200 hover:border-emerald-500 transition-colors"
+            className="relative w-50 h-50 rounded-full overflow-hidden bg-muted/40 cursor-pointer group border-2 border-border hover:border-emerald-500 transition-colors"
           >
             {preview ? (
               <>
-                <img 
-                  src={preview} 
-                  alt="Preview" 
+                <img
+                  src={preview}
+                  alt="Preview"
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
@@ -93,7 +99,7 @@ export function ImageUpload({currentImage, onImageChange, onImageRemove,label = 
               </>
             ) : (
               <div className="w-full h-full flex items-center justify-center">
-                <Upload className="w-8 h-8 text-gray-400" />
+                <Upload className="w-8 h-8 text-muted-foreground" />
               </div>
             )}
           </div>
@@ -130,14 +136,14 @@ export function ImageUpload({currentImage, onImageChange, onImageRemove,label = 
               <button
                 type="button"
                 onClick={handleRevert}
-                className="px-4 py-2 rounded-lg text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors"
+                className="px-4 py-2 rounded-lg text-sm font-medium bg-muted text-foreground border border-border hover:bg-muted/80 transition-colors"
               >
                 Revert
               </button>
             )}
           </div>
 
-          <p className="text-xs text-gray-500 text-center">
+          <p className="text-xs text-muted-foreground text-center">
             JPG, PNG o GIF. Max 5MB
           </p>
 

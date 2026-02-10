@@ -16,11 +16,11 @@ interface ResultsInfoProps {
 function getDifficultyStyles(difficulty: string) {
   switch (difficulty) {
     case "Avanzado":
-      return "bg-rose-50 text-rose-700 border-rose-200";
+      return "bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-500/15 dark:text-rose-300 dark:border-rose-500/30";
     case "Intermedio":
-      return "bg-amber-50 text-amber-700 border-amber-200";
+      return "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/15 dark:text-amber-300 dark:border-amber-500/30";
     default:
-      return "bg-emerald-50 text-emerald-700 border-emerald-200";
+      return "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-300 dark:border-emerald-500/30";
   }
 }
 
@@ -33,7 +33,7 @@ export function ResultsInfo({
   onCopy,
 }: ResultsInfoProps) {
   return (
-    <Card className="bg-white border border-slate-200 rounded-xl shadow-sm">
+    <Card className="bg-card border border-border rounded-xl shadow-sm">
       <CardHeader className="pb-4">
         <CardTitle className="text-base font-semibold text-muted-foreground uppercase tracking-wider">
           Información del Reto

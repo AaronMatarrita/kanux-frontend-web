@@ -13,10 +13,10 @@ interface CompletedChallengeCardProps {
 function getScoreConfig(score: number) {
   if (score >= 80) {
     return {
-      bg: "bg-emerald-100",
-      ring: "ring-emerald-200",
-      iconColor: "text-emerald-600",
-      text: "text-emerald-700",
+      bg: "bg-emerald-100 dark:bg-emerald-500/15",
+      ring: "ring-emerald-200 dark:ring-emerald-500/30",
+      iconColor: "text-emerald-600 dark:text-emerald-300",
+      text: "text-emerald-700 dark:text-emerald-200",
       Icon: Trophy,
       label: "Excelente desempeño",
     };
@@ -24,20 +24,20 @@ function getScoreConfig(score: number) {
 
   if (score >= 60) {
     return {
-      bg: "bg-amber-100",
-      ring: "ring-amber-200",
-      iconColor: "text-amber-600",
-      text: "text-amber-700",
+      bg: "bg-amber-100 dark:bg-amber-500/15",
+      ring: "ring-amber-200 dark:ring-amber-500/30",
+      iconColor: "text-amber-600 dark:text-amber-300",
+      text: "text-amber-700 dark:text-amber-200",
       Icon: Medal,
       label: "Desempeño aceptable",
     };
   }
 
   return {
-    bg: "bg-rose-100",
-    ring: "ring-rose-200",
-    iconColor: "text-rose-600",
-    text: "text-rose-700",
+    bg: "bg-rose-100 dark:bg-rose-500/15",
+    ring: "ring-rose-200 dark:ring-rose-500/30",
+    iconColor: "text-rose-600 dark:text-rose-300",
+    text: "text-rose-700 dark:text-rose-200",
     Icon: AlertTriangle,
     label: "Necesita mejorar",
   };
@@ -59,24 +59,24 @@ export function CompletedChallengeCard({
   };
 
   return (
-    <div className="group relative flex items-center justify-between gap-4 rounded-xl border border-slate-200 bg-white p-5 transition-all hover:-translate-y-0.5 hover:shadow-md">
+    <div className="group relative flex items-center justify-between gap-4 rounded-xl border border-border bg-card p-5 transition-all hover:-translate-y-0.5 hover:shadow-md">
       <div className="flex items-start gap-4 flex-1 min-w-0">
-        <div className="shrink-0 flex items-center justify-center w-11 h-11 rounded-xl bg-green-100 ring-1 ring-green-200">
-          <CheckCircle className="h-6 w-6 text-green-600" />
+        <div className="shrink-0 flex items-center justify-center w-11 h-11 rounded-xl bg-emerald-100 ring-1 ring-emerald-200 dark:bg-emerald-500/15 dark:ring-emerald-500/30">
+          <CheckCircle className="h-6 w-6 text-emerald-600 dark:text-emerald-300" />
         </div>
 
         <div className="flex-1 min-w-0">
-          <h3 className="text-sm font-semibold text-slate-900 truncate">
+          <h3 className="text-sm font-semibold text-foreground truncate">
             {submission.challenge.title}
           </h3>
 
-          <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-slate-500">
+          <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
             <span
               className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${config.className}`}
             >
               Difficulty: {submission.challenge.difficulty}
             </span>
-            <span className="text-slate-400">•</span>
+            <span className="text-muted-foreground/60">•</span>
 
             <span>
               {new Date(submission.submitted_at).toLocaleDateString("es-ES", {

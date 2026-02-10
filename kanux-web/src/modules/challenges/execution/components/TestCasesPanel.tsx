@@ -23,18 +23,20 @@ const STATUS_UI: Record<
   { dot: string; badge: string; label: string }
 > = {
   pending: {
-    dot: "bg-slate-200 border border-slate-300",
-    badge: "bg-slate-100 text-slate-700",
+    dot: "bg-slate-200 border border-slate-300 dark:bg-slate-700 dark:border-slate-600",
+    badge:
+      "bg-slate-100 text-slate-700 dark:bg-slate-500/15 dark:text-slate-300",
     label: "Pending",
   },
   passed: {
-    dot: "bg-emerald-100 border border-emerald-300",
-    badge: "bg-emerald-50 text-emerald-700",
+    dot: "bg-emerald-100 border border-emerald-300 dark:bg-emerald-500/15 dark:border-emerald-500/40",
+    badge:
+      "bg-emerald-50 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300",
     label: "Passed",
   },
   failed: {
-    dot: "bg-rose-100 border border-rose-300",
-    badge: "bg-rose-50 text-rose-700",
+    dot: "bg-rose-100 border border-rose-300 dark:bg-rose-500/15 dark:border-rose-500/40",
+    badge: "bg-rose-50 text-rose-700 dark:bg-rose-500/15 dark:text-rose-300",
     label: "Failed",
   },
 };
@@ -87,10 +89,10 @@ function TestCaseItem({ testCase }: { testCase: TestCaseItemData }) {
   return (
     <div
       className="
-        border border-slate-200 rounded-lg p-3 
-        bg-white 
+        border border-border rounded-lg p-3 
+        bg-card 
         transition-colors
-        hover:bg-slate-50
+        hover:bg-muted/40
       "
     >
       <div className="flex items-start gap-3">
@@ -98,7 +100,7 @@ function TestCaseItem({ testCase }: { testCase: TestCaseItemData }) {
 
         <div className="flex-1 min-w-0 space-y-1">
           {/* Título SIN truncate */}
-          <div className="text-sm font-medium text-slate-900 leading-snug">
+          <div className="text-sm font-medium text-foreground leading-snug">
             {testCase.description || `Test case ${testCase.id}`}
           </div>
 
@@ -122,7 +124,7 @@ function SummaryItem({
   color: string;
 }) {
   return (
-    <div className="flex items-center justify-between text-slate-700">
+    <div className="flex items-center justify-between text-muted-foreground">
       <span>{label}:</span>
       <span className={`flex items-center gap-1 ${color}`}>
         <span className="inline-block h-2 w-2 rounded-full bg-current" />
@@ -142,11 +144,23 @@ function TestCasesSummary({
   pending: number;
 }) {
   return (
-    <div className="mt-4 border border-slate-200 rounded-xl p-4 bg-white shadow-sm text-sm">
+    <div className="mt-4 border border-border rounded-xl p-4 bg-card shadow-sm text-sm">
       <div className="space-y-1">
-        <SummaryItem label="Passed" value={passed} color="text-emerald-700" />
-        <SummaryItem label="Failed" value={failed} color="text-rose-700" />
-        <SummaryItem label="Pending" value={pending} color="text-slate-700" />
+        <SummaryItem
+          label="Passed"
+          value={passed}
+          color="text-emerald-700 dark:text-emerald-300"
+        />
+        <SummaryItem
+          label="Failed"
+          value={failed}
+          color="text-rose-700 dark:text-rose-300"
+        />
+        <SummaryItem
+          label="Pending"
+          value={pending}
+          color="text-slate-700 dark:text-slate-300"
+        />
       </div>
     </div>
   );
@@ -162,8 +176,8 @@ export function TestCasesPanel({ testCases = [] }: TestCasesPanelProps) {
     <div className="h-full flex flex-col">
       {/* Header */}
       <div className="pb-3">
-        <h3 className="text-sm font-semibold text-slate-900">Test Cases</h3>
-        <p className="text-xs text-slate-500">
+        <h3 className="text-sm font-semibold text-foreground">Test Cases</h3>
+        <p className="text-xs text-muted-foreground">
           {counts.total} total · {counts.passed} passed · {counts.failed} failed
         </p>
       </div>
@@ -171,7 +185,9 @@ export function TestCasesPanel({ testCases = [] }: TestCasesPanelProps) {
       {/* List */}
       <div className="flex-1 overflow-auto space-y-3 pr-1">
         {normalized.length === 0 ? (
-          <div className="text-sm text-slate-500">No test cases available.</div>
+          <div className="text-sm text-muted-foreground">
+            No test cases available.
+          </div>
         ) : (
           normalized.map((tc) => <TestCaseItem key={tc.id} testCase={tc} />)
         )}

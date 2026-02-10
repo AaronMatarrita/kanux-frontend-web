@@ -56,15 +56,15 @@ export function ChallengeHero({
       </div>
 
       {/* HERO */}
-      <section className="relative overflow-hidden rounded-2xl border border-slate-200 bg-linear-to-br from-white to-slate-50 p-6 md:p-8">
+      <section className="relative overflow-hidden rounded-2xl border border-border bg-linear-to-br from-card to-muted/40 p-6 md:p-8">
         <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
           <div className="flex items-start gap-4">
-            <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-slate-100 text-slate-600 shadow-sm">
+            <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-muted text-muted-foreground shadow-sm">
               <DiffIcon className="h-8 w-8" />
             </div>
 
             <div className="space-y-3">
-              <h1 className="text-2xl font-bold text-slate-900 md:text-3xl">
+              <h1 className="text-2xl font-bold text-foreground md:text-3xl">
                 {challenge?.title}
               </h1>
 
@@ -85,7 +85,7 @@ export function ChallengeHero({
                 </span>
 
                 {!isTechnical && (
-                  <span className="rounded-full bg-purple-50 px-3 py-1 text-xs font-medium text-purple-700 border border-purple-200">
+                  <span className="rounded-full bg-purple-50 px-3 py-1 text-xs font-medium text-purple-700 border border-purple-200 dark:bg-purple-500/15 dark:text-purple-300 dark:border-purple-500/30">
                     Habilidades blandas
                   </span>
                 )}
@@ -103,7 +103,7 @@ export function ChallengeHero({
                 disabled={isStarting}
                 onClick={handleStart}
                 className={`inline-flex items-center justify-center gap-2 rounded-md px-5 py-2.5 text-sm font-semibold transition
-                bg-[#2EC27E] text-white hover:bg-[#28b76a] disabled:bg-slate-200 disabled:text-slate-400`}
+                bg-emerald-600 text-white hover:bg-emerald-700 disabled:bg-muted disabled:text-muted-foreground`}
               >
                 <Play className="h-4 w-4" />
                 {isStarting ? "Iniciando..." : "Iniciar desafío"}
@@ -115,7 +115,7 @@ export function ChallengeHero({
               disabled={isStarting}
               onClick={handleStart}
               className={`inline-flex items-center justify-center gap-2 rounded-md px-5 py-2.5 text-sm font-semibold transition
-              bg-[#2EC27E] text-white hover:bg-[#28b76a] disabled:bg-slate-200 disabled:text-slate-400`}
+              bg-emerald-600 text-white hover:bg-emerald-700 disabled:bg-muted disabled:text-muted-foreground`}
             >
               <Play className="h-4 w-4" />
               {isStarting ? "Iniciando..." : "Iniciar desafío"}

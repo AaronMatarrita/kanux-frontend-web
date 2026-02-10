@@ -44,7 +44,9 @@ export const StatCard: React.FC<StatCardProps> = ({
             {value}
           </p>
 
-          {subtitle && <p className="mt-1 text-xs text-red-600">{subtitle}</p>}
+          {subtitle && (
+            <p className="mt-1 text-xs text-destructive">{subtitle}</p>
+          )}
         </div>
       </CardContent>
     </Card>

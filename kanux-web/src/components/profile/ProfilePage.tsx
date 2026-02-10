@@ -8,8 +8,16 @@ import { SkillsSection } from "./SkillsSection";
 import { ChallengesSection } from "./ChallengesSection";
 import { useEffect, useState } from "react";
 import { profilesService } from "@/services";
-import { Skill, TalentProfile, Catalogs, UpdateTalentProfileRequest } from "@/services/profiles.service";
-import { ChallengeSubmissionsResponse, challengesService } from "@/services/challenges.service";
+import {
+  Skill,
+  TalentProfile,
+  Catalogs,
+  UpdateTalentProfileRequest,
+} from "@/services/profiles.service";
+import {
+  ChallengeSubmissionsResponse,
+  challengesService,
+} from "@/services/challenges.service";
 import { ButtonEdit } from "./ButtonEdit";
 
 // user Information, about, basic info, skills
@@ -26,34 +34,35 @@ import { toast, Toaster } from "sonner";
 type ModalType = "none" | "userInfo" | "about" | "basicInfo" | "skills";
 
 export function ProfilePage() {
-
   const [profile, setProfile] = useState<TalentProfile | null>(null);
   const [catalogs, setCatalogs] = useState<Catalogs | null>(null);
-  const [challenges, setChallenges] = useState<Array<ChallengeSubmissionsResponse[number]>>([]);
+  const [challenges, setChallenges] = useState<
+    Array<ChallengeSubmissionsResponse[number]>
+  >([]);
 
-  //states 
+  //states
   const [openModal, setOpenModal] = useState<ModalType>("none");
   const [loading, setLoading] = useState(true);
-
 
   const loadProfileData = async function loadProfile() {
     try {
       setLoading(true);
-      const [responseProfile, responseCatalogs, responseChallenges] = await Promise.all([
-        profilesService.getMyProfile(),
-        profilesService.getCatalogs(),
-        challengesService.getMyChallengeHistory()
-      ]);
+      const [responseProfile, responseCatalogs, responseChallenges] =
+        await Promise.all([
+          profilesService.getMyProfile(),
+          profilesService.getCatalogs(),
+          challengesService.getMyChallengeHistory(),
+        ]);
       setProfile(responseProfile);
       setCatalogs(responseCatalogs);
-      setChallenges(responseChallenges)
-      console.log(responseProfile)
+      setChallenges(responseChallenges);
+      console.log(responseProfile);
     } catch (err) {
       toast.error("No se pudo cargar el perfil.");
     } finally {
       setLoading(false);
     }
-  }
+  };
   useEffect(() => {
     loadProfileData();
   }, []);
@@ -67,14 +76,14 @@ export function ProfilePage() {
         title: data.title,
         location: data.location,
         contact: contactsArrayToBackend(data.contacts),
-        image_profile: data.image_profile
-      }
+        image_profile: data.image_profile,
+      };
 
       await profilesService.updateMyProfile(request);
       const resprofile: TalentProfile = await profilesService.getMyProfile();
       setProfile(resprofile);
       setOpenModal("none");
-      toast.success("La informacion del perfil fue actualizada.")
+      toast.success("La informacion del perfil fue actualizada.");
     } catch (error) {
       toast.error("No se pudo actualizar el perfil.");
     }
@@ -86,13 +95,13 @@ export function ProfilePage() {
       const request: UpdateTalentProfileRequest = {
         first_name: profile?.first_name,
         last_name: profile?.last_name,
-        about: data.about
-      }
+        about: data.about,
+      };
       await profilesService.updateMyProfile(request);
       const resprofile: TalentProfile = await profilesService.getMyProfile();
       setProfile(resprofile);
       setOpenModal("none");
-      toast.success("La descripcion fue actualizada.")
+      toast.success("La descripcion fue actualizada.");
     } catch (error) {
       toast.error("No se pudo actualizar el perfil.");
     }
@@ -105,16 +114,25 @@ export function ProfilePage() {
         last_name: profile?.last_name,
         experience_level: data.experienceLevel,
         opportunity_status_id: data.openToOpportunities,
-        learning_background_id: data.learningBackground
-      }
-      const toCreate = data.localLanguages.filter((item: any) => item.id.startsWith('temp-'));
-      const toDelete = profile?.languages_talent?.filter((orig: any) => !data.localLanguages.some((curr: any) => curr.id === orig.id)) ?? [];
+        learning_background_id: data.learningBackground,
+      };
+      const toCreate = data.localLanguages.filter((item: any) =>
+        item.id.startsWith("temp-"),
+      );
+      const toDelete =
+        profile?.languages_talent?.filter(
+          (orig: any) =>
+            !data.localLanguages.some((curr: any) => curr.id === orig.id),
+        ) ?? [];
       const toUpdate = data.localLanguages.filter((curr: any) => {
-        if (curr.id.startsWith('temp-')) return false;
-        const original = profile?.languages_talent?.find((orig: any) => orig.id === curr.id);
-        return original && (
-          original.id_languages !== curr.id_languages ||
-          original.level !== curr.level
+        if (curr.id.startsWith("temp-")) return false;
+        const original = profile?.languages_talent?.find(
+          (orig: any) => orig.id === curr.id,
+        );
+        return (
+          original &&
+          (original.id_languages !== curr.id_languages ||
+            original.level !== curr.level)
         );
       });
       // send data
@@ -126,76 +144,76 @@ export function ProfilePage() {
         ...toCreate.map((lang: any) =>
           profilesService.addLanguage({
             language_id: lang.id_languages!,
-            level: lang.level
-          })
+            level: lang.level,
+          }),
         ),
 
         // updates languages relation
         ...toUpdate.map((lang: any) =>
           profilesService.updateLanguage(lang.id, {
             language_id: lang.id_languages!,
-            level: lang.level
-          })
+            level: lang.level,
+          }),
         ),
 
         //delete languages relation
-        ...toDelete.map((lang: any) =>
-          profilesService.deleteLanguage(lang.id)
-        )
+        ...toDelete.map((lang: any) => profilesService.deleteLanguage(lang.id)),
       ]);
       const resprofile: TalentProfile = await profilesService.getMyProfile();
       setProfile(resprofile);
       setOpenModal("none");
-      toast.success("La informacion basica fue actualizada.")
+      toast.success("La informacion basica fue actualizada.");
     } catch (error) {
-      toast.error("No se pudo actualizar la informacion basica.")
+      toast.error("No se pudo actualizar la informacion basica.");
     }
   };
 
   // save Skills information
   const handleSaveSkills = async (dataSkill: Skill[]) => {
     try {
-      const toCreate = dataSkill.filter((item: any) => item.id.startsWith('temp-'));
-      const toDelete = profile?.skills?.filter((orig: any) => !dataSkill.some((curr: any) => curr.id === orig.id)) ?? [];
+      const toCreate = dataSkill.filter((item: any) =>
+        item.id.startsWith("temp-"),
+      );
+      const toDelete =
+        profile?.skills?.filter(
+          (orig: any) => !dataSkill.some((curr: any) => curr.id === orig.id),
+        ) ?? [];
       const toUpdate = dataSkill.filter((curr: any) => {
-        if (curr.id.startsWith('temp-')) return false;
-        const original = profile?.skills?.find((orig: any) => orig.id === curr.id);
-        return original && (
-          original.id_category !== curr.id_category ||
-          original.level !== curr.level ||
-          original.name !== curr.name
+        if (curr.id.startsWith("temp-")) return false;
+        const original = profile?.skills?.find(
+          (orig: any) => orig.id === curr.id,
+        );
+        return (
+          original &&
+          (original.id_category !== curr.id_category ||
+            original.level !== curr.level ||
+            original.name !== curr.name)
         );
       });
-
 
       await Promise.all([
         ...toCreate.map((sk: Skill) =>
           profilesService.addSkill({
             category_id: sk.id_category ?? "",
             name: sk.name,
-            level: sk.level
-          })
+            level: sk.level,
+          }),
         ),
-        ...toUpdate.map((sk:Skill)=>
-          profilesService.updateSkill(
-            sk.id,
-            {
-              category_id:sk.id_category,
-              name: sk.name,
-              level:sk.level
-            }
-          )
+        ...toUpdate.map((sk: Skill) =>
+          profilesService.updateSkill(sk.id, {
+            category_id: sk.id_category,
+            name: sk.name,
+            level: sk.level,
+          }),
         ),
-        ...toDelete.map((sk: Skill) =>
-          profilesService.deleteSkill(sk.id)
-        )
+        ...toDelete.map((sk: Skill) => profilesService.deleteSkill(sk.id)),
       ]);
       const resprofile: TalentProfile = await profilesService.getMyProfile();
       setProfile(resprofile);
       setOpenModal("none");
       toast.success("Las habilidades fueron actualizadas.");
     } catch (error) {
-      toast.error("No se pudieron actualizar las habilidades.")
+      toast.error("No se pudieron actualizar las habilidades.");
     }
   };
 
@@ -205,11 +223,14 @@ export function ProfilePage() {
       {/* About Section*/}
       <Card>
         <CardContent>
-          <h3 className="text-base font-semibold text-gray-900 mb-3">
+          <h3 className="text-base font-semibold text-foreground mb-3">
             Acerca de
           </h3>
           <div>
-            <p className="text-gray-600 leading-relaxed"> {profile?.about}</p>
+            <p className="text-muted-foreground leading-relaxed">
+              {" "}
+              {profile?.about}
+            </p>
             <ButtonEdit
               onExecute={() => setOpenModal("about")}
               label="Editar descripcion"
@@ -221,7 +242,7 @@ export function ProfilePage() {
       {/* Basic Information  */}
       <Card>
         <CardContent>
-          <h3 className="text-base font-semibold text-gray-900 mb-4">
+          <h3 className="text-base font-semibold text-foreground mb-4">
             Informacion basica
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -235,11 +256,14 @@ export function ProfilePage() {
             />
 
             <div className="flex flex-col gap-2">
-              <span className="text-base font-semibold text-gray-900">
+              <span className="text-base font-semibold text-foreground">
                 Idiomas
               </span>
               {profile?.languages_talent?.map((language) => (
-                <span key={language.id} className="text-sm text-gray-600">
+                <span
+                  key={language.id}
+                  className="text-sm text-muted-foreground"
+                >
                   {language.languages?.name} ({language.level})
                 </span>
               ))}
@@ -260,26 +284,31 @@ export function ProfilePage() {
 
   const SkillsTab = () => {
     const skills = profile?.skills || [];
-    const groupedSkills = skills.reduce((acc, skill) => {
-      if (!skill.id_category || !skill.category) return acc;
+    const groupedSkills = skills.reduce(
+      (acc, skill) => {
+        if (!skill.id_category || !skill.category) return acc;
 
-      if (!acc[skill.id_category]) {
-        acc[skill.id_category] = {
-          category: skill.category,
-          skills: []
-        };
-      }
+        if (!acc[skill.id_category]) {
+          acc[skill.id_category] = {
+            category: skill.category,
+            skills: [],
+          };
+        }
 
-      acc[skill.id_category].skills.push(skill);
-      return acc;
-    }, {} as Record<string, { category: { id: string; name: string }; skills: Skill[] }
-    >);
+        acc[skill.id_category].skills.push(skill);
+        return acc;
+      },
+      {} as Record<
+        string,
+        { category: { id: string; name: string }; skills: Skill[] }
+      >,
+    );
     return (
       <div className="space-y-6">
         {/* Verified Skills */}
         <Card>
           <CardContent>
-            <h3 className="text-base font-semibold text-gray-900 mb-4">
+            <h3 className="text-base font-semibold text-foreground mb-4">
               Habilidades verificadas
             </h3>
             <div className="space-y-4">
@@ -297,7 +326,8 @@ export function ProfilePage() {
             </div>
           </CardContent>
         </Card>
-      </div>);
+      </div>
+    );
   };
 
   const ActivityTab = () => {
@@ -316,25 +346,29 @@ export function ProfilePage() {
   const tabs = [
     { label: "Resumen", content: <OverviewTab /> },
     { label: "Habilidades", content: <SkillsTab /> },
-    { label: "Actividad", content: <ActivityTab /> }
+    { label: "Actividad", content: <ActivityTab /> },
   ];
   //loading spiner
   if (loading) {
     return (
       <div className="flex min-h-screen w-full items-center justify-center">
-        <LoadingSpinner size="md" message="Cargando perfil" className="profile" />
+        <LoadingSpinner
+          size="md"
+          message="Cargando perfil"
+          className="profile"
+        />
       </div>
     );
   }
 
   return (
     <>
-      <div className=" bg-gray-50 p-6">
+      <div className="p-6">
         <div className="mx-auto space-y-10">
           {/* title profile */}
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Perfil</h1>
-            <p className="text-slate-600 mt-1">
+            <h1 className="text-3xl font-bold text-foreground">Perfil</h1>
+            <p className="text-muted-foreground mt-1">
               Administra y revisa tu perfil
             </p>
           </div>
@@ -359,19 +393,18 @@ export function ProfilePage() {
                     location={`${profile?.location}`}
                     contact={profile?.contact}
                     avatar={`${profile?.image_url}`}
-                    progress={profile?.profile_completeness??0}
+                    progress={profile?.profile_completeness ?? 0}
                   />
                 </CardContent>
               </Card>
               {/* Tabs*/}
               <Tabs tabs={tabs} defaultTab={0} />
             </>
-          )
-          }
-        </div >
-      </div >
+          )}
+        </div>
+      </div>
       {/* Modals*/}
-      < Modal
+      <Modal
         isOpen={openModal === "userInfo"}
         onClose={() => setOpenModal("none")}
         title="Editar informacion de usuario"
@@ -384,12 +417,12 @@ export function ProfilePage() {
             title: profile?.title || "",
             location: profile?.location || "",
             contacts: backendContactsToArray(profile?.contact),
-            currentAvatarUrl: profile?.image_url
+            currentAvatarUrl: profile?.image_url,
           }}
           onSubmit={handleSaveUserInfo}
           onCancel={() => setOpenModal("none")}
         />
-      </Modal >
+      </Modal>
 
       <Modal
         isOpen={openModal === "about"}
@@ -414,11 +447,10 @@ export function ProfilePage() {
           initialData={{
             experienceLevel: profile?.experience_level || "",
             learningBackground: profile?.learning_backgrounds?.id || "",
-            openToOpportunities: profile?.opportunity_statuses?.id || ""
+            openToOpportunities: profile?.opportunity_statuses?.id || "",
           }}
           initialLanguages={profile?.languages_talent || []}
           catalogs={catalogs}
-
           onSubmit={handleSaveBasicInfo}
           onCancel={() => setOpenModal("none")}
         />
@@ -449,9 +481,8 @@ export function ProfilePage() {
   );
 }
 
-
 const backendContactsToArray = (
-  contacts?: Record<string, any> | null
+  contacts?: Record<string, any> | null,
 ): Contact[] => {
   if (!contacts) return [];
 
@@ -463,11 +494,11 @@ const backendContactsToArray = (
 };
 
 const contactsArrayToBackend = (contacts: Contact[]) => {
-  return contacts.reduce((acc, c) => {
-    if (c.type && c.value) acc[c.type] = c.value;
-    return acc;
-  }, {} as Record<string, string>);
+  return contacts.reduce(
+    (acc, c) => {
+      if (c.type && c.value) acc[c.type] = c.value;
+      return acc;
+    },
+    {} as Record<string, string>,
+  );
 };
-
-
-

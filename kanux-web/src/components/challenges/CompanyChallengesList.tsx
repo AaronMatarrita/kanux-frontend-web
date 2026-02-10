@@ -45,9 +45,12 @@ const DIFFICULTY_LABELS: Record<Difficulty, string> = {
 };
 
 const DIFFICULTY_COLORS: Record<Difficulty, string> = {
-  beginner: "bg-emerald-100 text-emerald-700",
-  intermediate: "bg-blue-100 text-blue-700",
-  advanced: "bg-purple-100 text-purple-700",
+  beginner:
+    "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300",
+  intermediate:
+    "bg-blue-100 text-blue-700 dark:bg-blue-500/15 dark:text-blue-300",
+  advanced:
+    "bg-purple-100 text-purple-700 dark:bg-purple-500/15 dark:text-purple-300",
 };
 
 const DIFFICULTY_OPTIONS = [
@@ -218,8 +221,8 @@ export const CompanyChallengesList: React.FC<CompanyChallengesListProps> = ({
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900">Desafíos</h1>
-            <p className="text-slate-600">
+            <h1 className="text-3xl font-bold text-foreground">Desafíos</h1>
+            <p className="text-muted-foreground">
               Gestiona los desafíos creados por tu empresa.
             </p>
           </div>
@@ -239,10 +242,10 @@ export const CompanyChallengesList: React.FC<CompanyChallengesListProps> = ({
         </div>
 
         {/* Filters */}
-        <div className="bg-white border rounded-lg p-4 space-y-4">
+        <div className="bg-card border border-border rounded-lg p-4 space-y-4">
           <div className="relative">
             <Search
-              className="absolute left-3 top-3 text-slate-400"
+              className="absolute left-3 top-3 text-muted-foreground"
               size={20}
             />
             <input
@@ -255,7 +258,7 @@ export const CompanyChallengesList: React.FC<CompanyChallengesListProps> = ({
                 }
               }}
               placeholder="Buscar desafíos..."
-              className="w-full pl-10 pr-4 py-2 border rounded-lg"
+              className="w-full pl-10 pr-4 py-2 border border-border rounded-lg bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring/40"
             />
           </div>
 
@@ -286,9 +289,9 @@ export const CompanyChallengesList: React.FC<CompanyChallengesListProps> = ({
             }
           />
         ) : (
-          <div className="bg-white border rounded-lg overflow-hidden">
+          <div className="bg-card border border-border rounded-lg overflow-hidden">
             <table className="w-full">
-              <thead className="bg-slate-50 border-b">
+              <thead className="bg-muted/40 border-b border-border">
                 <tr>
                   <th className="px-6 py-3 text-left">Desafío</th>
                   <th className="px-6 py-3 text-left">Dificultad</th>
@@ -298,9 +301,9 @@ export const CompanyChallengesList: React.FC<CompanyChallengesListProps> = ({
                 </tr>
               </thead>
 
-              <tbody className="divide-y">
+              <tbody className="divide-y divide-border">
                 {filteredChallenges.map((ch) => (
-                  <tr key={ch.id} className="hover:bg-slate-50">
+                  <tr key={ch.id} className="hover:bg-muted/40">
                     <td className="px-6 py-4 font-medium">{ch.title}</td>
 
                     <td className="px-6 py-4">
@@ -311,7 +314,7 @@ export const CompanyChallengesList: React.FC<CompanyChallengesListProps> = ({
 
                     <td className="px-6 py-4">{ch.submissions_count}</td>
 
-                    <td className="px-6 py-4 text-slate-600">
+                    <td className="px-6 py-4 text-muted-foreground">
                       {formatDate(ch.created_at)}
                     </td>
 
@@ -372,7 +375,7 @@ export const CompanyChallengesList: React.FC<CompanyChallengesListProps> = ({
 
         {/* Pagination */}
         <div className="flex justify-between items-center">
-          <span className="text-sm text-slate-600">
+          <span className="text-sm text-muted-foreground">
             Mostrando {filteredChallenges.length} de {totalItems} desafíos
           </span>
 

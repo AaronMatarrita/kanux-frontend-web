@@ -56,7 +56,7 @@ export function Select({
         aria-expanded={open}
         onClick={() => setOpen((prev) => !prev)}
         className={cn(
-          "flex w-full items-center justify-between rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500",
+          "flex w-full items-center justify-between rounded-md border border-border bg-background px-3 py-2 text-sm font-medium text-foreground shadow-sm hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring/40 focus:border-ring",
           buttonClassName,
         )}
       >
@@ -65,7 +65,7 @@ export function Select({
         </span>
         <ChevronDown
           className={cn(
-            "h-4 w-4 text-slate-500 transition-transform",
+            "h-4 w-4 text-muted-foreground transition-transform",
             open ? "rotate-180" : "rotate-0",
           )}
           aria-hidden
@@ -73,7 +73,7 @@ export function Select({
       </button>
 
       {open ? (
-        <div className="absolute z-20 mt-1 w-full overflow-hidden rounded-lg border border-slate-200 bg-white shadow-lg">
+        <div className="absolute z-20 mt-1 w-full overflow-hidden rounded-lg border border-border bg-popover text-popover-foreground shadow-lg">
           <ul
             role="listbox"
             className="max-h-64 overflow-auto py-1"
@@ -89,8 +89,8 @@ export function Select({
                     className={cn(
                       "flex w-full items-center justify-between px-3 py-2 text-sm transition-colors",
                       isSelected
-                        ? "bg-slate-900 text-white"
-                        : "text-slate-700 hover:bg-slate-50",
+                        ? "bg-emerald-600 text-white"
+                        : "text-foreground hover:bg-muted",
                     )}
                   >
                     <span className="truncate">{opt.label}</span>

@@ -61,12 +61,12 @@ export function CompletedTab({
 
   if (challenges.length === 0) {
     return (
-      <div className="rounded-lg border border-slate-200 bg-slate-50 p-12 text-center">
-        <CheckCircle className="mx-auto h-12 w-12 text-slate-400" />
-        <h3 className="mt-2 text-sm font-medium text-slate-900">
+      <div className="rounded-lg border border-border bg-muted/30 p-12 text-center">
+        <CheckCircle className="mx-auto h-12 w-12 text-muted-foreground" />
+        <h3 className="mt-2 text-sm font-medium text-foreground">
           No tienes desafíos completados
         </h3>
-        <p className="mt-1 text-sm text-slate-500">
+        <p className="mt-1 text-sm text-muted-foreground">
           Los desafíos que completes aparecerán aquí.
         </p>
       </div>
