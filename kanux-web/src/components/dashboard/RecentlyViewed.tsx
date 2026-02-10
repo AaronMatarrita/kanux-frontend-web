@@ -1,9 +1,11 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Zap, Trophy, ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { companiesService } from "@/services/companies.service";
+import { useAuth } from "@/context/AuthContext";
 
 interface RecentlyViewedProps {
   loading?: boolean;
@@ -13,9 +15,33 @@ export const RecentlyViewed: React.FC<RecentlyViewedProps> = ({
   loading = false,
 }) => {
   const router = useRouter();
+  const { session } = useAuth();
+
+  const [viewsUsed, setViewsUsed] = useState(0);
+  const [maxViews, setMaxViews] = useState(0);
+  const [periodEnd, setPeriodEnd] = useState<string | null>(null);
+  const [loadingPlan, setLoadingPlan] = useState(true);
+
+  useEffect(() => {
+    if (!session?.token) return;
+
+    companiesService
+      .getProfileViewsStatus(session.token)
+      .then((res) => {
+        setViewsUsed(res.data.viewsUsed);
+        setMaxViews(res.data.maxViews);
+        setPeriodEnd(res.data.periodEnd);
+      })
+      .catch((err) => {
+        console.error("Error loading plan status", err);
+      })
+      .finally(() => {
+        setLoadingPlan(false);
+      });
+  }, [session?.token]);
 
   const handleManagePlan = () => {
-    router.push("/company/dashboard");
+    router.push("/company/billing");
   };
 
   const handleCreateChallenge = () => {
@@ -72,6 +98,10 @@ export const RecentlyViewed: React.FC<RecentlyViewedProps> = ({
     );
   }
 
+  const remaining = Math.max(maxViews - viewsUsed, 0);
+  const percentage =
+    maxViews > 0 ? Math.min(Math.round((viewsUsed / maxViews) * 100), 100) : 0;
+
   return (
     <Card className="max-w-md h-fit">
       <CardHeader>
@@ -86,10 +116,22 @@ export const RecentlyViewed: React.FC<RecentlyViewedProps> = ({
                 <h3 className="font-semibold text-slate-900 text-lg mb-1">
                   Plan Activo de la Compañía
                 </h3>
+
                 <p className="text-sm text-slate-600 mb-4">
-                  Plan Enterprise · Renovación: 15 Dic 2024
+                  {loadingPlan || !periodEnd
+                    ? "Cargando plan..."
+                    : `Renovación: ${new Date(periodEnd).toLocaleDateString(
+                        "es-CR",
+                        {
+                          timeZone: "America/Costa_Rica",
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                        },
+                      )}`}
                 </p>
               </div>
+
               <div className="p-2 bg-blue-100 rounded-lg">
                 <Zap size={24} className="text-blue-600" />
               </div>
@@ -100,19 +142,16 @@ export const RecentlyViewed: React.FC<RecentlyViewedProps> = ({
                 <span className="text-sm text-slate-600">
                   Perfiles restantes
                 </span>
-                <span className="font-semibold text-slate-900">48/120</span>
+                <span className="font-semibold text-slate-900">
+                  {loadingPlan ? "--" : `${remaining}/${maxViews}`}
+                </span>
               </div>
+
               <div className="w-full bg-blue-200 rounded-full h-2">
                 <div
-                  className="bg-blue-600 h-2 rounded-full"
-                  style={{ width: "40%" }}
-                ></div>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-slate-600">
-                  Búsquedas activas
-                </span>
-                <span className="font-semibold text-slate-900">7</span>
+                  className="bg-blue-600 h-2 rounded-full transition-all"
+                  style={{ width: `${percentage}%` }}
+                />
               </div>
             </div>
 

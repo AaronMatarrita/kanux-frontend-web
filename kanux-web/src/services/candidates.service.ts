@@ -44,7 +44,6 @@ export interface PaginationMeta {
   totalPages: number;
 }
 
-
 export interface CandidatesFilter {
   skills?: string[];
   background?: string;
@@ -58,9 +57,8 @@ interface CandidateRawApiResponse {
   talent_id: string;
   talent_profile: CandidateProfile;
   skills: Skill[];
-  avg_score: number; 
+  avg_score: number;
 }
-
 
 export interface CandidateListItem {
   talent_id: string;
@@ -72,7 +70,6 @@ export interface CandidateListItem {
   profile: CandidateProfile;
   avg_score: number;
 }
-
 
 export type Skill = {
   id: string;
@@ -105,73 +102,37 @@ interface LearningBackgroundsApiResponse {
 }
 
 class CandidatesService {
-
-
   async getCandidatesFiltered(
-  token: string,
-  filters: {
-    searchText?: string;
-    skill?: string;
-    learningBackgroundId?: string;
-  },
-  page: number = 1,
-  pageSize: number = 10
-): Promise<{
-  candidates: CandidateListItem[];
-  pagination: PaginationMeta;
-}> {
-  const res = await httpClient.get<CandidatesApiResponse>(
-    "/companies/company/candidates/filter",
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      params: {
-        page,
-        pageSize,
-        search: filters.searchText || undefined,
-        skill: filters.skill || undefined,
-        learningBackgroundId : filters.learningBackgroundId || undefined,
-      },
-    }
-  );
-
-  return {
-    candidates: res.data.data.map((c) => ({
-      talent_id: c.talent_id,
-      first_name: c.talent_profile.first_name,
-      last_name: c.talent_profile.last_name,
-      title: c.talent_profile.title,
-      education: c.talent_profile.education,
-      skills: c.skills ?? [],
-      profile: c.talent_profile,
-      avg_score: c.avg_score,
-    })),
-    pagination: res.data.pagination,
-  };
-}
-
-async getTalentProfileSummary(
-  token: string,
-  compId: string,
-  talentProfileId: string
-): Promise<{
-  candidates: CandidateListItem[];
-}> {
-  const res = await httpClient.get(
-    `/companies/company/${compId}/${talentProfileId}/summary`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
-
-  const c = res.data;
-
-  return {
-    candidates: [
+    token: string,
+    filters: {
+      searchText?: string;
+      skill?: string;
+      learningBackgroundId?: string;
+    },
+    page: number = 1,
+    pageSize: number = 10,
+  ): Promise<{
+    candidates: CandidateListItem[];
+    pagination: PaginationMeta;
+  }> {
+    const res = await httpClient.get<CandidatesApiResponse>(
+      "/companies/company/candidates/filter",
       {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        params: {
+          page,
+          pageSize,
+          search: filters.searchText || undefined,
+          skill: filters.skill || undefined,
+          learningBackgroundId: filters.learningBackgroundId || undefined,
+        },
+      },
+    );
+
+    return {
+      candidates: res.data.data.map((c) => ({
         talent_id: c.talent_id,
         first_name: c.talent_profile.first_name,
         last_name: c.talent_profile.last_name,
@@ -180,25 +141,65 @@ async getTalentProfileSummary(
         skills: c.skills ?? [],
         profile: c.talent_profile,
         avg_score: c.avg_score,
-      },
-    ],
-  };
-}
+      })),
+      pagination: res.data.pagination,
+    };
+  }
 
-
-async  getLearningBackgrounds(token: string): Promise<LearningBackground[]> {
-  const res = await httpClient.get<LearningBackgroundsApiResponse>(
-    "/companies/company/candidates/learning-backgrounds",
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
+  async getTalentProfileSummary(
+    token: string,
+    compId: string,
+    talentProfileId: string,
+  ): Promise<{
+    candidates: CandidateListItem[];
+    limitReached?: boolean;
+  }> {
+    const res = await httpClient.get(
+      `/companies/company/${compId}/${talentProfileId}/summary`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       },
+    );
+
+    const c = res.data;
+
+    if (c.allowed === false) {
+      return {
+        candidates: [],
+        limitReached: true,
+      };
     }
-  );
 
-  return res.data.data;
-}
+    return {
+      candidates: [
+        {
+          talent_id: c.talent_id,
+          first_name: c.talent_profile.first_name,
+          last_name: c.talent_profile.last_name,
+          title: c.talent_profile.title,
+          education: c.talent_profile.education,
+          skills: c.skills ?? [],
+          profile: c.talent_profile,
+          avg_score: c.avg_score,
+        },
+      ],
+    };
+  }
 
+  async getLearningBackgrounds(token: string): Promise<LearningBackground[]> {
+    const res = await httpClient.get<LearningBackgroundsApiResponse>(
+      "/companies/company/candidates/learning-backgrounds",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+
+    return res.data.data;
+  }
 
   async getCandidatesDash(token: string): Promise<CandidateListItem[]> {
     const res = await httpClient.get<{ data: CandidateRawApiDash[] }>(

@@ -8,7 +8,7 @@ import {
 } from "@/services/candidates.service";
 import { useAuth } from "@/context/AuthContext";
 
-import { useEffect, ReactNode, useState } from "react";
+import { useEffect, ReactNode, useState, useRef } from "react";
 import { LucideIcon } from "lucide-react";
 import Image from "next/image";
 import { DashboardErrorState } from "../dashboard/DashboardErrorState";
@@ -35,11 +35,16 @@ export const CandidateProfileDetails: React.FC<
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [retrying, setRetrying] = useState(false);
+  const [limitReached, setLimitReached] = useState(false);
+
+  const didFetchRef = useRef(false);
 
   const loadCandidate = async (isRetry = false) => {
     if (!session?.token) return;
 
     setError(false);
+    setLimitReached(false);
+
     setLoading(!isRetry);
     setRetrying(isRetry);
 
@@ -49,6 +54,11 @@ export const CandidateProfileDetails: React.FC<
         compId,
         talentProfileId,
       );
+
+      if (res.limitReached) {
+        setLimitReached(true);
+        return;
+      }
 
       setCandidate(res.candidates[0] ?? null);
     } catch (err) {
@@ -61,6 +71,9 @@ export const CandidateProfileDetails: React.FC<
   };
 
   useEffect(() => {
+    if (didFetchRef.current) return;
+
+    didFetchRef.current = true;
     loadCandidate();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session?.token, compId, talentProfileId]);
@@ -81,6 +94,34 @@ export const CandidateProfileDetails: React.FC<
               <div className="mx-auto mb-3 h-10 w-10 animate-spin rounded-full border-2 border-slate-200 border-t-slate-600" />
               <p className="text-slate-500">Cargando perfil…</p>
             </div>
+          </div>
+        </SheetContent>
+      </Sheet>
+    );
+  }
+
+  if (limitReached) {
+    return (
+      <Sheet open onOpenChange={handleOpenChange}>
+        <SheetOverlay />
+        <SheetContent side="right" className="w-full max-w-md">
+          <div className="flex h-full flex-col items-center justify-center text-center p-8 space-y-6">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-amber-100">
+              <Globe className="h-8 w-8 text-amber-600" />
+            </div>
+
+            <h2 className="text-xl font-semibold text-slate-900">
+              Límite de vistas alcanzado
+            </h2>
+
+            <p className="text-slate-600 leading-relaxed">
+              Has alcanzado el límite de visualizaciones de perfiles permitido
+              por tu plan actual.
+              <br />
+              <span className="font-medium text-slate-800">
+                Actualiza tu suscripción para continuar.
+              </span>
+            </p>
           </div>
         </SheetContent>
       </Sheet>
