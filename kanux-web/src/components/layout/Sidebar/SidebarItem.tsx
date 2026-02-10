@@ -16,15 +16,15 @@ export const SidebarItem = ({ label, icon: Icon, href, active }: Props) => {
         "relative flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium w-full group overflow-hidden cursor-pointer",
         "transition-all duration-300 ease-out active:scale-[0.97]",
         active
-          ? "bg-sidebar-primary text-sidebar-primary-foreground"
-          : "text-sidebar-foreground hover:text-sidebar-primary",
+          ? "bg-emerald-500 text-white dark:text-emerald-950"
+          : "text-muted-foreground hover:text-foreground dark:text-sidebar-foreground dark:hover:text-emerald-600",
       )}
     >
       {/* Hover background */}
       {!active && (
         <span
           aria-hidden
-          className="absolute inset-0 bg-linear-to-r from-sidebar-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+          className="absolute inset-0 bg-linear-to-r from-emerald-500/12 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
         />
       )}
 
@@ -32,7 +32,7 @@ export const SidebarItem = ({ label, icon: Icon, href, active }: Props) => {
       <span
         aria-hidden
         className={cn(
-          "absolute left-0 top-1/2 -translate-y-1/2 w-1 rounded-full bg-sidebar-primary transition-all duration-300",
+          "absolute left-0 top-1/2 -translate-y-1/2 w-1 rounded-full bg-emerald-500 transition-all duration-300",
           active ? "h-6" : "h-0 group-hover:h-6",
         )}
       />
