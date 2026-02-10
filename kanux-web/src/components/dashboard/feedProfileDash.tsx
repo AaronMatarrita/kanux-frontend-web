@@ -146,7 +146,7 @@ export const Feed: React.FC<FeedProps> = ({ posts }) => {
                       {post.author?.name || "Anónimo"}
                     </h3>
                     {post.reactionsCount + post.commentsCount > 10 && (
-                      <span className="px-2.5 py-1 rounded-full bg-amber-100 text-amber-700 text-xs font-semibold">
+                      <span className="px-2.5 py-1 rounded-full bg-amber-100 text-amber-700 text-xs font-semibold dark:bg-amber-500/15 dark:text-amber-300">
                         Tendencia
                       </span>
                     )}
@@ -169,7 +169,7 @@ export const Feed: React.FC<FeedProps> = ({ posts }) => {
             <div className="flex flex-wrap items-center justify-between gap-4 border-t border-border/60 pt-4">
               <div className="flex items-center gap-6">
                 <div className="flex items-center gap-2">
-                  <div className="h-9 w-9 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center">
+                  <div className="h-9 w-9 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center dark:bg-rose-500/15 dark:text-rose-300">
                     <svg
                       className="h-4 w-4"
                       fill="currentColor"
@@ -191,7 +191,7 @@ export const Feed: React.FC<FeedProps> = ({ posts }) => {
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <div className="h-9 w-9 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+                  <div className="h-9 w-9 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center dark:bg-blue-500/15 dark:text-blue-300">
                     <svg
                       className="h-4 w-4"
                       fill="none"

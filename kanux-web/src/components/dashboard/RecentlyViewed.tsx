@@ -110,14 +110,14 @@ export const RecentlyViewed: React.FC<RecentlyViewedProps> = ({
 
       <CardContent>
         <div className="flex flex-col gap-6">
-          <div className="flex-1 bg-linear-to-br from-blue-50 to-indigo-50 border border-blue-100 rounded-xl p-5">
+          <div className="flex-1 bg-linear-to-br from-blue-50 to-indigo-50 border border-blue-100 rounded-xl p-5 dark:from-blue-950/40 dark:to-indigo-950/40 dark:border-blue-900/40">
             <div className="flex items-start justify-between mb-4">
               <div>
-                <h3 className="font-semibold text-slate-900 text-lg mb-1">
+                <h3 className="font-semibold text-foreground text-lg mb-1">
                   Plan Activo de la Compañía
                 </h3>
 
-                <p className="text-sm text-slate-600 mb-4">
+                <p className="text-sm text-muted-foreground mb-4">
                   {loadingPlan || !periodEnd
                     ? "Cargando plan..."
                     : `Renovación: ${new Date(periodEnd).toLocaleDateString(
@@ -132,24 +132,24 @@ export const RecentlyViewed: React.FC<RecentlyViewedProps> = ({
                 </p>
               </div>
 
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Zap size={24} className="text-blue-600" />
+              <div className="p-2 bg-blue-100 rounded-lg dark:bg-blue-900/40">
+                <Zap size={24} className="text-blue-600 dark:text-blue-300" />
               </div>
             </div>
 
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-slate-600">
+                <span className="text-sm text-muted-foreground">
                   Perfiles restantes
                 </span>
-                <span className="font-semibold text-slate-900">
+                <span className="font-semibold text-foreground">
                   {loadingPlan ? "--" : `${remaining}/${maxViews}`}
                 </span>
               </div>
 
-              <div className="w-full bg-blue-200 rounded-full h-2">
+              <div className="w-full bg-blue-200 rounded-full h-2 dark:bg-blue-900/60">
                 <div
-                  className="bg-blue-600 h-2 rounded-full transition-all"
+                  className="bg-blue-600 h-2 rounded-full transition-all dark:bg-blue-400"
                   style={{ width: `${percentage}%` }}
                 />
               </div>
@@ -157,43 +157,46 @@ export const RecentlyViewed: React.FC<RecentlyViewedProps> = ({
 
             <button
               onClick={handleManagePlan}
-              className="mt-5 w-full rounded-lg border border-blue-200 bg-white py-2.5 text-sm font-medium text-blue-700 transition-all hover:border-blue-300 hover:bg-blue-100 cursor-pointer"
+              className="mt-5 w-full rounded-lg border border-blue-200 bg-white py-2.5 text-sm font-medium text-blue-700 transition-all hover:border-blue-300 hover:bg-blue-100 cursor-pointer dark:border-blue-900/60 dark:bg-blue-950/30 dark:text-blue-200 dark:hover:bg-blue-900/40"
             >
               Gestionar Plan
             </button>
           </div>
 
-          <div className="flex-1 bg-linear-to-br from-emerald-50 to-green-50 border border-emerald-100 rounded-xl p-5">
+          <div className="flex-1 bg-linear-to-br from-emerald-50 to-green-50 border border-emerald-100 rounded-xl p-5 dark:from-emerald-950/40 dark:to-green-950/40 dark:border-emerald-900/40">
             <div className="flex items-start justify-between mb-4">
               <div>
-                <h3 className="font-semibold text-slate-900 text-lg mb-1">
+                <h3 className="font-semibold text-foreground text-lg mb-1">
                   Crear Desafíos para Cazar Talentos
                 </h3>
-                <p className="text-sm text-slate-600 mb-4">
+                <p className="text-sm text-muted-foreground mb-4">
                   Atrae talento de alto potencial con retos específicos
                 </p>
               </div>
-              <div className="p-2 bg-emerald-100 rounded-lg">
-                <Trophy size={24} className="text-emerald-600" />
+              <div className="p-2 bg-emerald-100 rounded-lg dark:bg-emerald-900/40">
+                <Trophy
+                  size={24}
+                  className="text-emerald-600 dark:text-emerald-300"
+                />
               </div>
             </div>
 
             <div className="space-y-4 mb-5">
               <div className="flex items-center gap-3">
                 <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
-                <span className="text-sm text-slate-700">
+                <span className="text-sm text-foreground">
                   Evalúa habilidades técnicas en escenarios reales
                 </span>
               </div>
               <div className="flex items-center gap-3">
                 <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
-                <span className="text-sm text-slate-700">
+                <span className="text-sm text-foreground">
                   Identifica a los mejores candidatos mediante competencias
                 </span>
               </div>
               <div className="flex items-center gap-3">
                 <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
-                <span className="text-sm text-slate-700">
+                <span className="text-sm text-foreground">
                   Reduce tiempo de contratación hasta un 40%
                 </span>
               </div>
@@ -201,7 +204,7 @@ export const RecentlyViewed: React.FC<RecentlyViewedProps> = ({
 
             <button
               onClick={handleCreateChallenge}
-              className="w-full rounded-lg bg-emerald-600 py-2.5 text-sm font-medium text-white transition-all hover:bg-emerald-700 hover:shadow-sm flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full rounded-lg bg-emerald-600 py-2.5 text-sm font-medium text-white transition-all hover:bg-emerald-700 hover:shadow-sm flex items-center justify-center gap-2 cursor-pointer dark:bg-emerald-500 dark:hover:bg-emerald-600"
             >
               Crear Desafío Personalizado
               <ArrowRight size={16} />

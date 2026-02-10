@@ -73,18 +73,18 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
       />
 
       <aside
-        className={`fixed left-0 top-0 z-50 h-screen w-72 bg-white border-r border-slate-200 flex flex-col transition-transform duration-300 ease-in-out ${
+        className={`fixed left-0 top-0 z-50 h-screen w-72 bg-sidebar border-r border-sidebar-border flex flex-col transition-transform duration-300 ease-in-out ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         {/* Logo */}
-        <div className="h-16 flex items-center px-6 border-b border-slate-200">
+        <div className="h-16 flex items-center px-6 border-b border-sidebar-border">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/brand/kanux-logo-sidebar.svg" alt="Kanux" />
         </div>
 
         {/* Section title */}
-        <div className="px-6 pt-6 pb-2 text-xs font-semibold tracking-wide text-slate-500 uppercase">
+        <div className="px-6 pt-6 pb-2 text-xs font-semibold tracking-wide text-sidebar-foreground/60 uppercase">
           Pages
         </div>
 

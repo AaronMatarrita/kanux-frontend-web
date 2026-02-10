@@ -31,13 +31,13 @@ export const RecommendedChallenges: React.FC<RecommendedChallengesProps> = ({
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
       case "Básico":
-        return "bg-emerald-50 text-emerald-700 border border-emerald-200";
+        return "bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-300 dark:border-emerald-500/30";
       case "Intermedio":
-        return "bg-amber-50 text-amber-700 border border-amber-200";
+        return "bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-500/15 dark:text-amber-300 dark:border-amber-500/30";
       case "Avanzado":
-        return "bg-rose-50 text-rose-700 border border-rose-200";
+        return "bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-500/15 dark:text-rose-300 dark:border-rose-500/30";
       default:
-        return "bg-slate-50 text-slate-700 border border-slate-200";
+        return "bg-slate-50 text-slate-700 border border-slate-200 dark:bg-slate-500/15 dark:text-slate-300 dark:border-slate-500/30";
     }
   };
 
