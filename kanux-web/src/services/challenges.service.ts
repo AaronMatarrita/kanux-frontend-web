@@ -1,0 +1,572 @@
+/**
+ * Challenges Service
+ * Access layer for challenges microservice (ms-challenges)
+ *
+ * All requests are proxied through API Gateway at /challenges
+ */
+
+import { httpClient } from "@/services/http";
+import { CreateSoftChallengeDto } from "@/modules/challenges/types/challenge";
+
+// ============================================================================
+// Request DTOs
+// ============================================================================
+
+export interface SubmitSoftChallengeRequest {
+  id_profile: string;
+  answers: Array<{
+    question_id: string;
+    selected_option_id: string;
+  }>;
+}
+
+export interface SubmitTechnicalChallengeRequest {
+  programming_language: string;
+  source_code: string;
+}
+
+export interface EvaluateChallengeRequest {
+  [key: string]: unknown;
+}
+
+// ============================================================================
+// Response DTOs
+// ============================================================================
+
+export interface Challenge {
+  id: string;
+  title: string;
+  description?: string;
+  type?: string;
+  difficulty?: string;
+  [key: string]: unknown;
+}
+
+export interface ChallengeMetrics {
+  total_submissions: number;
+  average_score: number;
+}
+
+export interface PublicTechnicalChallenge extends Challenge {
+  metrics?: ChallengeMetrics;
+}
+
+export interface SoftChallenge {
+  id: string;
+  title: string;
+  description: string;
+  type?: string;
+  difficulty: string;
+  duration_minutes: number;
+  created_at: string;
+  company: {
+    name: string;
+  };
+  non_technical_challenges: {
+    id: string;
+    instructions: string;
+    non_technical_questions: {
+      id: string;
+      question: string;
+      question_type: string;
+      non_technical_question_options: {
+        id: string;
+        option_text: string;
+        is_correct?: boolean;
+      }[];
+    }[];
+  }[];
+}
+
+export interface ChallengeListResponse {
+  data: Challenge[];
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    lastPage: number;
+  };
+}
+
+export interface ChallengeSubmissionResponse {
+  submission_id: string;
+  score: number;
+  total_questions: number;
+  correct_answers: number;
+  feedback: string;
+}
+
+export interface TechnicalChallengeStartResponse {
+  submission_id: string;
+  status: "started" | "submitted";
+}
+
+export interface TechnicalChallengeSubmitResponse {
+  submission_id: string;
+  status: string;
+}
+
+export interface TechnicalChallengeResultResponse {
+  submission_id: string;
+  status: string;
+  score: number;
+  challenge?: {
+    id: string;
+    title: string;
+    difficulty: string;
+  };
+  feedback?: ChallengeFeedbackWrapper | ChallengeFeedbackPayload | string;
+  submitted_at?: string;
+  feedback_generated_at?: string;
+}
+
+export interface ChallengeFeedbackPayload {
+  type?: string;
+  title?: string;
+  summary?: string;
+  final_score?: number;
+  score_breakdown?: Record<string, number>;
+  strengths?: string[];
+  areas_for_improvement?: string[];
+  next_steps?: string[];
+  answers_overview?: {
+    total?: number;
+    correct?: number;
+    incorrect?: number;
+  };
+  per_question_feedback?: Array<{
+    question_id?: string;
+    correct?: boolean;
+    explanation?: string;
+  }>;
+  tests?: Record<string, unknown>;
+  code_quality?: Record<string, number>;
+  tags?: string[];
+  markdown?: string;
+}
+
+export interface ChallengeFeedbackWrapper {
+  id?: string;
+  submission_id?: string;
+  feedback?: ChallengeFeedbackPayload | string;
+  created_at?: string;
+}
+
+export interface ChallengeLatestFeedbackResponse {
+  success: boolean;
+  data: ChallengeFeedbackWrapper;
+}
+
+export type ChallengeSubmissionsResponse = Array<{
+  submission_id: string;
+  challenge: {
+    id: string;
+    title: string;
+    type: string;
+    difficulty: string;
+    description?: string;
+    duration_minutes?: number;
+  };
+  score: number;
+  status: string;
+  evaluation_type?: string;
+  submitted_at: string;
+}>;
+
+export interface ChallengeHistoryResponse {
+  message: string;
+  data: ChallengeSubmissionsResponse;
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    total_pages: number;
+  };
+}
+
+export interface PublicTechnicalChallengesResponse {
+  data: PublicTechnicalChallenge[];
+  meta: {
+    total_records: number;
+    current_page: number;
+    limit: number;
+    total_pages: number;
+  };
+}
+
+export interface PublicTechnicalChallengeDetailResponse {
+  data: PublicTechnicalChallenge;
+  assets: {
+    challenge: unknown;
+    test_cases: unknown;
+  };
+}
+
+export interface TechnicalChallengeExecutionRequest {
+  code: string;
+  language?: "javascript" | "typescript";
+  userId?: string;
+}
+
+export interface TechnicalChallengeExecutionResult {
+  status: "ok" | "error";
+  results?: Array<{
+    id: string | number;
+    description?: string;
+    pass: boolean;
+    expected: unknown;
+    output: unknown;
+    durationMs: number;
+    error?: string;
+  }>;
+  logs?: string;
+  error?: string;
+  exitCode?: number;
+}
+
+// ============================================================================
+// Service
+// ============================================================================
+
+export const challengesService = {
+  // ========== Soft Challenges ==========
+
+  /**
+   * GET /challenges/soft-challenges?page=1&limit=10
+   */
+  listSoftChallenges: async (
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<ChallengeListResponse> => {
+    const res = await httpClient.get<ChallengeListResponse>(
+      "/challenges/soft-challenges",
+      { params: { page, limit } },
+    );
+    return res.data;
+  },
+
+  /**
+   * GET /challenges/soft-challenges/:id
+   */
+  getSoftChallenge: async (id: string): Promise<SoftChallenge> => {
+    const res = await httpClient.get<SoftChallenge>(
+      `/challenges/soft-challenges/${id}`,
+    );
+    return res.data;
+  },
+
+  /**
+   * POST /challenges/soft-challenges/:id/submit
+   */
+  submitSoftChallenge: async (
+    id: string,
+    data: SubmitSoftChallengeRequest,
+  ): Promise<ChallengeSubmissionResponse> => {
+    const res = await httpClient.post<ChallengeSubmissionResponse>(
+      `/challenges/soft-challenges/${id}/submit`,
+      data,
+    );
+    return res.data;
+  },
+
+  // ========== Technical Challenges ==========
+
+  /**
+   * POST /challenges/technical-challenges/:challengeId/start
+   */
+  startTechnicalChallenge: async (
+    challengeId: string,
+  ): Promise<TechnicalChallengeStartResponse> => {
+    const res = await httpClient.post<{
+      message: string;
+      data: TechnicalChallengeStartResponse;
+    }>(`/challenges/technical-challenges/${challengeId}/start`, {});
+    return res.data.data;
+  },
+
+  /**
+   * POST /challenges/technical-challenges/:submissionId/submit
+   * @param submissionId - ID de la submission (va en la URL)
+   * @param data - { programming_language, source_code }
+   */
+  submitTechnicalChallenge: async (
+    submissionId: string,
+    data: SubmitTechnicalChallengeRequest,
+  ): Promise<TechnicalChallengeSubmitResponse> => {
+    const res = await httpClient.post<{
+      message: string;
+      data: TechnicalChallengeSubmitResponse;
+    }>(`/challenges/technical-challenges/${submissionId}/submit`, data);
+    return res.data.data;
+  },
+
+  /**
+   * GET /challenges/technical-challenges/:submissionId/result
+   * Retrieves the evaluated result including AI feedback (if available).
+   */
+  getTechnicalChallengeResult: async (
+    submissionId: string,
+  ): Promise<TechnicalChallengeResultResponse> => {
+    const res = await httpClient.get<{
+      message: string;
+      data: TechnicalChallengeResultResponse;
+    }>(`/challenges/technical-challenges/${submissionId}/result`);
+    console.log("Raw API response for challenge result =", res.data);
+    return res.data.data;
+  },
+
+  /**
+   * GET /challenges/feedback/:submissionId/latest
+   */
+  getLatestChallengeFeedback: async (
+    submissionId: string,
+  ): Promise<ChallengeFeedbackWrapper> => {
+    const res = await httpClient.get<ChallengeLatestFeedbackResponse>(
+      `/challenges/feedback/${submissionId}/latest`,
+    );
+    return res.data.data;
+  },
+
+  /**
+   * GET /challenges/history/my
+   */
+  getMyChallengeHistory: async (): Promise<ChallengeSubmissionsResponse> => {
+    const res = await httpClient.get<ChallengeHistoryResponse>(
+      "/challenges/history/my",
+    );
+    return res.data.data;
+  },
+
+  // ========== General Challenges ==========
+
+  /**
+   * GET /challenges/challenges?page=1&limit=10
+   */
+  listChallenges: async (
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<ChallengeListResponse> => {
+    const res = await httpClient.get<ChallengeListResponse>(
+      "/challenges/challenges",
+      { params: { page, limit } },
+    );
+    return res.data;
+  },
+
+  /**
+   * GET /challenges/challenges/:id_company?page=1&limit=10
+   */
+  getChallengesByCompany: async (
+    companyId: string,
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<ChallengeListResponse> => {
+    const res = await httpClient.get<ChallengeListResponse>(
+      `/challenges/company/${companyId}`,
+      { params: { page, limit } },
+    );
+    return res.data;
+  },
+
+  /**
+   * GET /challenges/challenges/:id_challenge/submissions/:id_company
+   */
+  getSubmissionsByChallenge: async (
+    challengeId: string,
+    companyId: string,
+  ): Promise<ChallengeSubmissionsResponse> => {
+    const res = await httpClient.get<ChallengeSubmissionsResponse>(
+      `/challenges/${challengeId}/submissions/${companyId}`,
+    );
+    return res.data;
+  },
+
+  /**
+   * POST /challenges/internal/technical-challenges/:challengeId/execute
+   * Proxy to ms-runner through ms-challenges. Executes code against test cases.
+   */
+  executeTechnicalChallenge: async (
+    challengeId: string,
+    payload: TechnicalChallengeExecutionRequest,
+  ): Promise<TechnicalChallengeExecutionResult> => {
+    const { code, language, userId } = payload;
+    const runnerAuthToken = process.env.NEXT_PUBLIC_RUNNER_AUTH_TOKEN;
+    const runnerInternalToken = process.env.NEXT_PUBLIC_RUNNER_INTERNAL_TOKEN;
+    const res = await httpClient.post<{
+      message: string;
+      data: TechnicalChallengeExecutionResult;
+    }>(
+      `/challenges/internal/technical-challenges/${challengeId}/execute`,
+      {
+        source_code: code,
+        programming_language: language,
+        user_id: userId,
+      },
+      {
+        headers: {
+          ...(runnerAuthToken ? { "x-runner-token": runnerAuthToken } : {}),
+          ...(runnerInternalToken
+            ? { "x-internal-token": runnerInternalToken }
+            : {}),
+        },
+      },
+    );
+    // ms-challenges wraps runner response in { message, data: {...} }
+    return res.data.data || res.data;
+  },
+
+  /**
+   * POST /challenges/submissions/:id_submission/evaluate
+   */
+  evaluateChallenge: async (
+    submissionId: string,
+    data: EvaluateChallengeRequest,
+  ): Promise<{ success: boolean }> => {
+    const res = await httpClient.post<{ success: boolean }>(
+      `/challenges/submissions/${submissionId}/evaluate`,
+      data,
+    );
+    return res.data;
+  },
+
+  // ========== Public Technical Challenges ==========
+
+  /**
+   * GET /challenges/public/technical?page=1&limit=10
+   * Public listing filtered to technical challenges only.
+   */
+  listPublicTechnicalChallenges: async (
+    page: number = 1,
+    limit: number = 1,
+  ): Promise<PublicTechnicalChallengesResponse> => {
+    const res = await httpClient.get<PublicTechnicalChallengesResponse>(
+      "/challenges/technical-challenges/public",
+      { params: { page, limit } },
+    );
+    return res.data;
+  },
+
+  /**
+   * GET /challenges/public/technical/:challengeId
+   * Returns challenge metadata plus bundled assets (challenge + test_cases).
+   */
+  getPublicTechnicalChallengeDetail: async (
+    challengeId: string,
+  ): Promise<PublicTechnicalChallengeDetailResponse> => {
+    const res = await httpClient.get<PublicTechnicalChallengeDetailResponse>(
+      `/challenges/technical-challenges/public/${challengeId}`,
+    );
+    return res.data;
+  },
+
+  /**
+   * POST /challenges/company/:id_company
+   * Create non-technical (soft) challenge
+   */
+  createSoftChallenge: async (
+    companyId: string,
+    payload: CreateSoftChallengeDto,
+  ) => {
+    const res = await httpClient.post(
+      `/challenges/company/${companyId}`,
+      payload,
+    );
+    return res.data;
+  },
+
+  /**
+   * PATCH /challenges/:challengeId
+   */
+  updateChallengeBase: async (
+    challengeId: string,
+    data: Partial<{
+      title: string;
+      description: string;
+      difficulty: string;
+      duration_minutes: number;
+    }>,
+    companyId?: string,
+  ) => {
+    const url = companyId
+      ? `/challenges/${challengeId}/company/${companyId}`
+      : `/challenges/${challengeId}`;
+    const res = await httpClient.patch(url, data);
+    return res.data;
+  },
+
+  /**
+   * PATCH /challenges/:nonTechnicalChallengeId/non-technical/details
+   */
+  updateNonTechnicalDetails: async (
+    nonTechnicalChallengeId: string,
+    data: { instructions: string },
+    companyId?: string,
+  ) => {
+    const url = companyId
+      ? `/challenges/${nonTechnicalChallengeId}/company/${companyId}/non-technical/details`
+      : `/challenges/${nonTechnicalChallengeId}/non-technical/details`;
+    const res = await httpClient.patch(url, data);
+    return res.data;
+  },
+
+  /**
+   * PATCH /challenges/questions/:questionId
+   */
+  updateNonTechnicalQuestion: async (
+    questionId: string,
+    data: { question: string; question_type: string },
+    companyId?: string,
+  ) => {
+    const url = companyId
+      ? `/challenges/questions/${questionId}/company/${companyId}`
+      : `/challenges/questions/${questionId}`;
+    const res = await httpClient.patch(url, data);
+    return res.data;
+  },
+
+  /**
+   * POST /challenges/:challengeId/non-technical/:nonTechnicalChallengeId/questions
+   */
+  createNonTechnicalQuestion: async (
+    challengeId: string,
+    nonTechnicalChallengeId: string,
+    data: { question: string; question_type: string },
+    companyId?: string,
+  ) => {
+    const url = companyId
+      ? `/challenges/${challengeId}/company/${companyId}/non-technical/${nonTechnicalChallengeId}/questions`
+      : `/challenges/${challengeId}/non-technical/${nonTechnicalChallengeId}/questions`;
+    const res = await httpClient.post(url, data);
+    return res.data;
+  },
+
+  /**
+   * PATCH /challenges/options/:optionId
+   */
+  updateNonTechnicalOption: async (
+    optionId: string,
+    data: { option_text: string; is_correct: boolean },
+    companyId?: string,
+  ) => {
+    const url = companyId
+      ? `/challenges/options/${optionId}/company/${companyId}`
+      : `/challenges/options/${optionId}`;
+    const res = await httpClient.patch(url, data);
+    return res.data;
+  },
+
+  /**
+   * POST /challenges/questions/:questionId/options
+   */
+  createNonTechnicalOption: async (
+    questionId: string,
+    data: { option_text: string; is_correct: boolean },
+    companyId?: string,
+  ) => {
+    const url = companyId
+      ? `/challenges/questions/${questionId}/company/${companyId}/options`
+      : `/challenges/questions/${questionId}/options`;
+    const res = await httpClient.post(url, data);
+    return res.data;
+  },
+};

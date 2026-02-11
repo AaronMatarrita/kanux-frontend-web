@@ -1,0 +1,21 @@
+export function Badge({
+  children,
+  variant = "default",
+}: {
+  children: React.ReactNode;
+  variant?: "default" | "primary" | "outline";
+}) {
+  const variants = {
+    default: "bg-muted text-muted-foreground border border-border",
+    primary: "bg-emerald-500 text-white border border-emerald-600",
+    outline: "bg-transparent text-muted-foreground border border-border",
+  };
+
+  return (
+    <span
+      className={`inline-flex items-center px-3 py-1 rounded-md text-sm font-medium ${variants[variant]}`}
+    >
+      {children}
+    </span>
+  );
+}
