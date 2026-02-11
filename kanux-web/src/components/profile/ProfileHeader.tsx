@@ -17,13 +17,28 @@ export function ProfileHeader({
   email: string;
   location: string;
   contact: Record<string, unknown> | undefined;
-  avatar: string;
+  avatar: string | null | undefined;
   children?: React.ReactNode;
   progress: number;
 }) {
+  const initials = name
+    ?.trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((n) => n[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase()
+  console.log(initials,avatar)
   return (
     <div className="flex flex-wrap items-start gap-4">
-      <Avatar src={avatar} alt={name} size="xxlg" />
+      {!avatar || avatar === "" || avatar === "null" || avatar === "undefined"? (
+        <div className="w-50 h-50 rounded-full bg-linear-to-br from-sky-600 to-emerald-500 text-white flex items-center justify-center text-9xl font-semibold shadow-md">
+          {initials}
+        </div>
+      ) : (
+        <Avatar src={avatar} alt={name} size="xxlg" />
+      )}
 
       <div className="flex-1 mt-auto mb-auto">
         <h1 className="text-wrap text-2xl font-bold text-foreground">{name}</h1>
