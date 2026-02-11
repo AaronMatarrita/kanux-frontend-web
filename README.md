@@ -61,6 +61,9 @@ NEXT_PUBLIC_AUTH_DOMAIN=auth.kanux.com
 
 # Environment
 NODE_ENV=development
+
+# Socket connetion
+NEXT_PUBLIC_MESSAGES_WS_URL=http://localhost:3006/messages
 ```
 
 > **Note**: Variables starting with `NEXT_PUBLIC_` will be available on the client side.
