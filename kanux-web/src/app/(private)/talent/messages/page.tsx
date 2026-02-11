@@ -54,6 +54,11 @@ export default function Page() {
     session?.user.userType === "talent"
       ? (session?.user as any).profile?.full_name || "Talento"
       : (session?.user as any).profile?.name || "Empresa";
+
+  const userRole = session?.user.userType === "company" ? "company" : "talent";
+
+  console.log("Renderizando MessagesPage con userRole:", userRole);
+
   return (
     <div className="h-[calc(100vh-7rem)] flex flex-col">
       <MessagesLayout header={<MessagesHeader />}>
@@ -61,7 +66,7 @@ export default function Page() {
           conversations={conversations}
           loading={loading}
           error={error}
-          userRole="talent"
+          userRole={userRole}
           userPhoto={userPhoto}
           userName={userName}
         />
