@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback, useState } from "react";
 import {
   socketService,
   MessageReceivedPayload,
@@ -34,60 +34,79 @@ export function useWebSocket({
   enabled = true,
 }: UseWebSocketParams): UseWebSocketReturn {
   const { session } = useAuth();
+
   const hasJoinedRef = useRef(false);
   const currentConversationRef = useRef<string | null>(null);
-  const onMessageReceivedRef = useRef(onMessageReceived);
 
-  // Keep ref updated
+  const onMessageReceivedRef = useRef(onMessageReceived);
+  const onMessageErrorRef = useRef(onMessageError);
+  const onTypingRef = useRef(onTyping);
+  const onStopTypingRef = useRef(onStopTyping);
+
+  const [isConnected, setIsConnected] = useState(false);
+
   useEffect(() => {
     onMessageReceivedRef.current = onMessageReceived;
   }, [onMessageReceived]);
+
+  useEffect(() => {
+    onMessageErrorRef.current = onMessageError;
+  }, [onMessageError]);
+
+  useEffect(() => {
+    onTypingRef.current = onTyping;
+  }, [onTyping]);
+
+  useEffect(() => {
+    onStopTypingRef.current = onStopTyping;
+  }, [onStopTyping]);
 
   useEffect(() => {
     if (!enabled) return;
 
     const token = session?.token;
     if (!token) {
+      setIsConnected(false);
       return;
     }
 
-    if (!socketService.isConnected()) {
-      socketService.connect(token);
-    }
+    socketService.connect(token);
 
-    // Handle reconnection - rejoin conversation
     const socket = socketService.getSocket();
-    if (socket) {
-      const handleReconnect = () => {
-        console.log("WebSocket reconnected, rejoining conversation...");
-        hasJoinedRef.current = false;
-
-        if (currentConversationRef.current) {
-          socketService.joinConversation(currentConversationRef.current);
-          hasJoinedRef.current = true;
-          console.log(
-            `Rejoined conversation: ${currentConversationRef.current}`,
-          );
-        }
-      };
-
-      socket.on("connect", handleReconnect);
-
-      return () => {
-        socket.off("connect", handleReconnect);
-      };
+    if (!socket) {
+      setIsConnected(false);
+      return;
     }
 
-    return () => {};
+    const handleConnect = () => {
+      setIsConnected(true);
+
+      hasJoinedRef.current = false;
+
+      if (currentConversationRef.current) {
+        socketService.joinConversation(currentConversationRef.current);
+        hasJoinedRef.current = true;
+      }
+    };
+
+    const handleDisconnect = () => {
+      setIsConnected(false);
+      hasJoinedRef.current = false;
+    };
+
+    socket.on("connect", handleConnect);
+    socket.on("disconnect", handleDisconnect);
+
+    setIsConnected(socket.connected);
+
+    return () => {
+      socket.off("connect", handleConnect);
+      socket.off("disconnect", handleDisconnect);
+    };
   }, [enabled, session?.token]);
 
-  /**
-   * Listen for incoming messages - uses ref to avoid re-registering
-   */
   useEffect(() => {
-    if (!enabled || !socketService.isConnected()) {
-      return;
-    }
+    if (!enabled || !isConnected) return;
 
     const cleanup = socketService.onMessageReceived(
       (payload: MessageReceivedPayload) => {
@@ -104,17 +123,40 @@ export function useWebSocket({
     );
 
     return cleanup;
-  }, [enabled, session?.token]);
+  }, [enabled, isConnected]);
 
-  /**
-   * Join/Leave conversation rooms
-   */
   useEffect(() => {
-    if (!enabled || !conversationId || !socketService.isConnected()) {
-      return;
-    }
+    if (!enabled || !isConnected) return;
 
-    // Leave previous conversation if different
+    const handler = (err: any) => onMessageErrorRef.current?.(err);
+    const cleanup = socketService.onMessageError(handler);
+
+    return cleanup;
+  }, [enabled, isConnected]);
+
+  useEffect(() => {
+    if (!enabled || !isConnected) return;
+
+    const cleanup = socketService.onUserTyping((payload) => {
+      onTypingRef.current?.(payload.userId);
+    });
+
+    return cleanup;
+  }, [enabled, isConnected]);
+
+  useEffect(() => {
+    if (!enabled || !isConnected) return;
+
+    const cleanup = socketService.onUserStopTyping((payload) => {
+      onStopTypingRef.current?.(payload.userId);
+    });
+
+    return cleanup;
+  }, [enabled, isConnected]);
+
+  useEffect(() => {
+    if (!enabled || !conversationId || !isConnected) return;
+
     if (
       currentConversationRef.current &&
       currentConversationRef.current !== conversationId
@@ -123,64 +165,21 @@ export function useWebSocket({
       hasJoinedRef.current = false;
     }
 
-    // Join new conversation
     if (!hasJoinedRef.current) {
       socketService.joinConversation(conversationId);
       currentConversationRef.current = conversationId;
       hasJoinedRef.current = true;
-
-      console.log(`Joined conversation: ${conversationId}`);
     }
 
     return () => {
-      if (conversationId && hasJoinedRef.current) {
-        socketService.leaveConversation(conversationId);
-        hasJoinedRef.current = false;
-        currentConversationRef.current = null;
+      if (currentConversationRef.current) {
+        socketService.leaveConversation(currentConversationRef.current);
       }
+      hasJoinedRef.current = false;
+      currentConversationRef.current = null;
     };
-  }, [conversationId, enabled]);
+  }, [conversationId, enabled, isConnected]);
 
-  /**
-   * Listen for message errors
-   */
-  useEffect(() => {
-    if (!enabled || !onMessageError || !socketService.isConnected()) return;
-
-    const cleanup = socketService.onMessageError(onMessageError);
-
-    return cleanup;
-  }, [enabled, onMessageError, session?.token]);
-
-  /**
-   * Listen for typing events
-   */
-  useEffect(() => {
-    if (!enabled || !onTyping || !socketService.isConnected()) return;
-
-    const cleanup = socketService.onUserTyping((payload) => {
-      onTyping(payload.userId);
-    });
-
-    return cleanup;
-  }, [enabled, onTyping, session?.token]);
-
-  /**
-   * Listen for stop typing events
-   */
-  useEffect(() => {
-    if (!enabled || !onStopTyping || !socketService.isConnected()) return;
-
-    const cleanup = socketService.onUserStopTyping((payload) => {
-      onStopTyping(payload.userId);
-    });
-
-    return cleanup;
-  }, [enabled, onStopTyping, session?.token]);
-
-  /**
-   * Send message through WebSocket
-   */
   const sendMessage = useCallback(
     async (
       content: string,
@@ -203,10 +202,7 @@ export function useWebSocket({
           },
           (response: SendMessageResponse) => {
             if (response.success) {
-              resolve({
-                success: true,
-                messageId: response.messageId,
-              });
+              resolve({ success: true, messageId: response.messageId });
             } else {
               reject(new Error(response.message || "Failed to send message"));
             }
@@ -217,9 +213,6 @@ export function useWebSocket({
     [conversationId],
   );
 
-  /**
-   * Emit typing indicator
-   */
   const emitTyping = useCallback(() => {
     if (!conversationId || !socketService.isConnected()) return;
 
@@ -227,9 +220,6 @@ export function useWebSocket({
     socketService.emitUserTyping(conversationId, userId);
   }, [conversationId]);
 
-  /**
-   * Emit stop typing indicator
-   */
   const emitStopTyping = useCallback(() => {
     if (!conversationId || !socketService.isConnected()) return;
 
@@ -241,6 +231,6 @@ export function useWebSocket({
     sendMessage,
     emitTyping,
     emitStopTyping,
-    isConnected: socketService.isConnected(),
+    isConnected,
   };
 }
